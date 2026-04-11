@@ -508,25 +508,22 @@ function POSContent() {
                 </nav>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
-                <div className="lg:col-span-8 space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
+                <div className="lg:col-span-8 space-y-4 max-h-[calc(100vh-220px)] overflow-y-auto pr-2 custom-scrollbar">
                     <div className="relative group">
                         <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
                         <input type="text" placeholder="BUSCAR PRODUCTO..." className="w-full bg-white border-2 border-slate-100 rounded-[2rem] md:rounded-3xl py-4 md:py-5 pl-14 md:pl-16 pr-8 text-sm md:text-md font-bold text-slate-900 placeholder:text-slate-300 transition-all outline-none focus:border-rodrigo-mustard/30 shadow-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
                         {productosFiltrados.map((producto) => (
                             <motion.button
                                 key={producto.id}
                                 onClick={() => handleProductClick(producto)}
-                                className="group bg-white p-4 md:p-5 rounded-[1.5rem] md:rounded-4xl border-2 border-slate-100 shadow-sm hover:border-rodrigo-mustard/30 hover:shadow-xl transition-all text-left flex flex-col items-center"
+                                className="group bg-white p-3 rounded-2xl border border-slate-100 shadow-sm hover:border-rodrigo-terracotta/30 hover:shadow-md transition-all text-center"
                             >
-                                <div className="w-14 h-14 md:w-20 md:h-20 bg-slate-50 rounded-2xl flex items-center justify-center mb-3 md:mb-4 group-hover:scale-110 transition-transform">
-                                    <UtensilsCrossed size={24} className="md:w-8 md:h-8 text-slate-300 group-hover:text-rodrigo-terracotta" />
-                                </div>
-                                <h3 className="text-[10px] md:text-sm font-black text-slate-900 uppercase italic tracking-tight text-center leading-tight line-clamp-2">{producto.nombre}</h3>
-                                <p className="text-[11px] md:text-xs font-black text-rodrigo-terracotta mt-1 md:mt-2 italic">S/ {producto.precio.toFixed(2)}</p>
+                                <h3 className="text-[10px] font-bold text-slate-900 uppercase italic tracking-tight leading-tight line-clamp-2">{producto.nombre}</h3>
+                                <p className="text-sm font-black text-rodrigo-terracotta mt-1 italic">S/ {producto.precio.toFixed(2)}</p>
                             </motion.button>
                         ))}
                     </div>
