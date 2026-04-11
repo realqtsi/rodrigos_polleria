@@ -18,7 +18,7 @@ export interface AuthUser {
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     admin: ['dashboard', 'apertura', 'pos', 'mesas', 'cocina', 'ventas', 'inventario', 'reportes', 'cierre', 'gastos', 'configuracion', 'delivery'],
     cajero: ['dashboard', 'apertura', 'pos', 'mesas', 'cocina', 'ventas', 'inventario', 'reportes', 'cierre', 'gastos', 'configuracion'],
-    mozo: ['pos', 'mesas', 'cocina'],
+    mozo: ['dashboard', 'pos', 'mesas', 'cocina', 'ventas', 'delivery'],
     cocinero: ['cocina'],
     repartidor: ['delivery']
 };

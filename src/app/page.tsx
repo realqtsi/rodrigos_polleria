@@ -89,9 +89,11 @@ function DashboardContent() {
           <Link href="/reportes" className="flex-1 md:flex-none px-4 py-2.5 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all flex items-center justify-center gap-2 border border-slate-200">
             <BarChart3 size={14} /> <span className="hidden sm:inline">Reporte</span>
           </Link>
-          <button onClick={() => setShowAdminAjusteModal(true)} className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center hover:bg-black transition-all shadow-lg shadow-black/20 shrink-0">
-            <TrendingUp size={18} />
-          </button>
+          {(user?.rol === 'admin' || user?.rol === 'cajero') && (
+            <button onClick={() => setShowAdminAjusteModal(true)} className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center hover:bg-black transition-all shadow-lg shadow-black/20 shrink-0">
+              <TrendingUp size={18} />
+            </button>
+          )}
         </div>
       </header>
 
@@ -115,11 +117,11 @@ function DashboardContent() {
       {/* MÉTRICAS (Adaptable Grid) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {[
-          { label: 'Ingresos Totales', value: `S/ ${metricas.totalIngresos.toFixed(2)}`, icon: Wallet, colorClass: 'metric-icon-income', trend: 'Hoy' },
+          { label: 'Ingresos Totales', value: `S/ ${metricas.totalIngresos.toFixed(2)}`, icon: Wallet, colorClass: 'metric-icon-income', trend: 'Hoy', adminOnly: true },
           { label: 'Pedidos Totales', value: String(metricas.cantidadPedidos), icon: ShoppingCart, colorClass: 'metric-icon-orders', trend: 'Procesados' },
-          { label: 'Ticket Promedio', value: `S/ ${metricas.promedioPorPedido.toFixed(2)}`, icon: Receipt, colorClass: 'metric-icon-avg', trend: 'Pedido' },
+          { label: 'Ticket Promedio', value: `S/ ${metricas.promedioPorPedido.toFixed(2)}`, icon: Receipt, colorClass: 'metric-icon-avg', trend: 'Pedido', adminOnly: true },
           { label: 'Pollos Vendidos', value: formatearFraccionPollo(metricas.pollosVendidos), icon: Package, colorClass: 'metric-icon-sold', trend: 'Consumo' },
-        ].map((m, i) => (
+        ].filter(m => !m.adminOnly || (user?.rol === 'admin' || user?.rol === 'cajero')).map((m, i) => (
           <motion.div key={m.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
             className="glass-card p-5 md:p-6 border shadow-sm hover:shadow-xl transition-all group overflow-hidden relative min-h-[140px] md:min-h-0">
             <div className="absolute top-0 right-0 w-20 h-20 md:w-24 md:h-24 opacity-[0.02] transform translate-x-8 -translate-y-8 group-hover:scale-110 transition-transform">
@@ -138,7 +140,7 @@ function DashboardContent() {
       </div>
 
       {/* DISTRIBUCIÓN POR MÉTODO DE PAGO (Dense Grid) */}
-      {stock && (
+      {(user?.rol === 'admin' || user?.rol === 'cajero') && stock && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {[
             { label: 'Efectivo', monto: (stock.dinero_inicial || 0) + (montosPorMetodo['efectivo'] || 0) - getGM('efectivo'), icon: '/images/cash-icon.png' },
@@ -245,10 +247,12 @@ function DashboardContent() {
                     <div className="flex-1">
                       <div className="flex justify-between items-end mb-2">
                         <span className="text-sm font-black text-slate-700 uppercase italic">{p.nombre}</span>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-[10px] font-black text-slate-300">S/</span>
-                          <span className="text-sm font-black text-slate-900">{(p.ingresos).toFixed(2)}</span>
-                        </div>
+                        {(user?.rol === 'admin' || user?.rol === 'cajero') && (
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-[10px] font-black text-slate-300">S/</span>
+                            <span className="text-sm font-black text-slate-900">{(p.ingresos).toFixed(2)}</span>
+                          </div>
+                        )}
                       </div>
                       <div className="h-2 bg-slate-50 rounded-full overflow-hidden border border-slate-100/50">
                         <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} className={`h-full rounded-full ${colors[i % colors.length]}`} />
