@@ -66,9 +66,12 @@ function POSContent() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [showReceipt, setShowReceipt] = useState(false);
-    const [receiptTitle, setReceiptTitle] = useState('BOLETA DE VENTA');
+    const [receiptTitle, setReceiptTitle] = useState('Comprobante');
     const [lastSaleItems, setLastSaleItems] = useState<ItemCarrito[]>([]);
     const [lastSaleTotal, setLastSaleTotal] = useState(0);
+
+    // Mobile specific
+    const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
 
     // Table management
     const [selectedTable, setSelectedTable] = useState<Mesa | null>(null);
@@ -393,21 +396,23 @@ function POSContent() {
     if (view === 'start') {
         return (
             <div className="min-h-[80vh] flex items-center justify-center p-4">
-                <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
                     <motion.button
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         whileHover={{ scale: 1.02, y: -5 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setView('mesas')}
-                        className="group relative bg-white p-10 rounded-4xl border-2 border-slate-100 shadow-xl flex flex-col items-center text-center transition-all hover:border-rodrigo-mustard/30 hover:shadow-2xl overflow-hidden"
+                        className="group relative bg-white p-6 md:p-10 rounded-[2rem] md:rounded-4xl border-2 border-slate-100 shadow-xl flex flex-row md:flex-col items-center text-left md:text-center transition-all hover:border-rodrigo-mustard/30 hover:shadow-2xl overflow-hidden"
                     >
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-full -mr-16 -mt-16 group-hover:bg-rodrigo-mustard/5 transition-colors duration-500"></div>
-                        <div className="w-24 h-24 bg-slate-50 rounded-3xl flex items-center justify-center mb-8 rotate-3 shadow-sm border border-slate-100 group-hover:bg-white group-hover:rotate-0 transition-transform duration-500">
-                            <UtensilsCrossed size={48} className="text-slate-400 group-hover:text-rodrigo-terracotta transition-colors" />
+                        <div className="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-slate-50 rounded-full -mr-12 -mt-12 md:-mr-16 md:-mt-16 group-hover:bg-rodrigo-mustard/5 transition-colors duration-500"></div>
+                        <div className="w-16 h-16 md:w-24 md:h-24 bg-slate-50 rounded-2xl md:rounded-3xl flex items-center justify-center mb-0 md:mb-8 mr-6 md:mr-0 rotate-3 shadow-sm border border-slate-100 group-hover:bg-white group-hover:rotate-0 transition-transform duration-500 shrink-0">
+                            <UtensilsCrossed size={32} className="md:w-12 md:h-12 text-slate-400 group-hover:text-rodrigo-terracotta transition-colors" />
                         </div>
-                        <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter mb-4">Salón</h2>
-                        <p className="text-slate-400 text-sm font-bold uppercase tracking-widest leading-relaxed">Pedidos en mesa con atención personalizada</p>
+                        <div className="relative z-10">
+                            <h2 className="text-xl md:text-3xl font-black text-slate-900 uppercase italic tracking-tighter mb-1 md:mb-4">Salón</h2>
+                            <p className="text-slate-400 text-[10px] md:text-sm font-bold uppercase tracking-widest leading-none md:leading-relaxed">Pedidos en mesa</p>
+                        </div>
                     </motion.button>
 
                     <motion.button
@@ -417,14 +422,16 @@ function POSContent() {
                         whileHover={{ scale: 1.02, y: -5 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleTableClick(null)}
-                        className="group relative bg-white p-10 rounded-4xl border-2 border-slate-100 shadow-xl flex flex-col items-center text-center transition-all hover:border-rodrigo-mustard/30 hover:shadow-2xl overflow-hidden"
+                        className="group relative bg-white p-6 md:p-10 rounded-[2rem] md:rounded-4xl border-2 border-slate-100 shadow-xl flex flex-row md:flex-col items-center text-left md:text-center transition-all hover:border-rodrigo-mustard/30 hover:shadow-2xl overflow-hidden"
                     >
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-full -mr-16 -mt-16 group-hover:bg-rodrigo-mustard/5 transition-colors duration-500"></div>
-                        <div className="w-24 h-24 bg-slate-50 rounded-3xl flex items-center justify-center mb-8 -rotate-3 shadow-sm border border-slate-100 group-hover:bg-white group-hover:rotate-0 transition-transform duration-500">
-                            <ShoppingBag size={48} className="text-slate-400 group-hover:text-rodrigo-terracotta transition-colors" />
+                        <div className="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-slate-50 rounded-full -mr-12 -mt-12 md:-mr-16 md:-mt-16 group-hover:bg-rodrigo-mustard/5 transition-colors duration-500"></div>
+                        <div className="w-16 h-16 md:w-24 md:h-24 bg-slate-50 rounded-2xl md:rounded-3xl flex items-center justify-center mb-0 md:mb-8 mr-6 md:mr-0 -rotate-3 shadow-sm border border-slate-100 group-hover:bg-white group-hover:rotate-0 transition-transform duration-500 shrink-0">
+                            <ShoppingBag size={32} className="md:w-12 md:h-12 text-slate-400 group-hover:text-rodrigo-terracotta transition-colors" />
                         </div>
-                        <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter mb-4">Llevar</h2>
-                        <p className="text-slate-400 text-sm font-bold uppercase tracking-widest leading-relaxed">Recojo en local rápido y sin complicaciones</p>
+                        <div className="relative z-10">
+                            <h2 className="text-xl md:text-3xl font-black text-slate-900 uppercase italic tracking-tighter mb-1 md:mb-4">Llevar</h2>
+                            <p className="text-slate-400 text-[10px] md:text-sm font-bold uppercase tracking-widest leading-none md:leading-relaxed">Recojo en local</p>
+                        </div>
                     </motion.button>
 
                     <motion.button
@@ -438,14 +445,16 @@ function POSContent() {
                             setView('pedido');
                             setShowDeliveryMap(true);
                         }}
-                        className="group relative bg-white p-10 rounded-4xl border-2 border-slate-100 shadow-xl flex flex-col items-center text-center transition-all hover:border-rodrigo-mustard/30 hover:shadow-2xl overflow-hidden"
+                        className="group relative bg-white p-6 md:p-10 rounded-[2rem] md:rounded-4xl border-2 border-slate-100 shadow-xl flex flex-row md:flex-col items-center text-left md:text-center transition-all hover:border-rodrigo-mustard/30 hover:shadow-2xl overflow-hidden"
                     >
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-full -mr-16 -mt-16 group-hover:bg-rodrigo-mustard/5 transition-colors duration-500"></div>
-                        <div className="w-24 h-24 bg-slate-50 rounded-3xl flex items-center justify-center mb-8 rotate-3 shadow-sm border border-slate-100 group-hover:bg-white group-hover:rotate-0 transition-transform duration-500">
-                            <Navigation2 size={48} className="text-slate-400 group-hover:text-rodrigo-terracotta transition-colors" />
+                        <div className="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-slate-50 rounded-full -mr-12 -mt-12 md:-mr-16 md:-mt-16 group-hover:bg-rodrigo-mustard/5 transition-colors duration-500"></div>
+                        <div className="w-16 h-16 md:w-24 md:h-24 bg-slate-50 rounded-2xl md:rounded-3xl flex items-center justify-center mb-0 md:mb-8 mr-6 md:mr-0 rotate-3 shadow-sm border border-slate-100 group-hover:bg-white group-hover:rotate-0 transition-transform duration-500 shrink-0">
+                            <Navigation2 size={32} className="md:w-12 md:h-12 text-slate-400 group-hover:text-rodrigo-terracotta transition-colors" />
                         </div>
-                        <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter mb-4">Delivery</h2>
-                        <p className="text-slate-400 text-sm font-bold uppercase tracking-widest leading-relaxed">Envíos a domicilio con seguimiento en mapa</p>
+                        <div className="relative z-10">
+                            <h2 className="text-xl md:text-3xl font-black text-slate-900 uppercase italic tracking-tighter mb-1 md:mb-4">Delivery</h2>
+                            <p className="text-slate-400 text-[10px] md:text-sm font-bold uppercase tracking-widest leading-none md:leading-relaxed">Envíos a casa</p>
+                        </div>
                     </motion.button>
                 </div>
             </div>
@@ -454,26 +463,26 @@ function POSContent() {
 
     if (view === 'mesas') {
         return (
-            <div className="space-y-8 pb-20">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex items-center gap-4">
-                        <button onClick={() => setView('start')} className="w-12 h-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 shadow-sm"><ArrowRight className="rotate-180" size={24} /></button>
+            <div className="space-y-4 md:space-y-8 pb-32">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+                    <div className="flex items-center gap-3 md:gap-4">
+                        <button onClick={() => setView('start')} className="w-10 h-10 md:w-12 md:h-12 bg-white border border-slate-100 rounded-xl md:rounded-2xl flex items-center justify-center text-slate-400 shadow-sm"><ArrowRight className="rotate-180" size={20} /></button>
                         <div>
-                            <h1 className="text-5xl font-black text-slate-900 italic tracking-tighter uppercase leading-none">Salón Principal</h1>
-                            <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mt-2 translate-x-4">Seleccionar mesa para iniciar pedido</p>
+                            <h1 className="text-2xl md:text-5xl font-black text-slate-900 italic tracking-tighter uppercase leading-none">Salón Principal</h1>
+                            <p className="text-slate-400 text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em] mt-1 md:mt-2">Selecciona una mesa</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-4">
                     {mesas.map((mesa) => (
                         <motion.button
                             key={mesa.id}
                             onClick={() => handleTableClick(mesa)}
-                            className={`relative aspect-square rounded-4xl flex flex-col items-center justify-center transition-all duration-300 group shadow-sm ${mesa.estado === 'libre' ? 'bg-white border border-slate-100' : 'bg-rodrigo-terracotta text-white'}`}
+                            className={`relative aspect-square rounded-[1.5rem] md:rounded-4xl flex flex-col items-center justify-center transition-all duration-300 group shadow-sm ${mesa.estado === 'libre' ? 'bg-white border border-slate-100' : 'bg-rodrigo-terracotta text-white'}`}
                         >
-                            <span className="text-4xl font-black italic tracking-tighter">{mesa.numero}</span>
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em] mt-2">{mesa.estado === 'libre' ? 'Libre' : 'Ocupada'}</span>
+                            <span className="text-2xl md:text-4xl font-black italic tracking-tighter">{mesa.numero}</span>
+                            <span className="text-[7px] md:text-[9px] font-black uppercase tracking-[0.1em] md:tracking-[0.2em] mt-1 md:mt-2">{mesa.estado === 'libre' ? 'Libre' : 'Ocupada'}</span>
                         </motion.button>
                     ))}
                 </div>
@@ -482,83 +491,139 @@ function POSContent() {
     }
 
     return (
-        <div className="space-y-6 pb-20 lg:pb-10">
+        <div className="space-y-4 md:space-y-6 pb-32">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                    <button onClick={() => setView(isParaLlevar || isDelivery ? 'start' : 'mesas')} className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 shadow-sm"><ArrowRight className="rotate-180" size={20} /></button>
+                <div className="flex items-center gap-3 md:gap-4">
+                    <button onClick={() => setView(isParaLlevar || isDelivery ? 'start' : 'mesas')} className="w-10 h-10 md:w-12 md:h-12 bg-white border border-slate-200 rounded-xl md:rounded-2xl flex items-center justify-center text-slate-400 shadow-sm"><ArrowRight className="rotate-180" size={18} /></button>
                     <div>
-                        <h1 className="text-2xl font-black text-slate-900 italic tracking-tight uppercase">
-                            {isDelivery ? "Servicio Delivery" : isParaLlevar ? "Pedido Llevar" : `Mesa ${selectedTable?.numero}`}
+                        <h1 className="text-xl md:text-2xl font-black text-slate-900 italic tracking-tight uppercase">
+                            {isDelivery ? "Delivery" : isParaLlevar ? "Recojo" : `Mesa ${selectedTable?.numero}`}
                         </h1>
                     </div>
                 </div>
-                <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+                <nav className="flex items-center gap-2 overflow-x-auto pb-4 md:pb-0 no-scrollbar touch-pan-x">
                     {categorias.map((cat) => (
-                        <button key={cat.id} onClick={() => setCategoriaActiva(cat.id)} className={`px-5 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] border ${categoriaActiva === cat.id ? 'bg-rodrigo-terracotta text-white border-rodrigo-terracotta' : 'bg-white text-slate-400'}`}>{cat.nombre}</button>
+                        <button key={cat.id} onClick={() => setCategoriaActiva(cat.id)} className={`whitespace-nowrap px-4 md:px-5 py-2.5 md:py-3 rounded-xl font-black uppercase tracking-widest text-[9px] md:text-[10px] border transition-all ${categoriaActiva === cat.id ? 'bg-rodrigo-terracotta text-white border-rodrigo-terracotta shadow-md' : 'bg-white text-slate-400 border-slate-100 hover:border-slate-200'}`}>{cat.nombre}</button>
                     ))}
-                </div>
+                </nav>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
                 <div className="lg:col-span-8 space-y-6">
                     <div className="relative group">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
-                        <input type="text" placeholder="BUSCAR PRODUCTO..." className="w-full bg-white border-2 border-slate-100 rounded-3xl py-5 pl-16 pr-8 text-sm font-bold text-slate-900 placeholder:text-slate-300 transition-all outline-none focus:border-rodrigo-mustard/30 shadow-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                        <input type="text" placeholder="BUSCAR PRODUCTO..." className="w-full bg-white border-2 border-slate-100 rounded-[2rem] md:rounded-3xl py-4 md:py-5 pl-14 md:pl-16 pr-8 text-sm md:text-md font-bold text-slate-900 placeholder:text-slate-300 transition-all outline-none focus:border-rodrigo-mustard/30 shadow-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                         {productosFiltrados.map((producto) => (
                             <motion.button
                                 key={producto.id}
                                 onClick={() => handleProductClick(producto)}
-                                className="group bg-white p-5 rounded-4xl border-2 border-slate-100 shadow-sm hover:border-rodrigo-mustard/30 hover:shadow-xl transition-all text-left flex flex-col items-center"
+                                className="group bg-white p-4 md:p-5 rounded-[1.5rem] md:rounded-4xl border-2 border-slate-100 shadow-sm hover:border-rodrigo-mustard/30 hover:shadow-xl transition-all text-left flex flex-col items-center"
                             >
-                                <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                    <UtensilsCrossed size={32} className="text-slate-300 group-hover:text-rodrigo-terracotta" />
+                                <div className="w-14 h-14 md:w-20 md:h-20 bg-slate-50 rounded-2xl flex items-center justify-center mb-3 md:mb-4 group-hover:scale-110 transition-transform">
+                                    <UtensilsCrossed size={24} className="md:w-8 md:h-8 text-slate-300 group-hover:text-rodrigo-terracotta" />
                                 </div>
-                                <h3 className="text-sm font-black text-slate-900 uppercase italic tracking-tight text-center">{producto.nombre}</h3>
-                                <p className="text-xs font-black text-rodrigo-terracotta mt-2 italic">S/ {producto.precio.toFixed(2)}</p>
+                                <h3 className="text-[10px] md:text-sm font-black text-slate-900 uppercase italic tracking-tight text-center leading-tight line-clamp-2">{producto.nombre}</h3>
+                                <p className="text-[11px] md:text-xs font-black text-rodrigo-terracotta mt-1 md:mt-2 italic">S/ {producto.precio.toFixed(2)}</p>
                             </motion.button>
                         ))}
                     </div>
                 </div>
 
-                <div className="lg:col-span-4 sticky top-6">
-                    <div className="bg-slate-900 rounded-4xl p-8 border border-white/5 shadow-2xl text-white">
-                        <div className="flex items-center justify-between mb-8">
-                            <h2 className="text-xl font-black italic tracking-tighter uppercase">Carrito de Venta</h2>
-                            <button onClick={vaciarCarrito} className="p-2 hover:text-red-400 transition-colors"><Trash2 size={20} /></button>
-                        </div>
-
-                        <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar-light mb-8">
-                            {carrito.map((item, index) => (
-                                <div key={index} className="flex items-center justify-between bg-white/5 p-4 rounded-3xl border border-white/5">
-                                    <div className="flex-1">
-                                        <h4 className="text-xs font-black uppercase tracking-tight italic">{item.nombre}</h4>
-                                        <p className="text-[10px] text-white/50 font-bold uppercase mt-1">S/ {(item.cantidad * item.precio).toFixed(2)}</p>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <button onClick={() => modificarCantidad(index, -1)} className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20"><Minus size={14} /></button>
-                                        <span className="text-xs font-black">{item.cantidad}</span>
-                                        <button onClick={() => modificarCantidad(index, 1)} className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20"><Plus size={14} /></button>
-                                    </div>
-                                </div>
-                            ))}
-                            {carrito.length === 0 && (
-                                <div className="py-20 text-center opacity-20"><ShoppingBag className="mx-auto mb-4" size={48} /><p className="text-xs font-black uppercase tracking-widest">Carrito Vacío</p></div>
-                            )}
-                        </div>
-
-                        <div className="space-y-3 pt-6 border-t border-white/10">
-                            <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-white/50"><span>Subtotal</span><span>S/ {calcularSubtotal().toFixed(2)}</span></div>
-                            {isDelivery && deliveryInfo && <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-white/50"><span>Envío</span><span>S/ {deliveryInfo.cost.toFixed(2)}</span></div>}
-                            <div className="flex justify-between text-2xl font-black italic tracking-tighter text-rodrigo-mustard pt-2"><span>Total</span><span>S/ {calcularTotal().toFixed(2)}</span></div>
-                        </div>
-
-                        <button onClick={handleConfirmarPedido} disabled={procesando || carrito.length === 0} className="w-full bg-rodrigo-terracotta hover:bg-red-600 disabled:bg-stone-800 text-white rounded-3xl py-5 mt-8 font-black uppercase italic tracking-widest shadow-xl shadow-rodrigo-terracotta/20 transition-all flex items-center justify-center gap-3">{procesando ? 'Procesando...' : (currentVentaId ? 'Actualizar Pedido' : 'Confirmar Pedido')}<CheckCircle2 size={24} /></button>
-                    </div>
+                {/* Carrito (Desktop Sidebar) */}
+                <div className="hidden lg:block lg:col-span-4 sticky top-6">
+                    <CartPanel 
+                        carrito={carrito} 
+                        vaciarCarrito={vaciarCarrito} 
+                        modificarCantidad={modificarCantidad} 
+                        calcularSubtotal={calcularSubtotal}
+                        calcularTotal={calcularTotal}
+                        isDelivery={isDelivery}
+                        deliveryInfo={deliveryInfo}
+                        handleConfirmarPedido={handleConfirmarPedido}
+                        procesando={procesando}
+                        currentVentaId={currentVentaId}
+                    />
                 </div>
             </div>
+
+            {/* Mobile Bottom Cart Bar */}
+            <AnimatePresence>
+                {carrito.length > 0 && (
+                    <motion.div 
+                        initial={{ y: 100 }}
+                        animate={{ y: 0 }}
+                        exit={{ y: 100 }}
+                        className="lg:hidden fixed bottom-24 left-4 right-4 z-50 bg-slate-900 text-white rounded-[2rem] shadow-2xl overflow-hidden border border-white/10"
+                    >
+                        <button 
+                            onClick={() => setIsCartDrawerOpen(true)}
+                            className="w-full flex items-center justify-between p-5 active:bg-slate-800 transition-colors"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-rodrigo-terracotta rounded-xl flex items-center justify-center shadow-lg shadow-rodrigo-terracotta/20">
+                                    <ShoppingBag size={20} />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-[10px] text-white/40 font-black uppercase tracking-widest leading-none mb-1">Tu Pedido</p>
+                                    <p className="text-lg font-black italic tracking-tighter leading-none">{carrito.length} {carrito.length === 1 ? 'Item' : 'Items'}</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-[10px] text-rodrigo-mustard font-black uppercase tracking-widest leading-none mb-1">Total</p>
+                                <p className="text-2xl font-black italic tracking-tighter text-rodrigo-mustard leading-none">S/ {calcularTotal().toFixed(2)}</p>
+                            </div>
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Mobile Cart Drawer */}
+            <AnimatePresence>
+                {isCartDrawerOpen && (
+                    <div className="lg:hidden fixed inset-0 z-[60] flex flex-col">
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsCartDrawerOpen(false)}
+                            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                        />
+                        <motion.div 
+                            initial={{ y: '100%' }}
+                            animate={{ y: 0 }}
+                            exit={{ y: '100%' }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            className="mt-auto bg-slate-900 rounded-t-[3rem] p-8 border-t border-white/10 relative z-10 max-h-[85vh] overflow-y-auto"
+                        >
+                            <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-6" />
+                            <div className="flex items-center justify-between mb-8">
+                                <h2 className="text-2xl font-black italic tracking-tighter uppercase text-white">Revisar Pedido</h2>
+                                <button onClick={() => setIsCartDrawerOpen(false)} className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-white/50"><X size={24} /></button>
+                            </div>
+
+                            <CartPanel 
+                                carrito={carrito} 
+                                vaciarCarrito={vaciarCarrito} 
+                                modificarCantidad={modificarCantidad} 
+                                calcularSubtotal={calcularSubtotal}
+                                calcularTotal={calcularTotal}
+                                isDelivery={isDelivery}
+                                deliveryInfo={deliveryInfo}
+                                handleConfirmarPedido={() => {
+                                    handleConfirmarPedido();
+                                    setIsCartDrawerOpen(false);
+                                }}
+                                procesando={procesando}
+                                currentVentaId={currentVentaId}
+                                isMobileDrawer
+                            />
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
 
             <ProductOptionsModal
                 isOpen={isModalOpen}

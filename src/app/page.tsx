@@ -119,26 +119,31 @@ function DashboardContent() {
           { label: 'Pedidos Totales', value: String(metricas.cantidadPedidos), icon: ShoppingCart, colorClass: 'metric-icon-orders', trend: 'Procesados' },
           { label: 'Ticket Promedio', value: `S/ ${metricas.promedioPorPedido.toFixed(2)}`, icon: () => <span className="font-bold text-sm md:text-md">S/</span>, colorClass: 'metric-icon-avg', trend: 'Pedido' },
           { label: 'Pollos Vendidos', value: formatearFraccionPollo(metricas.pollosVendidos), icon: Package, colorClass: 'metric-icon-sold', trend: 'Consumo' },
-        ].map((m, i) => (
-          <motion.div key={m.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
-            className="glass-card p-5 md:p-6 border shadow-sm hover:shadow-xl transition-all group overflow-hidden relative min-h-[140px] md:min-h-0">
-            <div className="absolute top-0 right-0 w-20 h-20 md:w-24 md:h-24 opacity-[0.02] transform translate-x-8 -translate-y-8 group-hover:scale-110 transition-transform">
-              {typeof m.icon === 'function' ? (
-                <div className="text-3xl md:text-4xl font-black text-slate-100">{(m.icon as any)()}</div>
-              ) : (
-                <m.icon size={80} className="md:w-24 md:h-24" />
-              )}
-            </div>
-            <div className="flex items-center justify-between mb-4 md:mb-6">
-              <div className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center ${m.colorClass} shadow-inner transition-transform group-hover:scale-110`}>
-                {typeof m.icon === 'function' ? (m.icon as any)() : <m.icon size={20} className="md:w-6 md:h-6" strokeWidth={2.5} />}
+        ].map((m, i) => {
+          const mAny = m as any;
+          const Icon = typeof mAny.icon === 'function' && !mAny.icon.prototype?.render ? null : mAny.icon;
+
+          return (
+            <motion.div key={m.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
+              className="glass-card p-5 md:p-6 border shadow-sm hover:shadow-xl transition-all group overflow-hidden relative min-h-[140px] md:min-h-0">
+              <div className="absolute top-0 right-0 w-20 h-20 md:w-24 md:h-24 opacity-[0.02] transform translate-x-8 -translate-y-8 group-hover:scale-110 transition-transform">
+                {mAny.icon && !Icon ? (
+                  <div className="text-3xl md:text-4xl font-black text-slate-100">{mAny.icon()}</div>
+                ) : Icon ? (
+                  <Icon size={80} className="md:w-24 md:h-24" />
+                ) : null}
               </div>
-              <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{m.trend}</span>
-            </div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">{m.label}</p>
-            <p className="text-2xl md:text-4xl font-black text-slate-900 tracking-tighter italic">{m.value}</p>
-          </motion.div>
-        ))}
+              <div className="flex items-center justify-between mb-4 md:mb-6">
+                <div className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center ${m.colorClass} shadow-inner transition-transform group-hover:scale-110`}>
+                  {mAny.icon && !Icon ? mAny.icon() : Icon ? <Icon size={20} className="md:w-6 md:h-6" strokeWidth={2.5} /> : null}
+                </div>
+                <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{m.trend}</span>
+              </div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">{m.label}</p>
+              <p className="text-2xl md:text-4xl font-black text-slate-900 tracking-tighter italic">{m.value}</p>
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* DISTRIBUCIÓN POR MÉTODO DE PAGO (Dense Grid) */}
