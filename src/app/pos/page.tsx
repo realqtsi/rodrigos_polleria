@@ -22,7 +22,8 @@ import {
     Clock,
     User,
     ChevronDown,
-    Save
+    Save,
+    Bluetooth
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'react-hot-toast';
@@ -594,6 +595,42 @@ function POSContent() {
                             </button>
                         )}
                     </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        title="Vincular Impresora de Cocina"
+                        onClick={async () => {
+                            try {
+                                const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
+                                const printer = new BluetoothPrinter();
+                                await printer.connect();
+                                (window as any).kitchenPrinter = printer;
+                                toast.success('Cocina Vinculada 🔵');
+                            } catch (e) {
+                                toast.error('Error al vincular Cocina');
+                            }
+                        }}
+                        className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${(window as any).kitchenPrinter ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-white text-slate-400 border-slate-200 hover:border-blue-300'}`}
+                    >
+                        <Bluetooth size={18} />
+                    </button>
+                    <button
+                        title="Vincular Impresora de Caja"
+                        onClick={async () => {
+                            try {
+                                const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
+                                const printer = new BluetoothPrinter();
+                                await printer.connect();
+                                (window as any).cashierPrinter = printer;
+                                toast.success('Caja Vinculada 💳');
+                            } catch (e) {
+                                toast.error('Error al vincular Caja');
+                            }
+                        }}
+                        className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${(window as any).cashierPrinter ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-white text-slate-400 border-slate-200 hover:border-blue-300'}`}
+                    >
+                        <Save size={18} />
+                    </button>
                 </div>
                 <nav className="flex items-center gap-2 overflow-x-auto pb-4 md:pb-0 no-scrollbar touch-pan-x">
                     {categorias.map((cat) => (
