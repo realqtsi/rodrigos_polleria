@@ -429,17 +429,14 @@ function VentaCard({ venta, label, idx, onPay, onPrint, onCancel }: { venta: Ven
             <div className="text-right mb-3">
                 <p className="text-2xl font-black text-slate-900 tracking-tight">S/{(venta.total || 0).toFixed(2)}</p>
             </div>
-            <div className="space-y-1.5 mb-4 max-h-24 overflow-hidden">
-                {venta.items.slice(0, 4).map((item, id) => (
+            <div className="space-y-1.5 mb-4 max-h-48 overflow-y-auto pr-1">
+                {venta.items.map((item, id) => (
                     <div key={id} className="flex items-center gap-2 text-xs">
                         <span className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 text-[10px] font-black text-slate-600">{item.cantidad}</span>
                         <span className="text-slate-600 truncate flex-1 font-medium">{item.nombre}</span>
                         <span className="text-slate-400 text-[11px] font-mono">S/{(item.precio * item.cantidad).toFixed(2)}</span>
                     </div>
                 ))}
-                {venta.items.length > 4 && (
-                    <p className="text-[10px] text-slate-400 pl-7">+{venta.items.length - 4} más</p>
-                )}
             </div>
             <div className="flex gap-2">
                 <button onClick={onPay} className="flex-1 py-2.5 bg-slate-900 text-white font-bold text-[10px] uppercase rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-1.5">
