@@ -272,90 +272,42 @@ function MesasActivasContent() {
                         <p className="text-slate-400 text-xs max-w-[250px] mx-auto font-bold uppercase tracking-widest">No hay cuentas pendientes por cobrar en este momento.</p>
                     </motion.div>
                 ) : (
-                    <div className="space-y-16">
-                        {/* Section PARA LLEVAR */}
-                        {ventasParaLlevar.length > 0 && (
-                            <section>
-                                <div className="flex items-center gap-4 mb-8">
-                                    <div className="w-12 h-12 rounded-2xl bg-rodrigo-terracotta/10 border border-rodrigo-terracotta/20 flex items-center justify-center text-rodrigo-terracotta shadow-sm">
-                                        <ShoppingBag size={24} />
-                                    </div>
-                                    <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight italic">Para Llevar</h2>
-                                    <div className="h-px flex-1 bg-slate-100"></div>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    <AnimatePresence mode="popLayout">
-                                        {ventasParaLlevar.map((venta, idx) => (
-                                            <VentaCard
-                                                key={venta.id}
-                                                venta={venta}
-                                                label="PARA LLEVAR"
-                                                idx={idx}
-                                                onPay={() => abrirModalCobro(venta.id, null, undefined, venta.items, venta.total)}
-                                                onPrint={() => handlePrintPreCuenta(false, venta.items, venta.total, venta.id)}
-                                                onCancel={() => handleCancelClick(venta.id, null, 'Para Llevar')}
-                                            />
-                                        ))}
-                                    </AnimatePresence>
-                                </div>
-                            </section>
-                        )}
-
-                        {/* Section DELIVERY */}
-                        {ventasDelivery.length > 0 && (
-                            <section>
-                                <div className="flex items-center gap-4 mb-8">
-                                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm">
-                                        <Navigation size={24} />
-                                    </div>
-                                    <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight italic">Delivery</h2>
-                                    <div className="h-px flex-1 bg-slate-100"></div>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    <AnimatePresence mode="popLayout">
-                                        {ventasDelivery.map((venta, idx) => (
-                                            <VentaCard
-                                                key={venta.id}
-                                                venta={venta}
-                                                label="DELIVERY"
-                                                idx={idx}
-                                                onPay={() => abrirModalCobro(venta.id, null, undefined, venta.items, venta.total)}
-                                                onPrint={() => handlePrintPreCuenta(false, venta.items, venta.total, venta.id)}
-                                                onCancel={() => handleCancelClick(venta.id, null, 'Delivery')}
-                                            />
-                                        ))}
-                                    </AnimatePresence>
-                                </div>
-                            </section>
-                        )}
-
-                        {/* Section MESAS */}
-                        {mesasActivas.length > 0 && (
-                            <section>
-                                <div className="flex items-center gap-4 mb-8">
-                                    <div className="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shadow-sm">
-                                        <Users size={24} />
-                                    </div>
-                                    <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight italic">Servicio en Comedor</h2>
-                                    <div className="h-px flex-1 bg-slate-100"></div>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    <AnimatePresence mode="popLayout">
-                                        {mesasActivas.map((mesa, idx) => (
-                                            <VentaCard
-                                                key={mesa.id}
-                                                venta={mesa.venta!}
-                                                label={`MESA ${mesa.numero}`}
-                                                idx={idx}
-                                                onPay={() => abrirModalCobro(mesa.venta!.id, mesa.id, mesa.numero, mesa.venta!.items, mesa.venta!.total)}
-                                                onPrint={() => handlePrintPreCuenta(true, mesa.venta!.items, mesa.venta!.total, mesa.venta!.id, mesa.numero)}
-                                                onCancel={() => handleCancelClick(mesa.venta!.id, mesa.id, `Mesa ${mesa.numero}`)}
-                                            />
-                                        ))}
-                                    </AnimatePresence>
-                                </div>
-                            </section>
-                        )}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                        <AnimatePresence mode="popLayout">
+                            {ventasParaLlevar.map((venta, idx) => (
+                                <VentaCard
+                                    key={venta.id}
+                                    venta={venta}
+                                    label="LLEVAR"
+                                    idx={idx}
+                                    onPay={() => abrirModalCobro(venta.id, null, undefined, venta.items, venta.total)}
+                                    onPrint={() => handlePrintPreCuenta(false, venta.items, venta.total, venta.id)}
+                                    onCancel={() => handleCancelClick(venta.id, null, 'Para Llevar')}
+                                />
+                            ))}
+                            {ventasDelivery.map((venta, idx) => (
+                                <VentaCard
+                                    key={venta.id}
+                                    venta={venta}
+                                    label="DELIVERY"
+                                    idx={idx}
+                                    onPay={() => abrirModalCobro(venta.id, null, undefined, venta.items, venta.total)}
+                                    onPrint={() => handlePrintPreCuenta(false, venta.items, venta.total, venta.id)}
+                                    onCancel={() => handleCancelClick(venta.id, null, 'Delivery')}
+                                />
+                            ))}
+                            {mesasActivas.map((mesa, idx) => (
+                                <VentaCard
+                                    key={mesa.id}
+                                    venta={mesa.venta!}
+                                    label={`MESA ${mesa.numero}`}
+                                    idx={idx}
+                                    onPay={() => abrirModalCobro(mesa.venta!.id, mesa.id, mesa.numero, mesa.venta!.items, mesa.venta!.total)}
+                                    onPrint={() => handlePrintPreCuenta(true, mesa.venta!.items, mesa.venta!.total, mesa.venta!.id, mesa.numero)}
+                                    onCancel={() => handleCancelClick(mesa.venta!.id, mesa.id, `Mesa ${mesa.numero}`)}
+                                />
+                            ))}
+                        </AnimatePresence>
                     </div>
                 )}
 
@@ -415,81 +367,42 @@ function MesasActivasContent() {
 function VentaCard({ venta, label, idx, onPay, onPrint, onCancel }: { venta: Venta, label: string, idx: number, onPay: () => void, onPrint: () => void, onCancel: () => void }) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.05 }}
-            className="group relative bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 hover:border-slate-200 transition-all duration-500 shadow-sm"
+            transition={{ delay: idx * 0.03 }}
+            className="bg-white rounded-2xl border border-slate-100 p-3 shadow-sm hover:shadow-md transition-all cursor-pointer"
+            onClick={onPay}
         >
-            <div className="p-8 relative z-10">
-                <div className="flex justify-between items-start mb-6">
-                    <div>
-                        <span className="inline-block px-3 py-1 bg-slate-50 border border-slate-100 rounded-full text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">
-                            {label}
-                        </span>
-                        <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest italic">
-                            <Clock size={14} className="text-rodrigo-mustard" />
-                            {new Date(venta.created_at).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Por Cobrar</p>
-                        <p className="text-3xl font-black text-slate-900 tracking-tighter italic">S/{(venta.total || 0).toFixed(2)}</p>
-                    </div>
-                </div>
-
-                {/* Items Preview */}
-                <div className="space-y-2.5 mb-8 max-h-32 overflow-y-auto pr-2 custom-scrollbar">
-                    {venta.items.map((item, id) => (
-                        <div key={id} className="flex justify-between items-center text-sm">
-                            <div className="flex items-center gap-3">
-                                <span className="w-5 h-5 flex items-center justify-center rounded bg-slate-50 border border-slate-100 text-[10px] font-black text-rodrigo-terracotta">
-                                    {item.cantidad}
-                                </span>
-                                <span className="font-bold text-slate-700 uppercase truncate max-w-[140px] italic">{item.nombre}</span>
-                            </div>
-                            <span className="font-mono text-slate-300 text-[11px]">S/{(item.precio * item.cantidad).toFixed(2)}</span>
-                        </div>
-                    ))}
-                    {venta.tipo_pedido === 'delivery' && (venta.costo_envio || 0) > 0 && (
-                        <div className="flex justify-between items-center text-sm pt-2 border-t border-slate-50 border-dashed">
-                            <div className="flex items-center gap-3">
-                                <div className="w-5 h-5 flex items-center justify-center rounded bg-indigo-50 border border-indigo-100">
-                                    <Navigation size={10} className="text-indigo-500" />
-                                </div>
-                                <span className="font-bold text-indigo-500 uppercase italic">Costo de Envío</span>
-                            </div>
-                            <span className="font-mono text-indigo-400 text-[11px]">S/{venta.costo_envio?.toFixed(2)}</span>
-                        </div>
-                    )}
-                </div>
-
-                <div className="space-y-3">
-                    <button
-                        onClick={onPay}
-                        className="w-full py-4 bg-slate-900 text-white font-black rounded-2xl shadow-xl hover:brightness-110 active:scale-95 transition-all text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 italic"
-                    >
-                        <CreditCard size={16} /> REGISTRAR PAGO
-                    </button>
-
-                    <div className="grid grid-cols-2 gap-3">
-                        <button
-                            onClick={onPrint}
-                            className="py-3 bg-slate-50 border border-slate-100 text-slate-400 font-black rounded-2xl hover:bg-slate-100 active:scale-95 transition-all text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 italic shadow-sm"
-                        >
-                            <Printer size={14} /> Ticket
-                        </button>
-                        <button
-                            onClick={onCancel}
-                            className="py-3 bg-slate-50 border border-slate-100 text-slate-300 hover:text-rodrigo-terracotta font-black rounded-2xl hover:bg-red-50 active:scale-95 transition-all text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 italic shadow-sm"
-                        >
-                            <Trash2 size={14} /> Anular
-                        </button>
-                    </div>
-                </div>
+            <div className="flex justify-between items-start mb-2">
+                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${label.includes('MESA') ? 'bg-sky-100 text-sky-600' : label === 'DELIVERY' ? 'bg-indigo-100 text-indigo-600' : 'bg-amber-100 text-amber-600'}`}>
+                    {label}
+                </span>
+                <span className="text-[9px] text-slate-400 font-bold">
+                    {new Date(venta.created_at).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
+                </span>
             </div>
-
-            {/* Border glow on hover */}
-            <div className="absolute inset-x-0 bottom-0 h-1 bg-rodrigo-mustard transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 opacity-50"></div>
+            <div className="text-right mb-2">
+                <p className="text-xl font-black text-slate-900 tracking-tight">S/{(venta.total || 0).toFixed(2)}</p>
+            </div>
+            <div className="space-y-1 mb-3 max-h-20 overflow-hidden">
+                {venta.items.slice(0, 3).map((item, id) => (
+                    <div key={id} className="flex items-center gap-2 text-[10px]">
+                        <span className="w-4 h-4 flex items-center justify-center rounded bg-slate-100 text-[9px] font-black text-slate-500">{item.cantidad}</span>
+                        <span className="text-slate-600 truncate flex-1">{item.nombre}</span>
+                    </div>
+                ))}
+                {venta.items.length > 3 && (
+                    <p className="text-[9px] text-slate-400 pl-6">+{venta.items.length - 3} más</p>
+                )}
+            </div>
+            <div className="flex gap-1.5">
+                <button onClick={(e) => { e.stopPropagation(); onPrint(); }} className="flex-1 py-2 bg-slate-50 text-slate-500 font-bold text-[9px] uppercase rounded-lg hover:bg-slate-100 flex items-center justify-center gap-1">
+                    <Printer size={12} />
+                </button>
+                <button onClick={(e) => { e.stopPropagation(); onCancel(); }} className="flex-1 py-2 bg-slate-50 text-red-400 font-bold text-[9px] uppercase rounded-lg hover:bg-red-50 flex items-center justify-center gap-1">
+                    <Trash2 size={12} />
+                </button>
+            </div>
         </motion.div>
     );
 }
