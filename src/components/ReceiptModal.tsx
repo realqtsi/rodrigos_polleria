@@ -19,7 +19,7 @@ interface ReceiptModalProps {
 }
 
 interface ConfigNegocio {
-    id?: number; // Added ID for reliable updates
+    id?: number;
     ruc: string;
     razon_social: string;
     direccion: string;
@@ -29,6 +29,7 @@ interface ConfigNegocio {
     numero_correlativo: number;
     serie_ticket?: string;
     numero_ticket?: number;
+    ciudad?: string;
 }
 
 export default function ReceiptModal({ isOpen, onClose, items, total, orderId, mesaNumero, title = 'BOLETA DE VENTA', isNewSale = false }: ReceiptModalProps) {
@@ -40,14 +41,14 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
         mensaje_boleta: '¡Gracias por su preferencia!',
         serie_boleta: 'B001',
         numero_correlativo: 1,
-        serie_ticket: 'T001',
+        serie_ticket: 'TK001',
         numero_ticket: 1
     });
 
     const [numeroBoleta, setNumeroBoleta] = useState('');
-    const [tipoComprobante, setTipoComprobante] = useState<'boleta' | 'ticket'>('boleta'); // Nuevo estado
-    const [serieTicket, setSerieTicket] = useState('T001'); // Serie interna para tickets
-    const [numeroTicket, setNumeroTicket] = useState(''); // Correlativo para tickets
+    const [tipoComprobante, setTipoComprobante] = useState<'boleta' | 'ticket'>('ticket');
+    const [serieTicket, setSerieTicket] = useState('TK001');
+    const [numeroTicket, setNumeroTicket] = useState('');
     const [documento, setDocumento] = useState('');
     const [clienteNombre, setClienteNombre] = useState('');
     const [clienteDireccion, setClienteDireccion] = useState('');
@@ -57,28 +58,14 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
 
     useEffect(() => {
         if (isOpen) {
-            // Reset client data when opening modal
             setClienteNombre('');
             setClienteDireccion('');
             setErrorDocumento(null);
             setYaImpreso(false);
-
-            // Si viene título forzado, respetar, sino default a Boleta
-            if (title && title !== 'BOLETA DE VENTA') {
-                setTipoComprobante('ticket');
-                cargarConfiguracion('ticket');
-            } else {
-                setTipoComprobante('boleta');
-                cargarConfiguracion('boleta');
-            }
+            setTipoComprobante('ticket');
+            cargarConfiguracion('ticket');
         }
     }, [isOpen, title]);
-
-    // Cuando el usuario cambia manualmente el tipo
-    const handleTipoChange = (tipo: 'boleta' | 'ticket') => {
-        setTipoComprobante(tipo);
-        cargarConfiguracion(tipo);
-    };
 
     const cargarConfiguracion = async (tipoOverride?: 'boleta' | 'ticket') => {
         try {
@@ -211,83 +198,68 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
         <div className="hidden print:block print-ticket">
             {/* Encabezado del negocio */}
             <div className="ticket-header" style={{ textAlign: 'center' }}>
-                <p className="negocio-nombre" style={{ marginBottom: '2px' }}>{config.razon_social}</p>
-                <div className="negocio-info" style={{ marginTop: 0 }}>
-                    <p style={{ fontWeight: 'bold', fontSize: '12px' }}>ROJAS PALOMINO LADY LAURA</p>
-                    <p>AV. INDEPENDENCIA MZA. A LOTE. 06 URB. LUIS CARRANZA AYARZA</p>
-                    <p>FRENTE DE LA DIRECCION REGIONAL DE AGRIC</p>
-                    <p>AYACUCHO - HUAMANGA - AYACUCHO</p>
-                    <p style={{ marginTop: '4px', fontWeight: 'bold' }}>RUC: 10700899948</p>
+                <p className="negocio-nombre" style={{ marginBottom: '2px', fontWeight: 'bold', fontSize: '14px' }}>{config.razon_social}</p>
+                <div className="negocio-info" style={{ marginTop: 0, fontSize: '10px' }}>
+                    <p>{config.direccion || 'JR. HUASCAR 422'}</p>
+                    <p>AYACUCHO - HUAMANGA</p>
+                    <p style={{ marginTop: '4px', fontWeight: 'bold' }}>RUC: {config.ruc || '10700899948'}</p>
                     {config.telefono && <p>TEL: {config.telefono}</p>}
                 </div>
             </div>
 
-            {/* Número de boleta/ticket */}
-            <div className="ticket-boleta-num">
-                <p className="boleta-titulo">{tipoComprobante === 'boleta' ? 'BOLETA DE VENTA' : 'TICKET DE VENTA'}</p>
-                <p className="boleta-numero">
-                    {tipoComprobante === 'boleta' ? numeroBoleta : numeroTicket}
-                </p>
+            {/* Número de ticket */}
+            <div className="ticket-boleta-num" style={{ textAlign: 'center', marginTop: '8px' }}>
+                <p style={{ fontWeight: 'bold', fontSize: '12px', textDecoration: 'underline' }}>TICKET DE CONTROL INTERNO</p>
+                <p style={{ fontWeight: 'bold', fontSize: '14px' }}>{numeroTicket}</p>
             </div>
 
             {/* Fecha, hora, mesa */}
-            <div className="ticket-meta">
-                <div className="ticket-meta-row">
+            <div className="ticket-meta" style={{ marginTop: '8px' }}>
+                <div className="ticket-meta-row" style={{ fontSize: '10px' }}>
                     <span>FECHA: {fechaFormateada}</span>
                     <span>HORA: {horaFormateada}</span>
                 </div>
             </div>
-            {mesaNumero && tipoComprobante === 'ticket' && ( // MESA solo en Ticket, no en Boleta
-                <div className="ticket-mesa">
-                    MESA: {mesaNumero}
-                </div>
-            )}
-
-            {/* Datos del cliente */}
-            {(documento && clienteNombre) && (
-                <div className="ticket-cliente">
-                    <p style={{ fontSize: '9pt', textDecoration: 'underline', textTransform: 'uppercase' }}>Datos del Cliente:</p>
-                    <p>{documento.length === 11 ? 'RUC' : 'DNI'}: {documento}</p>
-                    <p>SR(A): {clienteNombre.toUpperCase()}</p>
-                    {clienteDireccion && <p>DIR: {clienteDireccion.toUpperCase()}</p>}
+            {mesaNumero && (
+                <div className="ticket-mesa" style={{ fontSize: '10px', textAlign: 'center', marginTop: '4px' }}>
+                    <strong>MESA: {mesaNumero}</strong>
                 </div>
             )}
 
             {/* Cabecera de items */}
-            <div className="ticket-items-header">
+            <div className="ticket-items-header" style={{ fontSize: '10px', fontWeight: 'bold', marginTop: '8px', borderTop: '1px solid black', borderBottom: '1px solid black', padding: '4px 0' }}>
                 <span>CANT  DESCRIPCIÓN</span>
                 <span>TOTAL</span>
             </div>
 
             {/* Items de venta */}
-            <div>
+            <div style={{ fontSize: '10px' }}>
                 {items.map((item, idx) => {
                     const cantidad = Number(item.cantidad) || 0;
                     const precio = Number(item.precio) || 0;
                     const subtotal = Number((item as any).subtotal) || (cantidad * precio);
                     return (
-                        <div key={idx} className="ticket-item">
+                        <div key={idx} className="ticket-item" style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0' }}>
                             <span className="item-cantidad">{cantidad}</span>
-                            <span className="item-nombre">{item.nombre?.toUpperCase()}</span>
-                            <span className="item-precio" style={{ whiteSpace: 'nowrap' }}>S/ {subtotal.toFixed(2)}</span>
+                            <span className="item-nombre" style={{ flex: 1, marginLeft: '8px' }}>{item.nombre?.toUpperCase()}</span>
+                            <span className="item-precio" style={{ whiteSpace: 'nowrap', marginLeft: '8px' }}>S/ {subtotal.toFixed(2)}</span>
                         </div>
                     );
                 })}
             </div>
 
             {/* Total */}
-            <div className="ticket-total-box">
-                <div className="ticket-total-row">
+            <div className="ticket-total-box" style={{ marginTop: '8px', borderTop: '2px solid black', paddingTop: '8px' }}>
+                <div className="ticket-total-row" style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '12px' }}>
                     <span className="ticket-total-label">TOTAL A PAGAR:</span>
                     <span className="ticket-total-amount">S/ {total.toFixed(2)}</span>
                 </div>
             </div>
 
             {/* Footer */}
-            <div className="ticket-footer">
+            <div className="ticket-footer" style={{ marginTop: '16px', textAlign: 'center', fontSize: '10px' }}>
                 <p className="footer-mensaje">"{config.mensaje_boleta}"</p>
-                <div className="footer-slogan">LA PASIÓN HECHA SAZÓN</div>
-                <p className="footer-sistema">SISTEMA Rodrigo's - Brasas & Broasters V1.0</p>
+                <p className="footer-sistema" style={{ marginTop: '8px', fontSize: '9px' }}>Rodrigo's - Brasas & Broasters CHICKEN</p>
             </div>
         </div>
     );
@@ -317,32 +289,10 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                                 <img src="/images/logo-rodrigos.jpeg" alt="Logo" className="w-full h-full object-contain" />
                             </div>
 
-                            <h2 className="text-lg font-bold">{tipoComprobante === 'boleta' ? 'BOLETA DE VENTA' : 'TICKET DE VENTA'}</h2>
-                            <p className="text-white/80 text-xs">
-                                {tipoComprobante === 'boleta' ? numeroBoleta : numeroTicket}
+                            <h2 className="text-lg font-bold">TICKET DE CONTROL INTERNO</h2>
+                            <p className="text-white/80 text-xs font-mono">
+                                {numeroTicket}
                             </p>
-
-                            {/* Selector de Tipo */}
-                            <div className="flex justify-center gap-2 mt-3">
-                                <button
-                                    onClick={() => handleTipoChange('boleta')}
-                                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${tipoComprobante === 'boleta'
-                                        ? 'bg-white text-rodrigo-terracotta shadow-lg'
-                                        : 'bg-red-700/50 text-white hover:bg-red-700'
-                                        }`}
-                                >
-                                    BOLETA
-                                </button>
-                                <button
-                                    onClick={() => handleTipoChange('ticket')}
-                                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${tipoComprobante === 'ticket'
-                                        ? 'bg-white text-rodrigo-terracotta shadow-lg'
-                                        : 'bg-red-700/50 text-white hover:bg-red-700'
-                                        }`}
-                                >
-                                    TICKET
-                                </button>
-                            </div>
                         </div>
 
                         {/* Sección de Cliente / DNI */}
@@ -420,44 +370,21 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                                 <div className="text-center pb-3 mb-3 border-b-2 border-black">
                                     <p className="font-black text-xl text-black leading-tight mb-1 uppercase tracking-tighter">{config.razon_social}</p>
                                     <div className="space-y-0.5 text-[10px] text-gray-500 font-bold uppercase">
-                                        <p className="text-black text-[11px]">ROJAS PALOMINO LADY LAURA</p>
-                                        <p className="leading-tight">AV. INDEPENDENCIA MZA. A LOTE. 06 URB. LUIS CARRANZA AYARZA</p>
-                                        <p className="leading-tight">FRENTE DE LA DIRECCION REGIONAL DE AGRIC</p>
-                                        <p className="leading-tight">AYACUCHO - HUAMANGA - AYACUCHO</p>
-                                        <p className="text-black pt-1">RUC: 10700899948</p>
+                                        <p className="leading-tight">{config.direccion || 'JR. HUASCAR 422'}</p>
+                                        <p className="leading-tight">{config.ciudad || 'AYACUCHO - HUAMANGA'}</p>
+                                        <p className="text-black pt-1">RUC: {config.ruc || '10700899948'}</p>
                                         {config.telefono && <p>TEL: {config.telefono}</p>}
                                     </div>
                                     <div className="mt-3 pt-2 border-t border-gray-100">
                                         <p className="font-black text-base text-rodrigo-terracotta tracking-widest">
-                                            {tipoComprobante === 'boleta' ? numeroBoleta : numeroTicket}
+                                            {numeroTicket}
                                         </p>
                                         <p className="text-[11px] text-gray-400 mt-1">{fechaFormateada} - {horaFormateada}</p>
-                                        {mesaNumero && tipoComprobante === 'ticket' && (
+                                        {mesaNumero && (
                                             <p className="text-[11px] bg-rodrigo-terracotta text-white font-bold rounded-full px-3 py-0.5 inline-block mt-2">MESA: {mesaNumero}</p>
                                         )}
                                     </div>
                                 </div>
-
-                                {/* Información del Cliente en Ticket On-Screen */}
-                                {(documento && clienteNombre) && (
-                                    <div className="mb-4 pb-3 border-b-2 border-black text-[11px] space-y-1">
-                                        <p className="text-[9px] font-bold text-gray-400 uppercase mb-1">Datos del Cliente</p>
-                                        <div className="flex gap-2">
-                                            <span className="font-black text-black w-12 italic">{documento.length === 11 ? 'RUC:' : 'DNI:'}</span>
-                                            <span className="text-black">{documento}</span>
-                                        </div>
-                                        <div className="flex gap-2 items-start">
-                                            <span className="font-black text-black w-12 italic">SR(A):</span>
-                                            <p className="uppercase text-black flex-1 leading-tight">{clienteNombre}</p>
-                                        </div>
-                                        {clienteDireccion && (
-                                            <div className="flex gap-2 items-start">
-                                                <span className="font-black text-black w-12 italic">DIR:</span>
-                                                <p className="uppercase text-black flex-1 leading-tight">{clienteDireccion}</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
 
                                 <div className="mb-4">
                                     <div className="flex justify-between text-[11px] font-black text-black border-b border-black pb-1 mb-2 uppercase">
@@ -488,9 +415,6 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
 
                                 <div className="text-center mt-6 pt-4 border-t-2 border-black">
                                     <p className="text-[11px] leading-tight font-bold italic mb-2">"{config.mensaje_boleta}"</p>
-                                    <div className="bg-black text-white py-1 px-4 inline-block transform -rotate-1">
-                                        <p className="text-[10px] uppercase font-black tracking-widest">La Pasión Hecha Sazón</p>
-                                    </div>
                                 </div>
                             </div>
                         </div>
