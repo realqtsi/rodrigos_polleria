@@ -42,6 +42,7 @@ export class BluetoothPrinter {
         '000018f0-0000-1000-8000-00805f9b34fb', // Generic POS
         '0000fff0-0000-1000-8000-00805f9b34fb', // TI
         '0000ff00-0000-1000-8000-00805f9b34fb', // Common 1
+        '00001101-0000-1000-8000-00805f9b34fb', // SPP (Serial Port Profile)
         '49535343-fe7d-4ae5-8fa9-9fafd205e455'  // ISSC
     ];
 
@@ -49,6 +50,7 @@ export class BluetoothPrinter {
         '00002af1-0000-1000-8000-00805f9b34fb', // Generic Write
         '0000fff1-0000-1000-8000-00805f9b34fb', // TI Write
         '0000ff01-0000-1000-8000-00805f9b34fb', // Common 1 Write
+        '00001101-0000-1000-8000-00805f9b34fb', // SPP Write
         '49535343-8841-43f4-a8d4-ecbe34729bb3'  // ISSC Write
     ];
 
@@ -61,18 +63,11 @@ export class BluetoothPrinter {
      */
     async connect(): Promise<boolean> {
         try {
-            console.log('Solicitando dispositivo Bluetooth...');
+            console.log('Solicitando dispositivo Bluetooth (Modo Compatible)...');
 
-            // Request device with specific name filters
+            // Request device - accepting all for maximum compatibility
             this.device = await navigator.bluetooth.requestDevice({
-                filters: [
-                    { namePrefix: 'ADV' },
-                    { namePrefix: 'BT' },
-                    { namePrefix: 'P80' },
-                    { namePrefix: 'Printer' },
-                    { namePrefix: 'RT' },
-                    { namePrefix: 'MTP' }
-                ],
+                acceptAllDevices: true,
                 optionalServices: this.SERVICE_UUIDS
             });
 
