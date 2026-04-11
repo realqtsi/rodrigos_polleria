@@ -44,8 +44,16 @@ app.post('/print-kitchen', (req, res) => {
 
             items.forEach(item => {
                 printer.text(`${item.cantidad}x ${item.nombre}`);
-                if (item.detalles?.notas) {
-                    printer.text(`   => ${item.detalles.notas}`);
+                if (item.detalles) {
+                    if (item.detalles.parte) {
+                        printer.text(`   > ${item.detalles.parte}`);
+                    }
+                    if (item.detalles.trozado) {
+                        printer.text(`   > ${item.detalles.trozado}`);
+                    }
+                    if (item.detalles.notas) {
+                        printer.text(`   > NOTA: ${item.detalles.notas}`);
+                    }
                 }
             });
 

@@ -329,6 +329,14 @@ function POSContent() {
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ ip: config?.ip_impresora_caja || '192.168.1.101', items: itemsParaCocina, subtotal: calcularSubtotal(), total: calcularTotal(), envio: deliveryInfo?.cost || 0, esDelivery: isDelivery, direccion: deliveryInfo?.address })
                         });
+                        const printedKeys = new Set(itemsParaCocina.map(p => `${p.producto_id}||${p.detalles?.parte || ''}||${p.detalles?.notas || ''}`));
+                        setCarrito(prev => prev.map(item => {
+                            const itemKey = `${item.producto_id}||${item.detalles?.parte || ''}||${item.detalles?.notas || ''}`;
+                            if (printedKeys.has(itemKey)) {
+                                return { ...item, printed: true };
+                            }
+                            return item;
+                        }));
                         toast.success('Impresión enviada correctamente 🖨️');
                     } catch (err) {
                         toast.error('Error al imprimir. Verifica el print-server.');
@@ -337,9 +345,11 @@ function POSContent() {
                 const audio = new Audio('/kitchen-bell.mp3');
                 audio.play().catch(() => { });
                 toast.success(resultado.message);
-                setView('mesas');
-                setCarrito([]);
-                setOrderNotes('');
+                if (!currentVentaId) {
+                    setView('mesas');
+                    setCarrito([]);
+                    setOrderNotes('');
+                }
                 refetch();
                 refetchMesas();
             } else {
