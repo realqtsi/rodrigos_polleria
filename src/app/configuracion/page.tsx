@@ -38,7 +38,8 @@ function ConfiguracionContent() {
         nombre_negocio: '',
         ruc: '',
         direccion: '',
-        telefono: ''
+        telefono: '',
+        modo_impresion: 'red'
     });
 
     // Users stuff
@@ -89,7 +90,8 @@ function ConfiguracionContent() {
                     nombre_negocio: data.nombre_negocio || '',
                     ruc: data.ruc || '',
                     direccion: data.direccion || '',
-                    telefono: data.telefono || ''
+                    telefono: data.telefono || '',
+                    modo_impresion: data.modo_impresion || 'red'
                 });
             }
         } catch (err) {
@@ -592,33 +594,122 @@ function ConfiguracionContent() {
                             className="space-y-8"
                         >
                             <div className="bg-white p-10 relative overflow-hidden border border-slate-100 rounded-[3rem] shadow-sm">
-                                <div className="absolute top-0 right-0 p-8 opacity-5">
+                                <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
                                     <Package size={120} className="text-slate-900" />
                                 </div>
-                                <h3 className="text-xs font-black text-rodrigo-mustard uppercase tracking-[0.4em] mb-8 flex items-center gap-3 italic">
-                                    <div className="w-8 h-px bg-rodrigo-mustard" />
-                                    Hardware & Red
-                                </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                    <div className="space-y-3">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">IP Impresora Cocina</label>
-                                        <input
-                                            type="text"
-                                            value={editConfig.ip_impresora_cocina}
-                                            onChange={e => setEditConfig({ ...editConfig, ip_impresora_cocina: e.target.value })}
-                                            className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-slate-900 font-mono focus:border-rodrigo-mustard/30 outline-none transition-all placeholder:text-slate-200"
-                                            placeholder="0.0.0.0"
-                                        />
-                                    </div>
-                                    <div className="space-y-3">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">IP Impresora Caja</label>
-                                        <input
-                                            type="text"
-                                            value={editConfig.ip_impresora_caja}
-                                            onChange={e => setEditConfig({ ...editConfig, ip_impresora_caja: e.target.value })}
-                                            className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-slate-900 font-mono focus:border-rodrigo-mustard/30 outline-none transition-all placeholder:text-slate-200"
-                                            placeholder="0.0.0.0"
-                                        />
+                                <div className="space-y-6">
+                                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                                        <div className="flex items-center justify-between mb-6">
+                                            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                                <span className="text-xl">🖨️</span> Configuración de Impresión
+                                            </h3>
+                                            <div className="flex bg-slate-100 p-1 rounded-xl">
+                                                <button
+                                                    onClick={() => setEditConfig({ ...editConfig, modo_impresion: 'red' })}
+                                                    className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${editConfig.modo_impresion === 'red' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400'}`}
+                                                >
+                                                    ETHERNET / RED
+                                                </button>
+                                                <button
+                                                    onClick={() => setEditConfig({ ...editConfig, modo_impresion: 'bluetooth' })}
+                                                    className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${editConfig.modo_impresion === 'bluetooth' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`}
+                                                >
+                                                    BLUETOOTH 🔵
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {editConfig.modo_impresion === 'red' ? (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="space-y-2">
+                                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest">IP Impresora Cocina</label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Ej: 192.168.1.100"
+                                                        value={editConfig.ip_impresora_cocina}
+                                                        onChange={e => setEditConfig({ ...editConfig, ip_impresora_cocina: e.target.value })}
+                                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rodrigo-mustard outline-none transition-all font-mono"
+                                                    />
+                                                    <p className="text-[10px] text-slate-400">Dirección IP estática de la impresora de cocina.</p>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest">IP Impresora Caja</label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Ej: 192.168.1.101"
+                                                        value={editConfig.ip_impresora_caja}
+                                                        onChange={e => setEditConfig({ ...editConfig, ip_impresora_caja: e.target.value })}
+                                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rodrigo-mustard outline-none transition-all font-mono"
+                                                    />
+                                                    <p className="text-[10px] text-slate-400">Dirección IP estática de la impresora de caja principal.</p>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="p-8 bg-blue-50/50 rounded-2xl border border-blue-100/50 text-center space-y-4">
+                                                <div className="w-16 h-16 bg-blue-100 rounded-3xl flex items-center justify-center text-blue-600 mx-auto shadow-sm">
+                                                    <Settings size={32} />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-blue-900">Modo Bluetooth Activado</h4>
+                                                    <p className="text-xs text-blue-500 mt-1 max-w-sm mx-auto">
+                                                        Cada mozo deberá vincular su celular directamente con las impresoras al iniciar el turno.
+                                                    </p>
+                                                </div>
+                                                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                                                    <button
+                                                        className="px-6 py-3 bg-white border border-blue-200 text-blue-600 font-bold text-xs rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
+                                                        onClick={async () => {
+                                                            try {
+                                                                const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
+                                                                if (!BluetoothPrinter.isSupported()) {
+                                                                    toast.error('Tu navegador no soporta Bluetooth. Usa Chrome en Android.');
+                                                                    return;
+                                                                }
+                                                                const printer = new BluetoothPrinter();
+                                                                await printer.connect();
+                                                                toast.success('Impresora de Cocina vinculada');
+                                                                (window as any).kitchenPrinter = printer;
+                                                            } catch (e: any) {
+                                                                console.error(e);
+                                                                if (e.name === 'NotFoundError') {
+                                                                    toast.error('No se seleccionó ningún dispositivo');
+                                                                } else {
+                                                                    toast.error('Error al vincular: Verifica que la impresora esté encendida');
+                                                                }
+                                                            }
+                                                        }}
+                                                    >
+                                                        VINCULAR COCINA 🔵
+                                                    </button>
+                                                    <button
+                                                        className="px-6 py-3 bg-white border border-blue-200 text-blue-600 font-bold text-xs rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
+                                                        onClick={async () => {
+                                                            try {
+                                                                const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
+                                                                if (!BluetoothPrinter.isSupported()) {
+                                                                    toast.error('Tu navegador no soporta Bluetooth. Usa Chrome en Android.');
+                                                                    return;
+                                                                }
+                                                                const printer = new BluetoothPrinter();
+                                                                await printer.connect();
+                                                                toast.success('Impresora de Caja vinculada');
+                                                                (window as any).cashierPrinter = printer;
+                                                            } catch (e: any) {
+                                                                console.error(e);
+                                                                if (e.name === 'NotFoundError') {
+                                                                    toast.error('No se seleccionó ningún dispositivo');
+                                                                } else {
+                                                                    toast.error('Error al vincular: Verifica que la impresora esté encendida');
+                                                                }
+                                                            }
+                                                        }}
+                                                    >
+                                                        VINCULAR CAJA 💳
+                                                    </button>
+                                                </div>
+                                                <p className="text-[9px] font-bold text-blue-300 uppercase tracking-widest">Requiere conexión HTTPS segura para funcionar</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

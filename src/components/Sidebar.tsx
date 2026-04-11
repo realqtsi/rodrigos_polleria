@@ -219,7 +219,7 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                                                 }
                                             `}
                                         >
-                                            <Icon size={18} className={isActive ? 'text-rodrigo-brown' : ''} />
+                                            <item.icon size={18} className={isActive ? 'text-rodrigo-brown' : ''} />
                                             <span className="font-medium text-sm">
                                                 {item.label}
                                             </span>

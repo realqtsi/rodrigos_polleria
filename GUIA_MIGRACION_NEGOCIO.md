@@ -7,9 +7,19 @@ Antes de mover nada, instala esto en la laptop del negocio:
 1. **Node.js (LTS):** Descárgalo de [nodejs.org](https://nodejs.org/). Instala la versión **LTS** (Recomendada).
 2. **Git (Opcional pero recomendado):** Para poder usar el comando `git pull` que tiene el archivo `.bat`.
 
-## 2. Copia de Archivos
-1. Copia toda la carpeta del proyecto `rodrigo's` a la nueva laptop.
-2. **IMPORTANTE:** Asegúrate de copiar el archivo `.env.local`. A veces Windows lo oculta por empezar con un punto. Este archivo tiene las llaves de Supabase y sin él no cargará nada.
+## 2. Copia de Archivos (Vía USB - El método rápido)
+He creado una herramienta llamada **EMPAQUETAR_PARA_USB.bat** que hace que el proceso sea casi instantáneo:
+1. En tu laptop actual, dale doble clic al archivo **EMPAQUETAR_PARA_USB.bat**.
+2. Esto creara un archivo llamado `RODRIGOS_POS_MIGRACION.zip` (pesa poquísimo porque no incluye carpetas basura).
+3. Copia ese archivo `.zip` a tu USB.
+4. En la laptop del negocio, extrae el contenido del `.zip` en una carpeta nueva.
+5. **IMPORTANTE:** Asegúrate de que el archivo `.env.local` esté dentro de esa carpeta.
+
+## 2.1 Método Alternativo (Vía GitHub)
+Si la laptop del negocio tiene buen internet:
+1. Instala Git.
+2. Abre una terminal y escribe: `git clone https://github.com/realqtsi/rodrigos_polleria.git`
+3. Copia manualmente el archivo `.env.local` desde tu USB a la carpeta del proyecto (este archivo NO se sube a internet por seguridad).
 
 ## 3. Instalación de Dependencias
 Una vez tengas los archivos en la nueva laptop, abre una terminal en esa carpeta y ejecuta:

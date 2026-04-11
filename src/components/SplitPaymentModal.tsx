@@ -109,16 +109,21 @@ export default function SplitPaymentModal({ isOpen, onClose, total, onConfirm }:
                                 {/* MODO RÁPIDO: Botones de pago único */}
                                 <p className="text-xs text-slate-400 uppercase font-semibold tracking-wide mb-3">Pago con un solo método</p>
                                 <div className="grid grid-cols-2 gap-3 mb-4">
-                                    {METODOS.map(m => (
-                                        <button
-                                            key={m.key}
-                                            onClick={() => handleQuickPay(m.key)}
-                                            className="py-5 rounded-xl font-semibold text-sm text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-all flex flex-col items-center justify-center gap-2 active:scale-95"
-                                        >
-                                            {typeof m.icon === 'function' ? (m.icon as any)() : <m.icon size={22} className="text-slate-500" />}
-                                            {m.label}
-                                        </button>
-                                    ))}
+                                    {METODOS.map((m) => {
+                                        const Icon = m.icon;
+                                        return (
+                                            <button
+                                                key={m.key}
+                                                onClick={() => handleQuickPay(m.key)}
+                                                className="py-5 rounded-xl font-semibold text-sm text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-all flex flex-col items-center justify-center gap-2 active:scale-95"
+                                            >
+                                                {Icon && (
+                                                    typeof Icon === 'function' && !(Icon as any).prototype?.render ? (Icon as any)() : <Icon size={20} className="text-slate-500" />
+                                                )}
+                                                {m.label}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
 
                                 {/* Separator */}
@@ -149,37 +154,42 @@ export default function SplitPaymentModal({ isOpen, onClose, total, onConfirm }:
                                 </button>
 
                                 <div className="space-y-3 mb-5">
-                                    {METODOS.map(m => (
-                                        <div key={m.key} className={`flex items-center gap-3 p-3 rounded-xl border ${montos[m.key] ? m.lightColor : 'border-slate-100 bg-white'} transition-all`}>
-                                            <div className={`w-9 h-9 rounded-lg ${m.color} flex items-center justify-center flex-shrink-0`}>
-                                                {typeof m.icon === 'function' ? (m.icon as any)() : <m.icon size={18} className="text-white" />}
+                                    {METODOS.map(m => {
+                                        const Icon = m.icon;
+                                        return (
+                                            <div key={m.key} className={`flex items-center gap-3 p-3 rounded-xl border ${montos[m.key] ? m.lightColor : 'border-slate-100 bg-white'} transition-all`}>
+                                                <div className={`w-9 h-9 rounded-lg ${m.color} flex items-center justify-center flex-shrink-0`}>
+                                                    {Icon && (
+                                                        typeof Icon === 'function' && !(Icon as any).prototype?.render ? (Icon as any)() : <Icon size={18} className="text-white" />
+                                                    )}
+                                                </div>
+                                                <span className="text-sm font-semibold text-slate-700 flex-1">{m.label}</span>
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-xs text-slate-400">S/</span>
+                                                    <input
+                                                        type="number"
+                                                        inputMode="decimal"
+                                                        step="0.01"
+                                                        min="0"
+                                                        value={montos[m.key] || ''}
+                                                        onChange={(e) => handleMontoChange(m.key, e.target.value)}
+                                                        placeholder="0.00"
+                                                        className="w-24 text-right font-bold text-slate-800 bg-transparent border-b-2 border-slate-200 focus:border-slate-500 outline-none py-1 text-base transition-colors"
+                                                    />
+                                                    {/* Auto-completar */}
+                                                    {diferencia > 0.01 && (
+                                                        <button
+                                                            onClick={() => handleAutoCompletar(m.key)}
+                                                            title={`Poner S/ ${diferencia.toFixed(2)} restantes aquí`}
+                                                            className="text-[10px] text-amber-600 bg-amber-50 hover:bg-amber-100 px-1.5 py-0.5 rounded font-bold transition-colors ml-1"
+                                                        >
+                                                            +{diferencia.toFixed(0)}
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <span className="text-sm font-semibold text-slate-700 flex-1">{m.label}</span>
-                                            <div className="flex items-center gap-1">
-                                                <span className="text-xs text-slate-400">S/</span>
-                                                <input
-                                                    type="number"
-                                                    inputMode="decimal"
-                                                    step="0.01"
-                                                    min="0"
-                                                    value={montos[m.key] || ''}
-                                                    onChange={(e) => handleMontoChange(m.key, e.target.value)}
-                                                    placeholder="0.00"
-                                                    className="w-24 text-right font-bold text-slate-800 bg-transparent border-b-2 border-slate-200 focus:border-slate-500 outline-none py-1 text-base transition-colors"
-                                                />
-                                                {/* Auto-completar */}
-                                                {diferencia > 0.01 && (
-                                                    <button
-                                                        onClick={() => handleAutoCompletar(m.key)}
-                                                        title={`Poner S/ ${diferencia.toFixed(2)} restantes aquí`}
-                                                        className="text-[10px] text-amber-600 bg-amber-50 hover:bg-amber-100 px-1.5 py-0.5 rounded font-bold transition-colors ml-1"
-                                                    >
-                                                        +{diferencia.toFixed(0)}
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
 
                                 {/* Resumen */}

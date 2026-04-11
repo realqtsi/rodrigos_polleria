@@ -58,7 +58,7 @@ function CierreCajaContent() {
     // Cargar stock inicial de bebidas cuando 'stock' esté disponible
     useEffect(() => {
         if (stock?.bebidas_detalle) {
-            setBebidasDetalle(mergeWithStock(stock.bebidas_detalle as Record<string, any>));
+            setBebidasDetalle(mergeWithStock(stock.bebidas_detalle as any));
         } else if (!loadingCatalog && allBrands.length > 0) {
             setBebidasDetalle(mergeWithStock({}));
         }

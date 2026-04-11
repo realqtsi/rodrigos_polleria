@@ -90,7 +90,7 @@ export default function Navbar() {
                                                 ? 'bg-rodrigo-terracotta text-white font-bold shadow-md shadow-rodrigo-terracotta/20'
                                                 : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-semibold'
                                                 }`}>
-                                                <Icon size={18} className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-rodrigo-terracotta transition-colors'} />
+                                                <item.icon size={18} className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-rodrigo-terracotta transition-colors'} />
                                                 <span>{item.label}</span>
                                             </div>
                                         </Link>
@@ -199,7 +199,7 @@ export default function Navbar() {
                                                             ? 'bg-rodrigo-terracotta text-white font-bold'
                                                             : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-semibold'
                                                             }`}>
-                                                            <Icon size={18} className={isActive ? 'text-white' : 'text-slate-400'} />
+                                                            <item.icon size={18} className={isActive ? 'text-white' : 'text-slate-400'} />
                                                             <span>{item.label}</span>
                                                         </div>
                                                     </Link>

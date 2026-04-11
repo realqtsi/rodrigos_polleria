@@ -316,19 +316,94 @@ function POSContent() {
                 const itemsParaCocina = carrito.filter(item => !item.printed);
                 if (itemsParaCocina.length > 0) {
                     try {
-                        const { data: config } = await supabase.from('configuracion_negocio').select('ip_impresora_cocina, ip_impresora_caja').eq('id', 1).single();
-                        const hostIp = window.location.hostname;
-                        const printServerUrl = `http://${hostIp}:3001`;
-                        await fetch(`${printServerUrl}/print-kitchen`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ ip: config?.ip_impresora_cocina || '192.168.1.100', mesa: selectedTable ? selectedTable.numero : 'LLEVAR', items: itemsParaCocina, notas: orderNotes })
-                        });
-                        await fetch(`${printServerUrl}/print-receipt`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ ip: config?.ip_impresora_caja || '192.168.1.101', items: itemsParaCocina, subtotal: calcularSubtotal(), total: calcularTotal(), envio: deliveryInfo?.cost || 0, esDelivery: isDelivery, direccion: deliveryInfo?.address })
-                        });
+                        const { data: config } = await supabase.from('configuracion_negocio').select('ip_impresora_cocina, ip_impresora_caja, modo_impresion, nombre_negocio, telefono').eq('id', 1).single();
+
+                        if (config?.modo_impresion === 'bluetooth') {
+                            // Modo Bluetooth: Usar las instancias guardadas en window
+                            const kitchenPrinter = (window as any).kitchenPrinter;
+                            const cashierPrinter = (window as any).cashierPrinter;
+
+                            if (!kitchenPrinter && !cashierPrinter) {
+                                toast.error('Impresoras Bluetooth no vinculadas. Ve a Ajustes.');
+                                return;
+                            }
+
+                            const { ESCPOS } = await import('@/lib/bluetoothPrinter');
+
+                            // 1. Imprimir a Cocina si hay impresora vinculada
+                            if (kitchenPrinter) {
+                                let cmds = new Uint8Array([
+                                    ...ESCPOS.RESET,
+                                    ...ESCPOS.ALIGN_CENTER,
+                                    ...ESCPOS.TEXT_SIZE_LARGE,
+                                    ...ESCPOS.TEXT_BOLD_ON,
+                                    ...ESCPOS.encodeText('COMANDA COCINA'),
+                                    ...ESCPOS.TEXT_SIZE_NORMAL,
+                                    ...ESCPOS.encodeText(`MESA: ${selectedTable ? selectedTable.numero : 'LLEVAR'}`),
+                                    ...ESCPOS.encodeText(`FECHA: ${new Date().toLocaleString()}`),
+                                    ...ESCPOS.encodeText('--------------------------------'),
+                                    ...ESCPOS.ALIGN_LEFT,
+                                    ...itemsParaCocina.flatMap(it => [
+                                        ...ESCPOS.TEXT_BOLD_ON,
+                                        ...ESCPOS.encodeText(`${it.cantidad}x ${it.nombre}`),
+                                        ...ESCPOS.TEXT_BOLD_OFF,
+                                        ...(it.detalles?.parte ? ESCPOS.encodeText(`   PARTE: ${it.detalles.parte}`) : []),
+                                        ...(it.detalles?.notas ? ESCPOS.encodeText(`   NOTA: ${it.detalles.notas}`) : []),
+                                        ...ESCPOS.encodeText(' ')
+                                    ] as any),
+                                    ...ESCPOS.encodeText('--------------------------------'),
+                                    ...ESCPOS.PAPER_FEED(3),
+                                    ...ESCPOS.FEED_AND_CUT
+                                ]);
+                                await kitchenPrinter.print(cmds);
+                            }
+
+                            // 2. Imprimir Comprobante/Ticket a Caja si hay impresora vinculada
+                            if (cashierPrinter) {
+                                let cmds = new Uint8Array([
+                                    ...ESCPOS.RESET,
+                                    ...ESCPOS.ALIGN_CENTER,
+                                    ...ESCPOS.TEXT_SIZE_LARGE,
+                                    ...ESCPOS.TEXT_BOLD_ON,
+                                    ...ESCPOS.encodeText(config.nombre_negocio || "RODRIGO'S"),
+                                    ...ESCPOS.TEXT_SIZE_NORMAL,
+                                    ...ESCPOS.encodeText('TICKET DE VENTA'),
+                                    ...ESCPOS.encodeText('--------------------------------'),
+                                    ...ESCPOS.ALIGN_LEFT,
+                                    ...itemsParaCocina.flatMap(it => [
+                                        ...ESCPOS.encodeText(`${it.cantidad}x ${it.nombre.substring(0, 20).padEnd(20)} S/ ${(it.cantidad * it.precio).toFixed(2)}`)
+                                    ] as any),
+                                    ...ESCPOS.encodeText('--------------------------------'),
+                                    ...ESCPOS.TEXT_BOLD_ON,
+                                    ...ESCPOS.ALIGN_RIGHT,
+                                    ...ESCPOS.encodeText(`SUBTOTAL: S/ ${calcularSubtotal().toFixed(2)}`),
+                                    ...(isDelivery ? ESCPOS.encodeText(`ENVIO: S/ ${(deliveryInfo?.cost || 0).toFixed(2)}`) : []),
+                                    ...ESCPOS.TEXT_SIZE_LARGE,
+                                    ...ESCPOS.encodeText(`TOTAL: S/ ${calcularTotal().toFixed(2)}`),
+                                    ...ESCPOS.TEXT_SIZE_NORMAL,
+                                    ...ESCPOS.TEXT_BOLD_OFF,
+                                    ...ESCPOS.ALIGN_CENTER,
+                                    ...ESCPOS.encodeText('¡Gracias por su preferencia!'),
+                                    ...ESCPOS.PAPER_FEED(3),
+                                    ...ESCPOS.FEED_AND_CUT
+                                ]);
+                                await cashierPrinter.print(cmds);
+                            }
+                        } else {
+                            // Modo RED (Legacy/WiFi)
+                            const hostIp = window.location.hostname;
+                            const printServerUrl = `http://${hostIp}:3001`;
+                            await fetch(`${printServerUrl}/print-kitchen`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ ip: config?.ip_impresora_cocina || '192.168.1.100', mesa: selectedTable ? selectedTable.numero : 'LLEVAR', items: itemsParaCocina, notas: orderNotes })
+                            });
+                            await fetch(`${printServerUrl}/print-receipt`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ ip: config?.ip_impresora_caja || '192.168.1.101', items: itemsParaCocina, subtotal: calcularSubtotal(), total: calcularTotal(), envio: deliveryInfo?.cost || 0, esDelivery: isDelivery, direccion: deliveryInfo?.address })
+                            });
+                        }
                         const printedKeys = new Set(itemsParaCocina.map(p => `${p.producto_id}||${p.detalles?.parte || ''}||${p.detalles?.notas || ''}`));
                         setCarrito(prev => prev.map(item => {
                             const itemKey = `${item.producto_id}||${item.detalles?.parte || ''}||${item.detalles?.notas || ''}`;
@@ -527,7 +602,7 @@ function POSContent() {
                 </nav>
             </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
                 <div className="lg:col-span-8 space-y-4 max-h-[calc(100vh-220px)] overflow-y-auto pr-2 custom-scrollbar">
                     <div className="relative group">
                         <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
@@ -550,10 +625,10 @@ function POSContent() {
 
                 {/* Carrito (Desktop Sidebar) */}
                 <div className="hidden lg:block lg:col-span-4 sticky top-6">
-                    <CartPanel 
-                        carrito={carrito} 
-                        vaciarCarrito={vaciarCarrito} 
-                        modificarCantidad={modificarCantidad} 
+                    <CartPanel
+                        carrito={carrito}
+                        vaciarCarrito={vaciarCarrito}
+                        modificarCantidad={modificarCantidad}
                         calcularSubtotal={calcularSubtotal}
                         calcularTotal={calcularTotal}
                         isDelivery={isDelivery}
@@ -568,13 +643,13 @@ function POSContent() {
             {/* Mobile Bottom Cart Bar */}
             <AnimatePresence>
                 {carrito.length > 0 && (
-                    <motion.div 
+                    <motion.div
                         initial={{ y: 100 }}
                         animate={{ y: 0 }}
                         exit={{ y: 100 }}
                         className="lg:hidden fixed bottom-24 left-4 right-4 z-50 bg-slate-900 text-white rounded-[2rem] shadow-2xl overflow-hidden border border-white/10"
                     >
-                        <button 
+                        <button
                             onClick={() => setIsCartDrawerOpen(true)}
                             className="w-full flex items-center justify-between p-5 active:bg-slate-800 transition-colors"
                         >
@@ -600,14 +675,14 @@ function POSContent() {
             <AnimatePresence>
                 {isCartDrawerOpen && (
                     <div className="lg:hidden fixed inset-0 z-[60] flex flex-col">
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setIsCartDrawerOpen(false)}
                             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                         />
-                        <motion.div 
+                        <motion.div
                             initial={{ y: '100%' }}
                             animate={{ y: 0 }}
                             exit={{ y: '100%' }}
@@ -620,10 +695,10 @@ function POSContent() {
                                 <button onClick={() => setIsCartDrawerOpen(false)} className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-white/50"><X size={24} /></button>
                             </div>
 
-                            <CartPanel 
-                                carrito={carrito} 
-                                vaciarCarrito={vaciarCarrito} 
-                                modificarCantidad={modificarCantidad} 
+                            <CartPanel
+                                carrito={carrito}
+                                vaciarCarrito={vaciarCarrito}
+                                modificarCantidad={modificarCantidad}
                                 calcularSubtotal={calcularSubtotal}
                                 calcularTotal={calcularTotal}
                                 isDelivery={isDelivery}

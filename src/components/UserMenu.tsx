@@ -85,7 +85,7 @@ export default function UserMenu() {
                             </div>
 
                             {/* Restablecer Button - solo admin y cajera */}
-                            {(user.rol === 'administrador' || user.rol === 'cajera') && (
+                            {(user.rol === 'admin' || user.rol === 'cajero') && (
                                 <>
                                     {!showResetConfirm ? (
                                         <button

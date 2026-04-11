@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# env files
+.env*
+
+# migration/temp files
+*.zip
+*.bat
+!INICIAR_RODRIGOS.bat
+ngrok.exe
+ngrok-v3-stable-windows-amd64/
+sql/
+rodrigo's/
+RODRIGOS_POS_MIGRACION.zip

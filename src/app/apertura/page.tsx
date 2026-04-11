@@ -76,7 +76,7 @@ function AperturaContent() {
 
             if (data) {
                 if (data.bebidas_detalle) {
-                    setBebidasDetalle(data.bebidas_detalle as BebidasDetalle);
+                    setBebidasDetalle(data.bebidas_detalle as any);
                 }
                 // Si hay stock de gaseosas disponible, lo usamos como base, pero el detalle es la fuente de verdad.
                 // El usuario pidió que se cargue solo una vez y se guarde para el día siguiente.
