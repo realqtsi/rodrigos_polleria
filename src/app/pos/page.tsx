@@ -499,6 +499,15 @@ function POSContent() {
                         <h1 className="text-xl md:text-2xl font-black text-slate-900 italic tracking-tight uppercase">
                             {isDelivery ? "Delivery" : isParaLlevar ? "Recojo" : `Mesa ${selectedTable?.numero}`}
                         </h1>
+                        {isDelivery && deliveryInfo && (
+                            <button
+                                onClick={() => setShowDeliveryMap(true)}
+                                className="text-xs font-bold text-indigo-500 hover:text-indigo-600 flex items-center gap-1 mt-1"
+                            >
+                                <MapPin size={12} />
+                                {deliveryInfo.address}
+                            </button>
+                        )}
                     </div>
                 </div>
                 <nav className="flex items-center gap-2 overflow-x-auto pb-4 md:pb-0 no-scrollbar touch-pan-x">
