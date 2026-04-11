@@ -284,7 +284,7 @@ function MesasActivasContent() {
                                     <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Para Llevar</h2>
                                     <span className="text-xs font-bold text-slate-400">({ventasParaLlevar.length})</span>
                                 </div>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                     <AnimatePresence mode="popLayout">
                                         {ventasParaLlevar.map((venta, idx) => (
                                             <VentaCard
@@ -311,7 +311,7 @@ function MesasActivasContent() {
                                     <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Delivery</h2>
                                     <span className="text-xs font-bold text-slate-400">({ventasDelivery.length})</span>
                                 </div>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                     <AnimatePresence mode="popLayout">
                                         {ventasDelivery.map((venta, idx) => (
                                             <VentaCard
@@ -338,7 +338,7 @@ function MesasActivasContent() {
                                     <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Mesas</h2>
                                     <span className="text-xs font-bold text-slate-400">({mesasActivas.length})</span>
                                 </div>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                     <AnimatePresence mode="popLayout">
                                         {mesasActivas.map((mesa, idx) => (
                                             <VentaCard
@@ -429,30 +429,37 @@ function VentaCard({ venta, label, idx, onPay, onPrint, onCancel }: { venta: Ven
                     {new Date(venta.created_at).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
                 </span>
             </div>
-            <div className="text-right mb-3">
-                <p className="text-2xl font-black text-slate-900 tracking-tight">S/{(venta.total || 0).toFixed(2)}</p>
+            <div className="text-right mb-4">
+                <p className="text-3xl font-black text-slate-900 tracking-tighter">S/{(venta.total || 0).toFixed(2)}</p>
             </div>
-            <div className="space-y-1.5 mb-4 max-h-48 overflow-y-auto pr-1">
+            <div className="space-y-2 mb-6 max-h-64 overflow-y-auto pr-2 bg-slate-50/50 p-2 rounded-xl border border-slate-50">
                 {venta.items.map((item, id) => (
-                    <div key={id} className="flex items-center gap-2 text-xs">
-                        <span className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 text-[10px] font-black text-slate-600">{item.cantidad}</span>
-                        <span className="text-slate-600 truncate flex-1 font-medium">{item.nombre}</span>
-                        <span className="text-slate-400 text-[11px] font-mono">S/{(item.precio * item.cantidad).toFixed(2)}</span>
+                    <div key={id} className="flex items-center gap-3 text-sm border-b border-slate-100/50 last:border-0 pb-1.5 last:pb-0">
+                        <span className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-sm border border-slate-100 text-[12px] font-black text-slate-900">{item.cantidad}</span>
+                        <div className="flex-1 min-w-0">
+                            <span className="text-slate-900 font-bold block truncate">{item.nombre}</span>
+                            {(item as any).detalles?.notas && (
+                                <span className="text-[10px] text-rodrigo-terracotta font-black uppercase italic block">
+                                    Nota: {(item as any).detalles.notas}
+                                </span>
+                            )}
+                        </div>
+                        <span className="text-slate-500 font-black text-xs whitespace-nowrap">S/{(item.precio * item.cantidad).toFixed(2)}</span>
                     </div>
                 ))}
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
                 {(user?.rol === 'admin' || user?.rol === 'cajero') && (
-                    <button onClick={onPay} className="flex-1 py-2.5 bg-slate-900 text-white font-bold text-[10px] uppercase rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-1.5">
-                        <CreditCard size={12} /> COBRAR
+                    <button onClick={onPay} className="flex-1 py-4 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest rounded-2xl hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+                        <CreditCard size={14} /> COBRAR
                     </button>
                 )}
-                <button onClick={onPrint} className={`py-2.5 px-3 bg-slate-100 text-slate-500 font-bold text-[10px] uppercase rounded-xl hover:bg-slate-200 transition-all ${user?.rol === 'mozo' ? 'flex-1' : ''}`}>
-                    <Printer size={12} /> {(user?.rol === 'mozo') && 'CUENTA'}
+                <button onClick={onPrint} className={`py-4 px-4 bg-white border-2 border-slate-100 text-slate-600 font-black text-[11px] uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all shadow-sm ${user?.rol === 'mozo' ? 'flex-1' : ''}`}>
+                    <Printer size={16} /> {(user?.rol === 'mozo' || !onPay) && ' IMPRIMIR'}
                 </button>
                 {(user?.rol === 'admin' || user?.rol === 'cajero') && (
-                    <button onClick={onCancel} className="py-2.5 px-3 bg-slate-100 text-red-400 font-bold text-[10px] uppercase rounded-xl hover:bg-red-50 transition-all">
-                        <Trash2 size={12} />
+                    <button onClick={onCancel} className="py-4 px-4 bg-white border-2 border-slate-100 text-red-500 font-black text-[11px] uppercase tracking-widest rounded-2xl hover:bg-red-50 hover:border-red-100 transition-all shadow-sm">
+                        <Trash2 size={16} />
                     </button>
                 )}
             </div>
