@@ -321,10 +321,12 @@ function POSContent() {
                     try {
                         const { data: config } = await supabase.from('configuracion_negocio').select('ip_impresora_cocina, ip_impresora_caja, modo_impresion, nombre_negocio, telefono').eq('id', 1).single();
 
-                        if (config?.modo_impresion === 'bluetooth') {
+                        const kitchenPrinter = (window as any).kitchenPrinter;
+                        const cashierPrinter = (window as any).cashierPrinter;
+                        const hasBluetooth = kitchenPrinter || cashierPrinter;
+
+                        if (config?.modo_impresion === 'bluetooth' || hasBluetooth) {
                             // Modo Bluetooth: Usar las instancias guardadas en window
-                            const kitchenPrinter = (window as any).kitchenPrinter;
-                            const cashierPrinter = (window as any).cashierPrinter;
 
                             if (!kitchenPrinter && !cashierPrinter) {
                                 toast.error('Impresoras Bluetooth no vinculadas. Ve a Ajustes.');
