@@ -661,3 +661,129 @@ function POSContent() {
         </div>
     );
 }
+
+type CartPanelProps = {
+    carrito: ItemCarrito[];
+    vaciarCarrito: () => void;
+    modificarCantidad: (index: number, delta: number) => void;
+    calcularSubtotal: () => number;
+    calcularTotal: () => number;
+    isDelivery: boolean;
+    deliveryInfo: { address: string; distanceKm: number; cost: number } | null;
+    handleConfirmarPedido: () => void;
+    procesando: boolean;
+    currentVentaId: string | null;
+    isMobileDrawer?: boolean;
+};
+
+function CartPanel({
+    carrito,
+    vaciarCarrito,
+    modificarCantidad,
+    calcularSubtotal,
+    calcularTotal,
+    isDelivery,
+    deliveryInfo,
+    handleConfirmarPedido,
+    procesando,
+    currentVentaId,
+    isMobileDrawer = false
+}: CartPanelProps) {
+    const subtotal = calcularSubtotal();
+    const total = calcularTotal();
+    const costoEnvio = deliveryInfo?.cost || 0;
+
+    return (
+        <div className={`bg-white rounded-[2rem] border border-slate-100 shadow-xl overflow-hidden ${isMobileDrawer ? '' : ''}`}>
+            <div className="p-6 border-b border-slate-50">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-black text-slate-900 uppercase italic tracking-tight">Tu Pedido</h2>
+                    {carrito.length > 0 && (
+                        <button
+                            onClick={vaciarCarrito}
+                            className="text-[10px] font-bold text-slate-400 hover:text-rodrigo-terracotta uppercase tracking-widest transition-colors"
+                        >
+                            Vaciar
+                        </button>
+                    )}
+                </div>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
+                    {carrito.length} {carrito.length === 1 ? 'item' : 'items'}
+                </p>
+            </div>
+
+            {carrito.length === 0 ? (
+                <div className="p-12 text-center">
+                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <ShoppingBag size={24} className="text-slate-200" />
+                    </div>
+                    <p className="text-sm font-bold text-slate-300 uppercase tracking-widest">Carrito vacío</p>
+                </div>
+            ) : (
+                <>
+                    <div className="max-h-[400px] overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                        {carrito.map((item, index) => (
+                            <div key={index} className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl">
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-bold text-slate-900 uppercase italic truncate">{item.nombre}</p>
+                                    {item.detalles?.notas && (
+                                        <p className="text-[10px] text-slate-400 mt-0.5">Nota: {item.detalles.notas}</p>
+                                    )}
+                                    <p className="text-xs font-mono text-rodrigo-terracotta mt-1">S/ {item.precio.toFixed(2)} c/u</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => modificarCantidad(index, -1)}
+                                        className="w-7 h-7 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-400 hover:text-rodrigo-terracotta hover:border-rodrigo-terracotta transition-colors"
+                                    >
+                                        <Minus size={12} />
+                                    </button>
+                                    <span className="w-6 text-center font-black text-slate-900 text-sm">{item.cantidad}</span>
+                                    <button
+                                        onClick={() => modificarCantidad(index, 1)}
+                                        className="w-7 h-7 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-400 hover:text-rodrigo-terracotta hover:border-rodrigo-terracotta transition-colors"
+                                    >
+                                        <Plus size={12} />
+                                    </button>
+                                </div>
+                                <span className="text-sm font-black text-slate-900 w-16 text-right">S/ {item.subtotal.toFixed(2)}</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="p-6 border-t border-slate-100 space-y-3">
+                        <div className="flex justify-between text-sm">
+                            <span className="text-slate-400 font-bold uppercase tracking-widest">Subtotal</span>
+                            <span className="text-slate-900 font-black">S/ {subtotal.toFixed(2)}</span>
+                        </div>
+                        {isDelivery && costoEnvio > 0 && (
+                            <div className="flex justify-between text-sm">
+                                <span className="text-indigo-500 font-bold uppercase tracking-widest">Costo Envío</span>
+                                <span className="text-indigo-500 font-black">S/ {costoEnvio.toFixed(2)}</span>
+                            </div>
+                        )}
+                        <div className="flex justify-between pt-3 border-t border-slate-100">
+                            <span className="text-slate-900 font-black uppercase tracking-widest">Total</span>
+                            <span className="text-xl font-black text-rodrigo-terracotta">S/ {total.toFixed(2)}</span>
+                        </div>
+
+                        <button
+                            onClick={handleConfirmarPedido}
+                            disabled={procesando}
+                            className={`w-full py-4 rounded-2xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-2 transition-all ${procesando ? 'bg-slate-100 text-slate-400' : 'bg-slate-900 text-white hover:brightness-110 active:scale-[0.98]'}`}
+                        >
+                            {procesando ? (
+                                <RefreshCw size={18} className="animate-spin" />
+                            ) : (
+                                <>
+                                    <Save size={18} />
+                                    {currentVentaId ? 'Actualizar Pedido' : 'Confirmar Pedido'}
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </>
+            )}
+        </div>
+    );
+}
