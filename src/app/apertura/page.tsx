@@ -230,6 +230,11 @@ function AperturaContent() {
 
             if (error) throw error;
 
+            // RESETEAR TODAS LAS MESAS AL INICIAR EL DÍA
+            await supabase
+                .from('mesas')
+                .update({ estado: 'libre' });
+
             toast.success(
                 `¡Día iniciado exitosamente!\nPollos: ${pollos} | Chicha: ${chicha}L | Bebidas: ${totalBebidas}`,
                 { duration: 3000, icon: '✅' }

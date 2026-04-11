@@ -309,8 +309,10 @@ function POSContent() {
             if (currentVentaId) {
                 resultado = await actualizarVenta(currentVentaId, carrito);
             } else {
-                if (selectedTable) await ocuparMesa(selectedTable.id);
                 resultado = await registrarVenta(carrito, selectedTable?.id, orderNotes, deliveryData);
+                if (resultado.success && selectedTable) {
+                    await ocuparMesa(selectedTable.id);
+                }
             }
 
             if (resultado.success) {
