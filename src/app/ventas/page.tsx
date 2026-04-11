@@ -272,42 +272,87 @@ function MesasActivasContent() {
                         <p className="text-slate-400 text-xs max-w-[250px] mx-auto font-bold uppercase tracking-widest">No hay cuentas pendientes por cobrar en este momento.</p>
                     </motion.div>
                 ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-                        <AnimatePresence mode="popLayout">
-                            {ventasParaLlevar.map((venta, idx) => (
-                                <VentaCard
-                                    key={venta.id}
-                                    venta={venta}
-                                    label="LLEVAR"
-                                    idx={idx}
-                                    onPay={() => abrirModalCobro(venta.id, null, undefined, venta.items, venta.total)}
-                                    onPrint={() => handlePrintPreCuenta(false, venta.items, venta.total, venta.id)}
-                                    onCancel={() => handleCancelClick(venta.id, null, 'Para Llevar')}
-                                />
-                            ))}
-                            {ventasDelivery.map((venta, idx) => (
-                                <VentaCard
-                                    key={venta.id}
-                                    venta={venta}
-                                    label="DELIVERY"
-                                    idx={idx}
-                                    onPay={() => abrirModalCobro(venta.id, null, undefined, venta.items, venta.total)}
-                                    onPrint={() => handlePrintPreCuenta(false, venta.items, venta.total, venta.id)}
-                                    onCancel={() => handleCancelClick(venta.id, null, 'Delivery')}
-                                />
-                            ))}
-                            {mesasActivas.map((mesa, idx) => (
-                                <VentaCard
-                                    key={mesa.id}
-                                    venta={mesa.venta!}
-                                    label={`MESA ${mesa.numero}`}
-                                    idx={idx}
-                                    onPay={() => abrirModalCobro(mesa.venta!.id, mesa.id, mesa.numero, mesa.venta!.items, mesa.venta!.total)}
-                                    onPrint={() => handlePrintPreCuenta(true, mesa.venta!.items, mesa.venta!.total, mesa.venta!.id, mesa.numero)}
-                                    onCancel={() => handleCancelClick(mesa.venta!.id, mesa.id, `Mesa ${mesa.numero}`)}
-                                />
-                            ))}
-                        </AnimatePresence>
+                    <div className="space-y-10">
+                        {ventasParaLlevar.length > 0 && (
+                            <section>
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center">
+                                        <ShoppingBag size={16} className="text-amber-600" />
+                                    </div>
+                                    <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Para Llevar</h2>
+                                    <span className="text-xs font-bold text-slate-400">({ventasParaLlevar.length})</span>
+                                </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                                    <AnimatePresence mode="popLayout">
+                                        {ventasParaLlevar.map((venta, idx) => (
+                                            <VentaCard
+                                                key={venta.id}
+                                                venta={venta}
+                                                label="LLEVAR"
+                                                idx={idx}
+                                                onPay={() => abrirModalCobro(venta.id, null, undefined, venta.items, venta.total)}
+                                                onPrint={() => handlePrintPreCuenta(false, venta.items, venta.total, venta.id)}
+                                                onCancel={() => handleCancelClick(venta.id, null, 'Para Llevar')}
+                                            />
+                                        ))}
+                                    </AnimatePresence>
+                                </div>
+                            </section>
+                        )}
+
+                        {ventasDelivery.length > 0 && (
+                            <section>
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-8 h-8 rounded-xl bg-indigo-100 flex items-center justify-center">
+                                        <Navigation size={16} className="text-indigo-600" />
+                                    </div>
+                                    <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Delivery</h2>
+                                    <span className="text-xs font-bold text-slate-400">({ventasDelivery.length})</span>
+                                </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                                    <AnimatePresence mode="popLayout">
+                                        {ventasDelivery.map((venta, idx) => (
+                                            <VentaCard
+                                                key={venta.id}
+                                                venta={venta}
+                                                label="DELIVERY"
+                                                idx={idx}
+                                                onPay={() => abrirModalCobro(venta.id, null, undefined, venta.items, venta.total)}
+                                                onPrint={() => handlePrintPreCuenta(false, venta.items, venta.total, venta.id)}
+                                                onCancel={() => handleCancelClick(venta.id, null, 'Delivery')}
+                                            />
+                                        ))}
+                                    </AnimatePresence>
+                                </div>
+                            </section>
+                        )}
+
+                        {mesasActivas.length > 0 && (
+                            <section>
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-8 h-8 rounded-xl bg-sky-100 flex items-center justify-center">
+                                        <Users size={16} className="text-sky-600" />
+                                    </div>
+                                    <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Mesas</h2>
+                                    <span className="text-xs font-bold text-slate-400">({mesasActivas.length})</span>
+                                </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                                    <AnimatePresence mode="popLayout">
+                                        {mesasActivas.map((mesa, idx) => (
+                                            <VentaCard
+                                                key={mesa.id}
+                                                venta={mesa.venta!}
+                                                label={`MESA ${mesa.numero}`}
+                                                idx={idx}
+                                                onPay={() => abrirModalCobro(mesa.venta!.id, mesa.id, mesa.numero, mesa.venta!.items, mesa.venta!.total)}
+                                                onPrint={() => handlePrintPreCuenta(true, mesa.venta!.items, mesa.venta!.total, mesa.venta!.id, mesa.numero)}
+                                                onCancel={() => handleCancelClick(mesa.venta!.id, mesa.id, `Mesa ${mesa.numero}`)}
+                                            />
+                                        ))}
+                                    </AnimatePresence>
+                                </div>
+                            </section>
+                        )}
                     </div>
                 )}
 
@@ -370,36 +415,40 @@ function VentaCard({ venta, label, idx, onPay, onPrint, onCancel }: { venta: Ven
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.03 }}
-            className="bg-white rounded-2xl border border-slate-100 p-3 shadow-sm hover:shadow-md transition-all cursor-pointer"
-            onClick={onPay}
+            className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md hover:border-slate-200 transition-all"
         >
-            <div className="flex justify-between items-start mb-2">
-                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${label.includes('MESA') ? 'bg-sky-100 text-sky-600' : label === 'DELIVERY' ? 'bg-indigo-100 text-indigo-600' : 'bg-amber-100 text-amber-600'}`}>
+            <div className="flex justify-between items-start mb-3">
+                <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${label.includes('MESA') ? 'bg-sky-100 text-sky-600' : label === 'DELIVERY' ? 'bg-indigo-100 text-indigo-600' : 'bg-amber-100 text-amber-600'}`}>
                     {label}
                 </span>
-                <span className="text-[9px] text-slate-400 font-bold">
+                <span className="text-[10px] text-slate-400 font-bold flex items-center gap-1">
+                    <Clock size={10} />
                     {new Date(venta.created_at).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
                 </span>
             </div>
-            <div className="text-right mb-2">
-                <p className="text-xl font-black text-slate-900 tracking-tight">S/{(venta.total || 0).toFixed(2)}</p>
+            <div className="text-right mb-3">
+                <p className="text-2xl font-black text-slate-900 tracking-tight">S/{(venta.total || 0).toFixed(2)}</p>
             </div>
-            <div className="space-y-1 mb-3 max-h-20 overflow-hidden">
-                {venta.items.slice(0, 3).map((item, id) => (
-                    <div key={id} className="flex items-center gap-2 text-[10px]">
-                        <span className="w-4 h-4 flex items-center justify-center rounded bg-slate-100 text-[9px] font-black text-slate-500">{item.cantidad}</span>
-                        <span className="text-slate-600 truncate flex-1">{item.nombre}</span>
+            <div className="space-y-1.5 mb-4 max-h-24 overflow-hidden">
+                {venta.items.slice(0, 4).map((item, id) => (
+                    <div key={id} className="flex items-center gap-2 text-xs">
+                        <span className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 text-[10px] font-black text-slate-600">{item.cantidad}</span>
+                        <span className="text-slate-600 truncate flex-1 font-medium">{item.nombre}</span>
+                        <span className="text-slate-400 text-[11px] font-mono">S/{(item.precio * item.cantidad).toFixed(2)}</span>
                     </div>
                 ))}
-                {venta.items.length > 3 && (
-                    <p className="text-[9px] text-slate-400 pl-6">+{venta.items.length - 3} más</p>
+                {venta.items.length > 4 && (
+                    <p className="text-[10px] text-slate-400 pl-7">+{venta.items.length - 4} más</p>
                 )}
             </div>
-            <div className="flex gap-1.5">
-                <button onClick={(e) => { e.stopPropagation(); onPrint(); }} className="flex-1 py-2 bg-slate-50 text-slate-500 font-bold text-[9px] uppercase rounded-lg hover:bg-slate-100 flex items-center justify-center gap-1">
+            <div className="flex gap-2">
+                <button onClick={onPay} className="flex-1 py-2.5 bg-slate-900 text-white font-bold text-[10px] uppercase rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-1.5">
+                    <CreditCard size={12} /> COBRAR
+                </button>
+                <button onClick={onPrint} className="py-2.5 px-3 bg-slate-100 text-slate-500 font-bold text-[10px] uppercase rounded-xl hover:bg-slate-200 transition-all">
                     <Printer size={12} />
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); onCancel(); }} className="flex-1 py-2 bg-slate-50 text-red-400 font-bold text-[9px] uppercase rounded-lg hover:bg-red-50 flex items-center justify-center gap-1">
+                <button onClick={onCancel} className="py-2.5 px-3 bg-slate-100 text-red-400 font-bold text-[10px] uppercase rounded-xl hover:bg-red-50 transition-all">
                     <Trash2 size={12} />
                 </button>
             </div>
