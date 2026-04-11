@@ -370,7 +370,7 @@ function POSContent() {
                                     ...ESCPOS.ALIGN_CENTER,
                                     ...ESCPOS.TEXT_SIZE_LARGE,
                                     ...ESCPOS.TEXT_BOLD_ON,
-                                    ...ESCPOS.encodeText(config.nombre_negocio || "RODRIGO'S"),
+                                    ...ESCPOS.encodeText(config?.nombre_negocio || "RODRIGO'S"),
                                     ...ESCPOS.TEXT_SIZE_NORMAL,
                                     ...ESCPOS.encodeText('TICKET DE VENTA'),
                                     ...ESCPOS.encodeText('--------------------------------'),
