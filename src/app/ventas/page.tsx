@@ -158,6 +158,13 @@ function MesasActivasContent() {
 
             if (error) throw error;
 
+            if (mesaId) {
+                await supabase
+                    .from('mesas')
+                    .update({ estado: 'libre' })
+                    .eq('id', mesaId);
+            }
+
             setShowPayModal(false);
             setPayModalData(null);
 
