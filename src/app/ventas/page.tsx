@@ -234,7 +234,7 @@ function MesasActivasContent() {
 
     return (
         <div className="min-h-screen bg-[#f8fafc] p-4 sm:p-8 lg:p-12 pb-32">
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-7xl mx-auto">
                 <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <motion.h1
@@ -284,7 +284,7 @@ function MesasActivasContent() {
                                     <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Para Llevar</h2>
                                     <span className="text-xs font-bold text-slate-400">({ventasParaLlevar.length})</span>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <AnimatePresence mode="popLayout">
                                         {ventasParaLlevar.map((venta, idx) => (
                                             <VentaCard
@@ -311,7 +311,7 @@ function MesasActivasContent() {
                                     <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Delivery</h2>
                                     <span className="text-xs font-bold text-slate-400">({ventasDelivery.length})</span>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <AnimatePresence mode="popLayout">
                                         {ventasDelivery.map((venta, idx) => (
                                             <VentaCard
@@ -338,7 +338,7 @@ function MesasActivasContent() {
                                     <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Mesas</h2>
                                     <span className="text-xs font-bold text-slate-400">({mesasActivas.length})</span>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <AnimatePresence mode="popLayout">
                                         {mesasActivas.map((mesa, idx) => (
                                             <VentaCard
@@ -437,7 +437,7 @@ function VentaCard({ venta, label, idx, onPay, onPrint, onCancel }: { venta: Ven
                     <div key={id} className="flex items-center gap-3 text-sm border-b border-slate-100/50 last:border-0 pb-1.5 last:pb-0">
                         <span className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-sm border border-slate-100 text-[12px] font-black text-slate-900">{item.cantidad}</span>
                         <div className="flex-1 min-w-0">
-                            <span className="text-slate-900 font-bold block truncate">{item.nombre}</span>
+                            <span className="text-slate-900 font-bold block">{item.nombre}</span>
                             {(item as any).detalles?.notas && (
                                 <span className="text-[10px] text-rodrigo-terracotta font-black uppercase italic block">
                                     Nota: {(item as any).detalles.notas}
