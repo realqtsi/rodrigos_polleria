@@ -128,60 +128,74 @@ const HTTP_PORT = 3001;
 const USB_VID = 1110;
 const USB_PID = 2056;
 
-function generarTicketVenta(printer, data) {
+// --- GENERADOR MANUAL DE ESC/POS (MÁS ESTABLE QUE LA LIBRERÍA ALPHA) ---
+function manualEscPos(data) {
     const { items, total, title, mesa } = data;
-    
-    // Inicialización de hardware
-    printer.hardware('init');
+    let chunks = [];
 
-    printer
-        .align('ct').size(2, 2).text("RODRIGO'S")
-        .size(1, 1).text("BRASAS & BROASTERS")
-        .text("--------------------------------");
+    const add = (buf) => chunks.push(typeof buf === 'string' ? Buffer.from(buf, 'binary') : buf);
+    const line = (text = '') => add(text + '\n');
     
-    if (title) printer.style('b').text(title).style('n');
-    printer.align('lt');
-    
-    if (mesa) printer.text(`MESA: ${mesa}`);
-    printer.text('--------------------------------');
+    // Comandos ESC/POS Básicos
+    const INIT = Buffer.from([0x1B, 0x40]);
+    const CENTER = Buffer.from([0x1B, 0x61, 0x01]);
+    const LEFT = Buffer.from([0x1B, 0x61, 0x00]);
+    const RIGHT = Buffer.from([0x1B, 0x61, 0x02]);
+    const BOLD_ON = Buffer.from([0x1B, 0x45, 0x01]);
+    const BOLD_OFF = Buffer.from([0x1B, 0x45, 0x00]);
+    const SIZE_BIG = Buffer.from([0x1D, 0x21, 0x11]);
+    const SIZE_NORMAL = Buffer.from([0x1D, 0x21, 0x00]);
+    const CUT = Buffer.from([0x1D, 0x56, 0x41, 0x03]);
 
-    items.forEach(item => {
-        const cantidad = Number(item.cantidad) || 0;
-        const precio = Number(item.precio) || 0;
-        const itemTotal = (cantidad * precio).toFixed(2);
+    add(INIT);
+    add(CENTER);
+    add(SIZE_BIG);
+    line("RODRIGO'S");
+    add(SIZE_NORMAL);
+    line("BRASAS & BROASTERS");
+    line("--------------------------------");
+    
+    if (title) {
+        add(BOLD_ON);
+        line(title.toUpperCase());
+        add(BOLD_OFF);
+    }
+    
+    add(LEFT);
+    if (mesa) line(`MESA: ${mesa}`);
+    line("--------------------------------");
+
+    (items || []).forEach(item => {
+        const can = item.cantidad || 0;
+        const pre = item.precio || 0;
+        const sub = (can * pre).toFixed(2);
+        const name = (item.nombre || '').toUpperCase().substring(0, 18);
+        line(`${can} ${name.padEnd(18)} S/ ${sub}`);
         
-        let nombre = (item.nombre || '').toUpperCase().substring(0, 20);
-        printer.text(`${cantidad} ${nombre.padEnd(20)} S/ ${itemTotal}`);
-        
-        // Agregar detalles (Presa, Trozado, Notas)
         if (item.detalles) {
-            let detallesArr = [];
-            if (item.detalles.parte) detallesArr.push(`PRESA: ${item.detalles.parte.toUpperCase()}`);
-            if (item.detalles.trozado && item.detalles.trozado !== 'entero') detallesArr.push(item.detalles.trozado.toUpperCase());
-            
-            if (detallesArr.length > 0) {
-                printer.text(`   > ${detallesArr.join(' / ')}`);
-            }
-            if (item.detalles.notas) {
-                printer.text(`   > NOTA: ${item.detalles.notas}`);
-            }
+            if (item.detalles.parte) line(`   > PRESA: ${item.detalles.parte.toUpperCase()}`);
+            if (item.detalles.trozado && item.detalles.trozado !== 'entero') line(`   > ${item.detalles.trozado.toUpperCase()}`);
+            if (item.detalles.notas) line(`   > NOTA: ${item.detalles.notas}`);
         }
     });
 
-    printer.text('--------------------------------')
-        .align('rt').size(2, 2)
-        .text(`TOTAL: S/ ${Number(total).toFixed(2)}`)
-        .size(1, 1)
-        .align('ct')
-        .feed(2)
-        .text("¡Gracias por su preferencia!")
-        .feed(4)
-        .cut();
+    line("--------------------------------");
+    add(RIGHT);
+    add(SIZE_BIG);
+    line(`TOTAL: S/ ${Number(total || 0).toFixed(2)}`);
+    add(SIZE_NORMAL);
+    add(CENTER);
+    line("\nGRACIAS POR SU PREFERENCIA");
+    line("\n\n\n\n");
+    add(CUT);
+
+    return Buffer.concat(chunks);
 }
 
 app.post('/print-receipt-usb', (req, res) => {
     let device;
     try {
+        console.log("📥 Petición de impresión recibida...");
         device = usb.findByIds(USB_VID, USB_PID);
         if (!device) {
             const devices = usb.getDeviceList();
@@ -197,31 +211,24 @@ app.post('/print-receipt-usb', (req, res) => {
 
         if (!outEndpoint) throw new Error("No se encontró puerto de salida USB.");
 
-        let bufferCollector = [];
-        const internalDevice = {
-            write: (chunk) => {
-                bufferCollector.push(chunk);
-            }
-        };
-
-        const printer = new escpos.Printer(internalDevice);
-        generarTicketVenta(printer, req.body);
-        
-        const finalBuffer = Buffer.concat(bufferCollector);
+        // Generar buffer manualmente
+        const finalBuffer = manualEscPos(req.body);
         console.log(`📦 Enviando buffer USB (${finalBuffer.length} bytes)...`);
 
         outEndpoint.transfer(finalBuffer, (err) => {
-            iface.release(true, () => device.close());
+            iface.release(true, () => {
+                device.close();
+            });
             if (err) {
                 console.error("❌ Error en transferencia USB:", err);
                 return res.status(500).json({ success: false, message: err.message });
             }
-            console.log("✅ Ticket impreso con éxito via USB Directo.");
-            res.json({ success: true, message: "Ticket impreso en USB (Directo)" });
+            console.log("✅ Ticket impreso con éxito.");
+            res.json({ success: true, message: "Ticket impreso" });
         });
 
     } catch (e) {
-        console.error("Error en impresión USB:", e);
+        console.error("Error en impresión USB:", e.message);
         res.status(500).json({ success: false, message: e.message });
     }
 });
