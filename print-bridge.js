@@ -113,6 +113,63 @@ const channel = supabase
         }
     });
 
+// --- INTEGRACIÓN DE SERVIDOR EXPRESS PARA IMPRESIÓN USB DESDE EL NAVEGADOR ---
+const express = require('express');
+const cors = require('cors');
+escpos.USB = require('escpos-usb');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const HTTP_PORT = 3001;
+
+function generarTicketVenta(printer, data) {
+    const { items, total, title, mesa } = data;
+    printer
+        .font('a').align('ct').size(2, 2).text("RODRIGO'S")
+        .size(1, 1).text("BRASAS & BROASTERS").text("--------------------------------");
+    if (title) printer.style('b').text(title).style('n');
+    printer.align('lt');
+    if (mesa) printer.text(`MESA: ${mesa}`);
+    printer.text('--------------------------------');
+    items.forEach(item => {
+        const itemTotal = (item.cantidad * item.precio).toFixed(2);
+        let nombre = item.nombre.substring(0, 20).padEnd(20);
+        printer.text(`${item.cantidad} ${nombre} S/ ${itemTotal}`);
+        if (item.detalles?.notas) printer.text(`   Nota: ${item.detalles.notas}`);
+    });
+    printer.text('--------------------------------')
+        .align('rt').size(2, 2).text(`TOTAL: S/ ${total.toFixed(2)}`)
+        .size(1, 1).align('ct').feed(1).text("¡Gracias por su preferencia!")
+        .feed(3).cut();
+}
+
+app.post('/print-receipt-usb', (req, res) => {
+    let device;
+    try {
+        device = new escpos.USB();
+    } catch (e) {
+        return res.status(500).json({ success: false, message: "No se detectó la impresora USB ADV-8011N." });
+    }
+    const printer = new escpos.Printer(device);
+    device.open((error) => {
+        if (error) return res.status(500).json({ success: false, message: error.message });
+        try {
+            generarTicketVenta(printer, req.body);
+            printer.close();
+            res.json({ success: true, message: "Ticket impreso en USB" });
+        } catch (err) {
+            res.status(500).json({ success: false, message: err.message });
+        }
+    });
+});
+
+app.listen(HTTP_PORT, '0.0.0.0', () => {
+    console.log(`\n🌎 Servidor local de tickets (USB) activo en puerto ${HTTP_PORT}`);
+    console.log(`✅ Todo listo. Ya puede usar el sistema en Chrome.`);
+});
+
 // Manejo de errores de conexión
 process.on('uncaughtException', (err) => {
     console.error('💥 Error inesperado:', err);
