@@ -440,9 +440,21 @@ function VentaCard({ venta, label, idx, onPay, onPrint, onCancel }: { venta: Ven
                     <div key={id} className="flex items-center gap-3 text-sm border-b border-slate-100/50 last:border-0 pb-1.5 last:pb-0">
                         <span className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-sm border border-slate-100 text-[12px] font-black text-slate-900">{item.cantidad}</span>
                         <div className="flex-1 min-w-0">
-                            <span className="text-slate-900 font-bold block">{item.nombre}</span>
+                            <span className="text-slate-900 font-bold block italic uppercase tracking-tight">{item.nombre}</span>
+                            <div className="flex flex-wrap gap-1 mt-0.5">
+                                {(item as any).detalles?.parte && (
+                                    <span className="text-[9px] bg-rodrigo-terracotta/10 text-rodrigo-terracotta px-1.5 py-0.5 rounded font-black uppercase">
+                                        Presa: {(item as any).detalles.parte}
+                                    </span>
+                                )}
+                                {(item as any).detalles?.trozado && (item as any).detalles.trozado !== 'entero' && (
+                                    <span className="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-black uppercase">
+                                        {(item as any).detalles.trozado}
+                                    </span>
+                                )}
+                            </div>
                             {(item as any).detalles?.notas && (
-                                <span className="text-[10px] text-rodrigo-terracotta font-black uppercase italic block">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase italic block mt-1">
                                     Nota: {(item as any).detalles.notas}
                                 </span>
                             )}
