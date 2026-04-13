@@ -228,8 +228,8 @@ function ConfiguracionContent() {
                 })
             });
 
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Error al actualizar');
+            const data = await res.json().catch(() => ({ error: 'Respuesta inválida del servidor' }));
+            if (!res.ok) throw new Error(data.error || `Error del servidor (${res.status})`);
 
             setEmpleados(prev => prev.map(p =>
                 p.id === emp.id ? { ...p, nombre: editUserName.trim(), rol: editUserRole } : p
@@ -264,8 +264,8 @@ function ConfiguracionContent() {
                 })
             });
 
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Error al crear usuario');
+            const data = await res.json().catch(() => ({ error: 'Respuesta inválida del servidor' }));
+            if (!res.ok) throw new Error(data.error || `Error del servidor (${res.status})`);
 
             toast.success('Usuario creado correctamente');
             setShowNewUserForm(false);
@@ -297,8 +297,8 @@ function ConfiguracionContent() {
                 method: 'DELETE'
             });
 
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Error al eliminar');
+            const data = await res.json().catch(() => ({ error: 'Respuesta inválida del servidor' }));
+            if (!res.ok) throw new Error(data.error || `Error del servidor (${res.status})`);
 
             setEmpleados(prev => prev.filter(p => p.id !== id));
             toast.success('Usuario eliminado');

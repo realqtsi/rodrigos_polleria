@@ -5,6 +5,7 @@ import { Printer, X, CheckCircle, Receipt, Search, User, RefreshCw, Trash2 } fro
 import type { ItemCarrito, ItemVenta } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
 import { consultarDNI, consultarRUC } from '@/services/apiPeruService';
+import toast from 'react-hot-toast';
 
 interface ReceiptModalProps {
 
@@ -134,10 +135,40 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
         setErrorDocumento(null);
     };
 
+    const imprimirUSB = async () => {
+        try {
+            const hostIp = window.location.hostname;
+            const printServerUrl = `http://${hostIp}:3001`; // Suponiendo que el bridge corre en la misma máquina o es accesible
+
+            const response = await fetch(`${printServerUrl}/print-receipt-usb`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    items,
+                    total,
+                    subtotal: total, // Asumido igual si no hay desglose aquí
+                    envio: 0,
+                    esDelivery: false,
+                    title: title,
+                    mesa: mesaNumero
+                })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                toast.success('Impresión automática USB enviada 🖨️');
+            } else {
+                console.warn('Error en impresión USB:', result.message);
+                // No lanzamos toast de error para no confundir si el bridge no está abierto, 
+                // el usuario aún tiene el botón de imprimir manual del navegador.
+            }
+        } catch (e) {
+            console.error('No se pudo conectar con el bridge de impresión:', e);
+        }
+    };
+
     const handlePrint = async () => {
         // 1. Validar si debe incrementar correlativo
-        // NO incrementar si es "Estado de Cuenta" (Pre-cuenta) o similar
-        // SÓLO incrementar si es una venta nueva (isNewSale) y NO ha sido impresa ya en esta sesión
         const esPreCuenta = title === 'ESTADO DE CUENTA';
         const debeIncrementar = isNewSale && !esPreCuenta && !yaImpreso;
 
@@ -155,8 +186,6 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
 
                     if (tipoComprobante === 'boleta') {
                         updateData.numero_correlativo = (freshConfig.numero_correlativo || 0) + 1;
-                        console.log('Incrementando correlativo boleta a:', updateData.numero_correlativo);
-
                         const { error: updateError } = await supabase
                             .from('configuracion_negocio')
                             .update(updateData)
@@ -164,13 +193,9 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
 
                         if (!updateError) {
                             setYaImpreso(true);
-                            // Refrescar localmente para que si imprimen de nuevo aparezca el siguiente
                             await cargarConfiguracion();
-                        } else {
-                            console.error("Error al actualizar numeración:", updateError);
                         }
                     } else {
-                        // Ticket no avanza correlativo en BD por petición del usuario
                         setYaImpreso(true);
                     }
                 }
@@ -179,8 +204,23 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
             }
         }
 
+        // 2. Intentar impresión directa vía USB (Bridge)
+        imprimirUSB();
+
+        // 3. Abrir diálogo del navegador como respaldo
         window.print();
     };
+
+    // Auto-impresión al abrir el modal si es una venta o pre-cuenta nueva
+    useEffect(() => {
+        if (isOpen) {
+            // Pequeño delay para asegurar que el bridge esté listo o el modal cargado
+            const timer = setTimeout(() => {
+                imprimirUSB();
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen]);
 
     const fecha = new Date();
     const fechaFormateada = fecha.toLocaleDateString('es-PE', {

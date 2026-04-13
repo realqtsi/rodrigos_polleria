@@ -88,9 +88,18 @@ const channel = supabase
                 console.log('✨ Nuevo pedido detectado. Iniciando impresión...');
                 imprimirComanda(venta);
             } else if (payload.eventType === 'UPDATE') {
-                console.log('🔄 Pedido actualizado. (Ignorando para evitar duplicados unless you want to print updates)');
-                // Si quieres que las actualizaciones también impriman, descomenta la siguiente línea:
-                // imprimirComanda(venta);
+                const oldVenta = payload.old;
+                const newVenta = payload.new;
+
+                // Solo imprimimos si NO es un cambio de pago (de pendiente a pagado)
+                // y si el estado actual no es pagado
+                if (newVenta.estado_pago === 'pagado') {
+                    console.log('💰 Pago detectado o pedido ya pagado. Saltando impresión de comanda.');
+                    return;
+                }
+
+                console.log('🔄 Pedido actualizado. Re-enviando comanda a cocina...');
+                imprimirComanda(newVenta);
             }
         }
     )
