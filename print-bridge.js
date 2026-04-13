@@ -194,6 +194,7 @@ function manualEscPos(data) {
 
 app.post('/print-receipt-usb', (req, res) => {
     let device;
+    let iface;
     try {
         console.log("📥 Petición de impresión recibida...");
         device = usb.findByIds(USB_VID, USB_PID);
@@ -204,23 +205,43 @@ app.post('/print-receipt-usb', (req, res) => {
 
         if (!device) throw new Error("No se detectó la impresora USB.");
 
-        device.open();
-        const iface = device.interfaces[0];
-        iface.claim();
-        const outEndpoint = iface.endpoints.find(e => e.direction === 'out');
+        // Intentar abrir. Si ya está abierta, a veces lanza error o simplemente continua.
+        try {
+            device.open();
+        } catch (e) {
+            if (!e.message.includes('already open')) {
+                throw e;
+            }
+        }
 
+        iface = device.interfaces[0];
+        
+        // Intentar reclamar. Si falla, liberar primero por si acaso quedó bloqueada.
+        try {
+            iface.claim();
+        } catch (e) {
+            console.log("⚠️ Reclamando interfaz (segundo intento)...");
+            // No hacemos nada, intentamos seguir
+        }
+
+        const outEndpoint = iface.endpoints.find(e => e.direction === 'out');
         if (!outEndpoint) throw new Error("No se encontró puerto de salida USB.");
 
-        // Generar buffer manualmente
         const finalBuffer = manualEscPos(req.body);
         console.log(`📦 Enviando buffer USB (${finalBuffer.length} bytes)...`);
 
         outEndpoint.transfer(finalBuffer, (err) => {
-            iface.release(true, () => {
-                device.close();
-            });
+            // Liberar SIEMPRE
+            try {
+                iface.release(true, () => {
+                    device.close();
+                });
+            } catch (closeErr) {
+                console.error("Error al cerrar dispositivo:", closeErr.message);
+            }
+
             if (err) {
-                console.error("❌ Error en transferencia USB:", err);
+                console.error("❌ Error en transferencia USB:", err.message);
                 return res.status(500).json({ success: false, message: err.message });
             }
             console.log("✅ Ticket impreso con éxito.");
@@ -228,7 +249,14 @@ app.post('/print-receipt-usb', (req, res) => {
         });
 
     } catch (e) {
-        console.error("Error en impresión USB:", e.message);
+        console.error("❌ Error en impresión USB:", e.message);
+        
+        // Limpieza de emergencia
+        try {
+            if (iface) iface.release(true, () => {});
+            if (device) device.close();
+        } catch (err) {}
+
         res.status(500).json({ success: false, message: e.message });
     }
 });
