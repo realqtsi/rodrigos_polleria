@@ -1,58 +1,55 @@
 const escpos = require('escpos');
-// No usaremos escpos.USB directamente si falla el constructor
 const usb = require('usb');
 
 console.log('🔍 Buscando dispositivos USB...');
 
 try {
     const devices = usb.getDeviceList();
-    const printers = devices.filter(d => {
-        try {
-            return d.deviceDescriptor.bDeviceClass === 0 || d.deviceDescriptor.bDeviceClass === 7;
-        } catch (e) { return false; }
-    });
+    // Buscar específicamente el dispositivo "Hi Print" (VID 1110, PID 2056) que vimos en Zadig
+    const myPrinter = devices.find(d => 
+        (d.deviceDescriptor.idVendor === 1110 && d.deviceDescriptor.idProduct === 2056) ||
+        d.deviceDescriptor.bDeviceClass === 7
+    );
 
-    if (printers.length === 0) {
-        console.log('❌ No se detectó ninguna impresora USB compatible.');
-    } else {
-        console.log(`✅ Se encontraron ${printers.length} dispositivos USB.`);
-        
-        // Intentar usar escpos-usb pero con un fix manual si es necesario
-        escpos.USB = require('escpos-usb');
-        
-        try {
-            const device = new escpos.USB(); 
-            const printer = new escpos.Printer(device);
+    if (!myPrinter) {
+        console.log('❌ No se detectó la impresora Hi Print.');
+        console.log('Dispositivos encontrados:', devices.length);
+        devices.forEach(d => {
+            console.log(`- VID: ${d.deviceDescriptor.idVendor}, PID: ${d.deviceDescriptor.idProduct}`);
+        });
+        return;
+    }
 
-            device.open((err) => {
-                if (err) {
-                    console.error('❌ Error al abrir la impresora:', err.message);
-                    console.log('Sugerencia: Use Zadig para cambiar el driver a WinUSB.');
-                    return;
-                }
-                console.log('🖨️  Imprimiendo ticket de prueba...');
-                printer
-                    .font('a')
-                    .align('ct')
-                    .text('PRUEBA DE CONEXIÓN')
-                    .text('RODRIGO\'S POS')
-                    .text('--------------------------------')
-                    .text('Si lees esto, la USB funciona ok.')
-                    .feed(3)
-                    .cut()
-                    .close();
-                console.log('🚀 ¡Prueba enviada!');
-            });
-        } catch (e) {
-            console.error('❌ El driver de la impresora tiene un conflicto con Node.js:', e.message);
-            console.log('\n--- SOLUCIÓN PASO A PASO ---');
-            console.log('1. Abra Zadig.');
-            console.log('2. Options -> List All Devices.');
-            console.log('3. Seleccione su impresora USB.');
-            console.log('4. Cambie el driver actual por "WinUSB".');
-            console.log('5. Dele a "Replace Driver" o "Reinstall Driver".');
-            console.log('6. Reinicie esta prueba.');
-        }
+    console.log(`✅ Impresora detectada: VID ${myPrinter.deviceDescriptor.idVendor}, PID ${myPrinter.deviceDescriptor.idProduct}`);
+
+    // Intentar inicializar escpos-usb manualmente con este dispositivo
+    escpos.USB = require('escpos-usb');
+    
+    try {
+        console.log('Encendiendo motor de impresión...');
+        
+        // Pasamos el VID y PID exactos al constructor
+        const device = new escpos.USB(myPrinter.deviceDescriptor.idVendor, myPrinter.deviceDescriptor.idProduct);
+        const printer = new escpos.Printer(device);
+
+        device.open((err) => {
+            if (err) {
+                console.error('❌ Error al abrir la impresora:', err.message);
+                return;
+            }
+            console.log('🖨️  Enviando ticket de prueba...');
+            printer
+                .font('a').align('ct').style('bu').size(1, 1).text('PRUEBA EXITOSA')
+                .size(0, 0).text('Rodrigo\'s Pollería').text('--------------------------------')
+                .text('Si sale este papel, ya podemos cobrar.')
+                .feed(3).cut().close();
+            console.log('🚀 ¡Prueba enviada! Debería salir el papel ahora.');
+        });
+    } catch (e) {
+        console.error('❌ Error de librería:', e.message);
+        console.log('\nSi el error es "usb.on is not a function", es un problema de versión de Node 24.');
+        console.log('Intente ejecutar este comando para arreglarlo:');
+        console.log('npm install usb@2.14.0');
     }
 } catch (error) {
     console.error('💥 Error:', error);
