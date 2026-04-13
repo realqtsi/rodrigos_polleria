@@ -36,8 +36,8 @@ interface ConfigNegocio {
 export default function ReceiptModal({ isOpen, onClose, items, total, orderId, mesaNumero, title = 'BOLETA DE VENTA', isNewSale = false }: ReceiptModalProps) {
     const [config, setConfig] = useState<ConfigNegocio>({
         ruc: '',
-        razon_social: "Rodrigo's - Brasas & Broasters CHICKEN",
-        direccion: '',
+        razon_social: "RODRIGO'S BRASAS & BROASTERS",
+        direccion: 'JR. HUASCAR 422',
         telefono: '',
         mensaje_boleta: '¡Gracias por su preferencia!',
         serie_boleta: 'B001',
@@ -241,7 +241,6 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                 <div className="negocio-info" style={{ marginTop: 0, fontSize: '10px' }}>
                     <p>{config.direccion || 'JR. HUASCAR 422'}</p>
                     <p>AYACUCHO - HUAMANGA</p>
-                    <p style={{ marginTop: '4px', fontWeight: 'bold' }}>RUC: {config.ruc || '10700899948'}</p>
                     {config.telefono && <p>TEL: {config.telefono}</p>}
                 </div>
             </div>
@@ -314,7 +313,7 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
             {/* Footer */}
             <div className="ticket-footer" style={{ marginTop: '16px', textAlign: 'center', fontSize: '10px' }}>
                 <p className="footer-mensaje">"{config.mensaje_boleta}"</p>
-                <p className="footer-sistema" style={{ marginTop: '8px', fontSize: '9px' }}>Rodrigo's - Brasas & Broasters CHICKEN</p>
+                <p className="footer-sistema" style={{ marginTop: '8px', fontSize: '9px' }}>RODRIGO'S BRASAS & BROASTERS</p>
             </div>
         </div>
     );
@@ -427,7 +426,6 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                                     <div className="space-y-0.5 text-[10px] text-gray-500 font-bold uppercase">
                                         <p className="leading-tight">{config.direccion || 'JR. HUASCAR 422'}</p>
                                         <p className="leading-tight">{config.ciudad || 'AYACUCHO - HUAMANGA'}</p>
-                                        <p className="text-black pt-1">RUC: {config.ruc || '10700899948'}</p>
                                         {config.telefono && <p>TEL: {config.telefono}</p>}
                                     </div>
                                     <div className="mt-3 pt-2 border-t border-gray-100">
