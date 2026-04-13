@@ -653,14 +653,14 @@ function POSContent() {
                 </nav>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
-                <div className="lg:col-span-8 space-y-4 max-h-[calc(100vh-220px)] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative">
+                <div className="md:col-span-8 space-y-4 max-h-[calc(100vh-220px)] overflow-y-auto pr-2 custom-scrollbar">
                     <div className="relative group">
                         <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
                         <input type="text" placeholder="BUSCAR PRODUCTO..." className="w-full bg-white border-2 border-slate-100 rounded-[2rem] md:rounded-3xl py-4 md:py-5 pl-14 md:pl-16 pr-8 text-sm md:text-md font-bold text-slate-900 placeholder:text-slate-300 transition-all outline-none focus:border-rodrigo-mustard/30 shadow-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                         {productosFiltrados.map((producto) => (
                             <motion.button
                                 key={producto.id}
@@ -675,7 +675,7 @@ function POSContent() {
                 </div>
 
                 {/* Carrito (Desktop Sidebar) */}
-                <div className="hidden lg:block lg:col-span-4 sticky top-6">
+                <div className="hidden md:block md:col-span-4 sticky top-6">
                     <CartPanel
                         carrito={carrito}
                         vaciarCarrito={vaciarCarrito}
@@ -698,7 +698,7 @@ function POSContent() {
                         initial={{ y: 100 }}
                         animate={{ y: 0 }}
                         exit={{ y: 100 }}
-                        className="lg:hidden fixed bottom-24 left-4 right-4 z-50 bg-slate-900 text-white rounded-[2rem] shadow-2xl overflow-hidden border border-white/10"
+                        className="md:hidden fixed bottom-24 left-4 right-4 z-50 bg-slate-900 text-white rounded-[2rem] shadow-2xl overflow-hidden border border-white/10"
                     >
                         <button
                             onClick={() => setIsCartDrawerOpen(true)}
@@ -725,7 +725,7 @@ function POSContent() {
             {/* Mobile Cart Drawer */}
             <AnimatePresence>
                 {isCartDrawerOpen && (
-                    <div className="lg:hidden fixed inset-0 z-[60] flex flex-col">
+                    <div className="md:hidden fixed inset-0 z-[60] flex flex-col">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -868,8 +868,20 @@ function CartPanel({
                             <div key={index} className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl">
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-bold text-slate-900 uppercase italic truncate">{item.nombre}</p>
+                                    <div className="flex flex-wrap gap-1 mt-0.5">
+                                        {item.detalles?.parte && (
+                                            <span className="text-[9px] bg-rodrigo-terracotta/10 text-rodrigo-terracotta px-1.5 py-0.5 rounded font-black uppercase">
+                                                Presa: {item.detalles.parte}
+                                            </span>
+                                        )}
+                                        {item.detalles?.trozado && item.detalles.trozado !== 'entero' && (
+                                            <span className="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-black uppercase">
+                                                {item.detalles.trozado}
+                                            </span>
+                                        )}
+                                    </div>
                                     {item.detalles?.notas && (
-                                        <p className="text-[10px] text-slate-400 mt-0.5">Nota: {item.detalles.notas}</p>
+                                        <p className="text-[10px] text-slate-400 mt-1 leading-tight"><span className="font-bold">Nota:</span> {item.detalles.notas}</p>
                                     )}
                                     <p className="text-xs font-mono text-rodrigo-terracotta mt-1">S/ {item.precio.toFixed(2)} c/u</p>
                                 </div>
