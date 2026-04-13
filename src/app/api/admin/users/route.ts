@@ -1,9 +1,38 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 export const dynamic = 'force-dynamic';
+
+async function getSupabaseClient() {
+    const cookieStore = await cookies();
+    return createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                get(name: string) {
+                    return cookieStore.get(name)?.value;
+                },
+                set(name: string, value: string, options: CookieOptions) {
+                    try {
+                        cookieStore.set({ name, value, ...options });
+                    } catch (error) {
+                        // Ignorado en API Routes / Server Components
+                    }
+                },
+                remove(name: string, options: CookieOptions) {
+                    try {
+                        cookieStore.delete({ name, ...options });
+                    } catch (error) {
+                        // Ignorado en API Routes / Server Components
+                    }
+                },
+            },
+        }
+    );
+}
 
 // Verificar si el usuario es administrador
 async function checkAdmin(supabase: any) {
@@ -25,8 +54,7 @@ async function checkAdmin(supabase: any) {
 
 // POST: Crear nuevo usuario
 export async function POST(request: Request) {
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabase = await getSupabaseClient();
 
     if (!(await checkAdmin(supabase))) {
         return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
@@ -79,8 +107,7 @@ export async function POST(request: Request) {
 
 // PUT: Actualizar usuario (nombre, rol, contraseña)
 export async function PUT(request: Request) {
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabase = await getSupabaseClient();
 
     if (!(await checkAdmin(supabase))) {
         return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
@@ -126,8 +153,7 @@ export async function PUT(request: Request) {
 
 // DELETE: Eliminar usuario
 export async function DELETE(request: Request) {
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabase = await getSupabaseClient();
 
     if (!(await checkAdmin(supabase))) {
         return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
