@@ -47,6 +47,14 @@ function ConfiguracionContent() {
     const [editingUserId, setEditingUserId] = useState<string | null>(null);
     const [editUserName, setEditUserName] = useState('');
     const [editUserRole, setEditUserRole] = useState('');
+    const [editUserPassword, setEditUserPassword] = useState('');
+    
+    // New user form states
+    const [showNewUserForm, setShowNewUserForm] = useState(false);
+    const [newUserName, setNewUserName] = useState('');
+    const [newUserEmail, setNewUserEmail] = useState('');
+    const [newUserPassword, setNewUserPassword] = useState('');
+    const [newUserRole, setNewUserRole] = useState('mozo');
 
     const cargarProductos = async () => {
         try {
@@ -191,12 +199,14 @@ function ConfiguracionContent() {
         setEditingUserId(emp.id);
         setEditUserName(emp.nombre);
         setEditUserRole(emp.rol);
+        setEditUserPassword('');
     };
 
     const cancelarEdicionUsuario = () => {
         setEditingUserId(null);
         setEditUserName('');
         setEditUserRole('');
+        setEditUserPassword('');
     };
 
     const guardarUsuario = async (emp: any) => {
@@ -207,22 +217,94 @@ function ConfiguracionContent() {
 
         setSaving(true);
         try {
-            const { error } = await supabase
-                .from('user_profiles')
-                .update({ nombre: editUserName.trim(), rol: editUserRole })
-                .eq('id', emp.id);
+            const res = await fetch('/api/admin/users', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: emp.id,
+                    nombre: editUserName.trim(),
+                    rol: editUserRole,
+                    password: editUserPassword || undefined
+                })
+            });
 
-            if (error) throw error;
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Error al actualizar');
 
             setEmpleados(prev => prev.map(p =>
                 p.id === emp.id ? { ...p, nombre: editUserName.trim(), rol: editUserRole } : p
             ));
 
-            toast.success('Usuario actualizado correctly');
+            toast.success('Usuario actualizado correctamente');
             cancelarEdicionUsuario();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error:', error);
-            toast.error('Error al actualizar usuario');
+            toast.error(error.message || 'Error al actualizar usuario');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const crearUsuario = async () => {
+        if (!newUserName.trim() || !newUserEmail.trim() || !newUserPassword.trim()) {
+            toast.error('Completa todos los campos');
+            return;
+        }
+
+        setSaving(true);
+        try {
+            const res = await fetch('/api/admin/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nombre: newUserName.trim(),
+                    email: newUserEmail.trim(),
+                    password: newUserPassword,
+                    rol: newUserRole
+                })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Error al crear usuario');
+
+            toast.success('Usuario creado correctamente');
+            setShowNewUserForm(false);
+            setNewUserName('');
+            setNewUserEmail('');
+            setNewUserPassword('');
+            cargarEmpleados();
+        } catch (error: any) {
+            console.error('Error:', error);
+            toast.error(error.message || 'Error al crear usuario');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const eliminarUsuario = async (id: string, nombre: string) => {
+        if (id === user?.id) {
+            toast.error('No puedes eliminarte a ti mismo');
+            return;
+        }
+
+        if (!confirm(`¿Estás seguro de eliminar a "${nombre}"? Esta acción no se puede deshacer.`)) {
+            return;
+        }
+
+        setSaving(true);
+        try {
+            const res = await fetch(`/api/admin/users?id=${id}`, {
+                method: 'DELETE'
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Error al eliminar');
+
+            setEmpleados(prev => prev.filter(p => p.id !== id));
+            toast.success('Usuario eliminado');
+        } catch (error: any) {
+            console.error('Error:', error);
+            toast.error(error.message || 'Error al eliminar usuario');
         } finally {
             setSaving(false);
         }
@@ -438,16 +520,95 @@ function ConfiguracionContent() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            className="bg-white border border-slate-100 rounded-[3rem] shadow-sm overflow-hidden"
+                            className="space-y-6"
                         >
-                            <table className="w-full border-collapse">
-                                <thead>
-                                    <tr className="bg-slate-50/50 border-b border-slate-100">
-                                        <th className="text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-8 py-6 italic">Personal</th>
-                                        <th className="text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-8 py-6 italic">Nombre de Visualización</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                            <div className="flex justify-end">
+                                <button
+                                    onClick={() => setShowNewUserForm(!showNewUserForm)}
+                                    className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all shadow-lg"
+                                >
+                                    {showNewUserForm ? <X size={14} strokeWidth={3} /> : <Plus size={14} strokeWidth={3} />}
+                                    {showNewUserForm ? 'Cancelar' : 'Nuevo Usuario'}
+                                </button>
+                            </div>
+
+                            <AnimatePresence>
+                                {showNewUserForm && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="bg-white border-2 border-dashed border-slate-200 rounded-[2rem] p-8 overflow-hidden"
+                                    >
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Nombre</label>
+                                                <input
+                                                    type="text"
+                                                    value={newUserName}
+                                                    onChange={e => setNewUserName(e.target.value)}
+                                                    placeholder="Nombre completo"
+                                                    className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold italic outline-none focus:border-rodrigo-terracotta/30"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Email</label>
+                                                <input
+                                                    type="email"
+                                                    value={newUserEmail}
+                                                    onChange={e => setNewUserEmail(e.target.value)}
+                                                    placeholder="correo@rodrigos.com"
+                                                    className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold italic outline-none focus:border-rodrigo-terracotta/30"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Contraseña</label>
+                                                <input
+                                                    type="password"
+                                                    value={newUserPassword}
+                                                    onChange={e => setNewUserPassword(e.target.value)}
+                                                    placeholder="••••••••"
+                                                    className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold italic outline-none focus:border-rodrigo-terracotta/30"
+                                                />
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <div className="flex-1 space-y-2">
+                                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Rol</label>
+                                                    <select
+                                                        value={newUserRole}
+                                                        onChange={e => setNewUserRole(e.target.value)}
+                                                        className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold italic outline-none focus:border-rodrigo-terracotta/30"
+                                                    >
+                                                        <option value="mozo">Mozo</option>
+                                                        <option value="admin">Administrador</option>
+                                                        <option value="cajero">Cajero (Caja)</option>
+                                                        <option value="cocinero">Cocina</option>
+                                                        <option value="repartidor">Repartidor (Delivery)</option>
+                                                    </select>
+                                                </div>
+                                                <button
+                                                    onClick={crearUsuario}
+                                                    disabled={saving}
+                                                    className="bg-emerald-500 text-white p-3.5 rounded-xl self-end shadow-md hover:brightness-110 disabled:opacity-50"
+                                                >
+                                                    <Check size={20} strokeWidth={3} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            <div className="bg-white border border-slate-100 rounded-[3rem] shadow-sm overflow-hidden">
+                                <table className="w-full border-collapse">
+                                    <thead>
+                                        <tr className="bg-slate-50/50 border-b border-slate-100">
+                                            <th className="text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-8 py-6 italic">Personal</th>
+                                            <th className="text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-8 py-6 italic">Gestión de Cuenta</th>
+                                            <th className="text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-8 py-6 italic w-20">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                                     {empleados.map((emp) => (
                                         <tr key={emp.id} className="group border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
                                             <td className="px-8 py-6">
@@ -461,16 +622,45 @@ function ConfiguracionContent() {
                                             <td className="px-8 py-6">
                                                 <AnimatePresence mode="wait">
                                                     {editingUserId === emp.id ? (
-                                                        <motion.div key="edit" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center justify-end gap-3">
-                                                            <input
-                                                                type="text"
-                                                                value={editUserName}
-                                                                onChange={e => setEditUserName(e.target.value)}
-                                                                className="bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-2 text-right text-sm text-slate-900 font-black italic focus:border-rodrigo-mustard/30 focus:outline-none transition-all"
-                                                                autoFocus
-                                                            />
-                                                            <button onClick={() => guardarUsuario(emp)} disabled={saving} className="p-2 bg-emerald-500 text-white rounded-lg hover:brightness-110 shadow-sm"><Check size={16} strokeWidth={3} /></button>
-                                                            <button onClick={cancelarEdicionUsuario} className="p-2 bg-slate-100 text-slate-400 rounded-lg hover:text-slate-600"><X size={16} strokeWidth={3} /></button>
+                                                        <motion.div key="edit" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col md:flex-row items-center gap-3">
+                                                            <div className="flex-1 space-y-1 w-full">
+                                                                <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-2">Nombre</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={editUserName}
+                                                                    onChange={e => setEditUserName(e.target.value)}
+                                                                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 font-black italic focus:border-rodrigo-mustard/30 outline-none"
+                                                                    placeholder="Nombre"
+                                                                />
+                                                            </div>
+                                                            <div className="flex-1 space-y-1 w-full">
+                                                                <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-2">Nueva Contraseña (Opcional)</label>
+                                                                <input
+                                                                    type="password"
+                                                                    value={editUserPassword}
+                                                                    onChange={e => setEditUserPassword(e.target.value)}
+                                                                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 font-black italic focus:border-rodrigo-mustard/30 outline-none"
+                                                                    placeholder="••••••••"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-1 w-full md:w-auto">
+                                                                <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-2">Rol</label>
+                                                                <select 
+                                                                    value={editUserRole}
+                                                                    onChange={e => setEditUserRole(e.target.value)}
+                                                                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 font-black italic focus:border-rodrigo-mustard/30 outline-none"
+                                                                >
+                                                                    <option value="mozo">Mozo</option>
+                                                                    <option value="admin">Administrador</option>
+                                                                    <option value="cajero">Cajero (Caja)</option>
+                                                                    <option value="cocinero">Cocina</option>
+                                                                    <option value="repartidor">Repartidor (Delivery)</option>
+                                                                </select>
+                                                            </div>
+                                                            <div className="flex gap-2 pt-4 md:pt-4">
+                                                                <button onClick={() => guardarUsuario(emp)} disabled={saving} className="p-2 bg-emerald-500 text-white rounded-lg hover:brightness-110 shadow-sm"><Check size={16} strokeWidth={3} /></button>
+                                                                <button onClick={cancelarEdicionUsuario} className="p-2 bg-slate-100 text-slate-400 rounded-lg hover:text-slate-600"><X size={16} strokeWidth={3} /></button>
+                                                            </div>
                                                         </motion.div>
                                                     ) : (
                                                         <motion.button
@@ -478,21 +668,34 @@ function ConfiguracionContent() {
                                                             initial={{ opacity: 0 }}
                                                             animate={{ opacity: 1 }}
                                                             onClick={() => iniciarEdicionUsuario(emp)}
-                                                            className="flex items-center justify-end gap-3 w-full group/btn text-right"
+                                                            className="flex flex-col items-start gap-1 group/btn w-full"
                                                         >
-                                                            <span className="text-lg font-black text-slate-900 italic group-hover/btn:text-rodrigo-terracotta transition-colors tracking-tighter">
-                                                                {emp.nombre}
-                                                            </span>
-                                                            <Pencil size={14} className="text-slate-200 opacity-0 group-hover/btn:opacity-100 transition-all" />
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-lg font-black text-slate-900 italic group-hover/btn:text-rodrigo-terracotta transition-colors tracking-tighter">
+                                                                    {emp.nombre}
+                                                                </span>
+                                                                <Pencil size={12} className="text-slate-200 opacity-0 group-hover/btn:opacity-100 transition-all" />
+                                                            </div>
+                                                            <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Click para editar cuenta y contraseña</span>
                                                         </motion.button>
                                                     )}
                                                 </AnimatePresence>
+                                            </td>
+                                            <td className="px-8 py-6 text-right">
+                                                <button 
+                                                    onClick={() => eliminarUsuario(emp.id, emp.nombre)}
+                                                    disabled={saving || emp.id === user?.id}
+                                                    className="p-3 bg-slate-50 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all disabled:opacity-0"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
-                        </motion.div>
+                        </div>
+
                     )}
 
                     {activeTab === 'bebidas' && user?.rol === 'admin' && (
