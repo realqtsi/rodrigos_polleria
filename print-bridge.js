@@ -133,11 +133,13 @@ function manualEscPos(data) {
     const { items, total, title, mesa } = data;
     let chunks = [];
 
-    const add = (buf) => chunks.push(typeof buf === 'string' ? Buffer.from(buf, 'binary') : buf);
-    const line = (text = '') => add(text + '\n');
+    // Usamos latin1 para que los caracteres especiales coincidan con la tabla de la impresora
+    const add = (buf) => chunks.push(typeof buf === 'string' ? Buffer.from(buf, 'latin1') : buf);
+    const line = (text = '') => add(text + '\r\n'); // Usar \r\n para forzar el avance de línea en todas las impresoras
     
     // Comandos ESC/POS Básicos
     const INIT = Buffer.from([0x1B, 0x40]);
+    const SELECT_CP850 = Buffer.from([0x1B, 0x74, 0x02]); // Seleccionar página de códigos 850
     const CENTER = Buffer.from([0x1B, 0x61, 0x01]);
     const LEFT = Buffer.from([0x1B, 0x61, 0x00]);
     const RIGHT = Buffer.from([0x1B, 0x61, 0x02]);
@@ -148,16 +150,19 @@ function manualEscPos(data) {
     const CUT = Buffer.from([0x1D, 0x56, 0x41, 0x03]);
 
     add(INIT);
+    add(SELECT_CP850);
     add(CENTER);
     add(SIZE_BIG);
     line("RODRIGO'S");
-    add(SIZE_NORMAL);
     line("BRASAS & BROASTERS");
+    add(SIZE_NORMAL);
     line("--------------------------------");
     
     if (title) {
         add(BOLD_ON);
-        line(title.toUpperCase());
+        // Limpiamos el título de cualquier referencia a RUC si existiera
+        const cleanTitle = title.replace(/RUC:?\s?\d+/gi, '').trim();
+        line(cleanTitle.toUpperCase());
         add(BOLD_OFF);
     }
     
