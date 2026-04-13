@@ -694,8 +694,7 @@ function ConfiguracionContent() {
                                     ))}
                                 </tbody>
                             </table>
-                        </div>
-
+                        </motion.div>
                     )}
 
                     {activeTab === 'bebidas' && user?.rol === 'admin' && (
