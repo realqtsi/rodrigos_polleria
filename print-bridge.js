@@ -130,23 +130,54 @@ const USB_PID = 2056;
 
 function generarTicketVenta(printer, data) {
     const { items, total, title, mesa } = data;
+    
+    // Inicialización de hardware y codificación para español (CP850)
+    printer.pure(Buffer.from([0x1B, 0x40])); // ESC @ (Initialize)
+    printer.pure(Buffer.from([0x1B, 0x74, 0x02])); // ESC t 2 (Select CP850 table)
+
     printer
-        .font('a').align('ct').size(2, 2).text("RODRIGO'S")
-        .size(1, 1).text("BRASAS & BROASTERS").text("--------------------------------");
+        .align('ct').size(2, 2).text("RODRIGO'S")
+        .size(1, 1).text("BRASAS & BROASTERS")
+        .text("--------------------------------");
+    
     if (title) printer.style('b').text(title).style('n');
     printer.align('lt');
+    
     if (mesa) printer.text(`MESA: ${mesa}`);
     printer.text('--------------------------------');
+
     items.forEach(item => {
-        const itemTotal = (item.cantidad * (item.precio || 0)).toFixed(2);
-        let nombre = (item.nombre || '').substring(0, 20).padEnd(20);
-        printer.text(`${item.cantidad} ${nombre} S/ ${itemTotal}`);
-        if (item.detalles?.notas) printer.text(`   Nota: ${item.detalles.notas}`);
+        const cantidad = Number(item.cantidad) || 0;
+        const precio = Number(item.precio) || 0;
+        const itemTotal = (cantidad * precio).toFixed(2);
+        
+        let nombre = (item.nombre || '').toUpperCase().substring(0, 20);
+        printer.text(`${cantidad} ${nombre.padEnd(20)} S/ ${itemTotal}`);
+        
+        // Agregar detalles (Presa, Trozado, Notas)
+        if (item.detalles) {
+            let detallesArr = [];
+            if (item.detalles.parte) detallesArr.push(`PRESA: ${item.detalles.parte.toUpperCase()}`);
+            if (item.detalles.trozado && item.detalles.trozado !== 'entero') detallesArr.push(item.detalles.trozado.toUpperCase());
+            
+            if (detallesArr.length > 0) {
+                printer.text(`   > ${detallesArr.join(' / ')}`);
+            }
+            if (item.detalles.notas) {
+                printer.text(`   > NOTA: ${item.detalles.notas}`);
+            }
+        }
     });
+
     printer.text('--------------------------------')
-        .align('rt').size(2, 2).text(`TOTAL: S/ ${total.toFixed(2)}`)
-        .size(1, 1).align('ct').feed(1).text("¡Gracias por su preferencia!")
-        .feed(3).cut();
+        .align('rt').size(2, 2)
+        .text(`TOTAL: S/ ${Number(total).toFixed(2)}`)
+        .size(1, 1)
+        .align('ct')
+        .feed(2)
+        .text("¡Gracias por su preferencia!")
+        .feed(4)
+        .cut();
 }
 
 app.post('/print-receipt-usb', (req, res) => {
@@ -154,7 +185,6 @@ app.post('/print-receipt-usb', (req, res) => {
     try {
         device = usb.findByIds(USB_VID, USB_PID);
         if (!device) {
-            // Intento de búsqueda por clase de dispositivo si no coincide el ID exacto
             const devices = usb.getDeviceList();
             device = devices.find(d => d.deviceDescriptor.bDeviceClass === 7);
         }
@@ -168,7 +198,6 @@ app.post('/print-receipt-usb', (req, res) => {
 
         if (!outEndpoint) throw new Error("No se encontró puerto de salida USB.");
 
-        // Collector para capturar los comandos de escpos.Printer
         let bufferCollector = [];
         const internalDevice = {
             write: (chunk) => {
@@ -179,11 +208,13 @@ app.post('/print-receipt-usb', (req, res) => {
         const printer = new escpos.Printer(internalDevice);
         generarTicketVenta(printer, req.body);
         
-        // Enviar el buffer recolectado vía USB directo
-        outEndpoint.transfer(Buffer.concat(bufferCollector), (err) => {
+        const finalBuffer = Buffer.concat(bufferCollector);
+        console.log(`📦 Enviando buffer USB (${finalBuffer.length} bytes)...`);
+
+        outEndpoint.transfer(finalBuffer, (err) => {
             iface.release(true, () => device.close());
             if (err) {
-                console.error("Error en transferencia USB:", err);
+                console.error("❌ Error en transferencia USB:", err);
                 return res.status(500).json({ success: false, message: err.message });
             }
             console.log("✅ Ticket impreso con éxito via USB Directo.");
