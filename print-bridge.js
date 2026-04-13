@@ -131,9 +131,8 @@ const USB_PID = 2056;
 function generarTicketVenta(printer, data) {
     const { items, total, title, mesa } = data;
     
-    // Inicialización de hardware y codificación para español (CP850)
-    printer.pure(Buffer.from([0x1B, 0x40])); // ESC @ (Initialize)
-    printer.pure(Buffer.from([0x1B, 0x74, 0x02])); // ESC t 2 (Select CP850 table)
+    // Inicialización de hardware
+    printer.hardware('init');
 
     printer
         .align('ct').size(2, 2).text("RODRIGO'S")
