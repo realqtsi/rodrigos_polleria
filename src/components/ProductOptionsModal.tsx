@@ -63,9 +63,10 @@ export default function ProductOptionsModal({ isOpen, onClose, onConfirm, produc
 
     // Detectar si es infusión (té, anis, manzanilla...)
     // El usuario pidió: "te manzanilla . canela y clavo, anis"
+    // Evitamos que coincida con "entero" o "mostrito" que tienen "te"
     const esInfusion = !esPromocion && (
         nombreLower.includes('infusion') ||
-        nombreLower.includes('te') ||
+        /\bte\b/i.test(nombreLower) ||
         nombreLower.includes('té') ||
         nombreLower.includes('mate') ||
         nombreLower.includes('anis') ||
@@ -73,7 +74,7 @@ export default function ProductOptionsModal({ isOpen, onClose, onConfirm, produc
     );
 
 
-    const partesPollo: { valor: PartesPollo; emoji: string; label: string }[] = [
+    const todasPartes: { valor: PartesPollo; emoji: string; label: string }[] = [
         { valor: 'pecho', emoji: '🍗', label: 'Pecho' },
         { valor: 'pierna', emoji: '🍖', label: 'Pierna' },
         { valor: 'ala', emoji: '🦴', label: 'Ala' },
@@ -81,6 +82,20 @@ export default function ProductOptionsModal({ isOpen, onClose, onConfirm, produc
         { valor: 'entrepierna', emoji: '🍖', label: 'Entrepierna' },
         { valor: 'Rabadilla', emoji: '🐔', label: 'Rabadilla' },
     ];
+
+    // Lógica dinámica de presas según requerimiento del usuario
+    const esOctavoOMostrito = nombreLower.includes('1/8') || nombreLower.includes('octavo') || nombreLower.includes('mostrito');
+    const esCuartoOMostrazo = nombreLower.includes('1/4') || nombreLower.includes('cuarto') || nombreLower.includes('mostrazo');
+
+    let partesConfiguradas = todasPartes;
+
+    if (esCuartoOMostrazo) {
+        // Mostrazo o 1/4 solo dos presas: pecho y pierna
+        partesConfiguradas = todasPartes.filter(p => p.valor === 'pecho' || p.valor === 'pierna');
+    } else if (esOctavoOMostrito) {
+        // Mostrito o octavo: pecho, pierna, ala y entrepierna
+        partesConfiguradas = todasPartes.filter(p => ['pecho', 'pierna', 'ala', 'entrepierna'].includes(p.valor));
+    }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -260,7 +275,7 @@ export default function ProductOptionsModal({ isOpen, onClose, onConfirm, produc
                                         Elegir Parte del Pollo
                                     </label>
                                     <div className="grid grid-cols-3 gap-2">
-                                        {partesPollo.map((p) => {
+                                        {partesConfiguradas.map((p) => {
                                             const count = conteoPartes[p.valor] || 0;
                                             return (
                                                 <button
