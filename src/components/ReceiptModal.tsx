@@ -274,27 +274,28 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
             {/* Items de venta */}
             <div style={{ fontSize: '10px' }}>
                 {items.map((item, idx) => {
-                    const cantidad = Number(item.cantidad) || 0;
-                    const precio = Number(item.precio) || 0;
-                    const subtotal = Number(item.subtotal) || (cantidad * precio);
+                    const i = item as any;
+                    const cantidad = Number(i.cantidad) || 0;
+                    const precio = Number(i.precio) || 0;
+                    const subtotal = Number(i.subtotal) || (cantidad * precio);
                         return (
                             <div key={idx} className="ticket-item" style={{ display: 'flex', flexDirection: 'column', padding: '2px 0', borderBottom: '1px dashed #eee' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <span className="item-cantidad" style={{ fontWeight: 'bold' }}>{cantidad} x </span>
-                                    <span className="item-nombre" style={{ flex: 1, marginLeft: '4px', fontWeight: 'bold' }}>{item.nombre?.toUpperCase()}</span>
+                                    <span className="item-nombre" style={{ flex: 1, marginLeft: '4px', fontWeight: 'bold' }}>{i.nombre?.toUpperCase()}</span>
                                     <span className="item-precio" style={{ whiteSpace: 'nowrap', marginLeft: '8px', fontWeight: 'bold' }}>S/ {subtotal.toFixed(2)}</span>
                                 </div>
                                 <div style={{ marginLeft: '24px', fontSize: '9px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                                    {item.detalles?.parte && (
-                                        <span>PRESA: {item.detalles.parte.toUpperCase()}</span>
+                                    {i.detalles?.parte && (
+                                        <span>PRESA: {i.detalles.parte.toUpperCase()}</span>
                                     )}
-                                    {item.detalles?.trozado && item.detalles.trozado !== 'entero' && (
-                                        <span> / {item.detalles.trozado.toUpperCase()}</span>
+                                    {i.detalles?.trozado && i.detalles.trozado !== 'entero' && (
+                                        <span> / {i.detalles.trozado.toUpperCase()}</span>
                                     )}
                                 </div>
-                                {item.detalles?.notas && (
+                                {i.detalles?.notas && (
                                     <div style={{ marginLeft: '24px', fontSize: '9px', fontStyle: 'italic', color: '#666' }}>
-                                        Nota: {item.detalles.notas}
+                                        Nota: {i.detalles.notas}
                                     </div>
                                 )}
                             </div>
@@ -447,33 +448,34 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                                     </div>
                                     <div className="space-y-2">
                                         {items.map((item, idx) => {
-                                            const cantidad = Number(item.cantidad) || 0;
-                                            const precio = Number(item.precio) || 0;
-                                            const subtotal = Number(item.subtotal) || (cantidad * precio);
+                                            const i = item as any;
+                                            const cantidad = Number(i.cantidad) || 0;
+                                            const precio = Number(i.precio) || 0;
+                                            const subtotal = Number(i.subtotal) || (cantidad * precio);
                                             return (
                                                 <div key={idx} className="py-2 border-b border-gray-100 last:border-0">
                                                     <div className="flex justify-between text-black leading-snug items-start">
                                                         <span className="pr-4 flex gap-2">
                                                             <span className="font-black text-rodrigo-terracotta">{cantidad}</span>
-                                                            <span className="font-bold">{item.nombre?.toUpperCase()}</span>
+                                                            <span className="font-bold">{i.nombre?.toUpperCase()}</span>
                                                         </span>
                                                         <span className="font-black whitespace-nowrap">S/ {subtotal.toFixed(2)}</span>
                                                     </div>
                                                     <div className="flex flex-wrap gap-1 mt-1 ml-6">
-                                                        {item.detalles?.parte && (
+                                                        {i.detalles?.parte && (
                                                             <span className="text-[9px] bg-rodrigo-terracotta/10 text-rodrigo-terracotta px-1.5 py-0.5 rounded font-black">
-                                                                PRESA: {item.detalles.parte.toUpperCase()}
+                                                                PRESA: {i.detalles.parte.toUpperCase()}
                                                             </span>
                                                         )}
-                                                        {item.detalles?.trozado && item.detalles.trozado !== 'entero' && (
+                                                        {i.detalles?.trozado && i.detalles.trozado !== 'entero' && (
                                                             <span className="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-black">
-                                                                {item.detalles.trozado.toUpperCase()}
+                                                                {i.detalles.trozado.toUpperCase()}
                                                             </span>
                                                         )}
                                                     </div>
-                                                    {item.detalles?.notas && (
+                                                    {i.detalles?.notas && (
                                                         <p className="text-[10px] text-gray-400 italic mt-1 ml-6 leading-tight">
-                                                            Nota: {item.detalles.notas}
+                                                            Nota: {i.detalles.notas}
                                                         </p>
                                                     )}
                                                 </div>
