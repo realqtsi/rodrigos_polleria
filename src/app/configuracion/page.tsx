@@ -655,64 +655,75 @@ function ConfiguracionContent() {
                                                 <div className="w-16 h-16 bg-blue-100 rounded-3xl flex items-center justify-center text-blue-600 mx-auto shadow-sm">
                                                     <Settings size={32} />
                                                 </div>
-                                                <div>
-                                                    <h4 className="font-bold text-blue-900">Modo Bluetooth Activado</h4>
-                                                    <p className="text-xs text-blue-500 mt-1 max-w-sm mx-auto">
-                                                        Cada mozo deberá vincular su celular directamente con las impresoras al iniciar el turno.
-                                                    </p>
-                                                </div>
-                                                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-                                                    <button
-                                                        className="px-6 py-3 bg-white border border-blue-200 text-blue-600 font-bold text-xs rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
-                                                        onClick={async () => {
-                                                            try {
-                                                                const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
-                                                                if (!BluetoothPrinter.isSupported()) {
-                                                                    toast.error('Tu navegador no soporta Bluetooth. Usa Chrome en Android.');
-                                                                    return;
+                                                {editConfig.modo_impresion === 'bridge' ? (
+                                                    <div>
+                                                        <h4 className="font-bold text-emerald-900">Modo Cloud Bridge Activo 🌉</h4>
+                                                        <p className="text-xs text-emerald-600 mt-1 max-w-sm mx-auto">
+                                                            La impresión se gestiona automáticamente desde la laptop del local. Asegúrate de tener abierta la ventana negra del Bridge.
+                                                        </p>
+                                                    </div>
+                                                ) : (
+                                                    <div>
+                                                        <h4 className="font-bold text-blue-900">Modo Bluetooth Activado</h4>
+                                                        <p className="text-xs text-blue-500 mt-1 max-w-sm mx-auto">
+                                                            Cada mozo deberá vincular su celular directamente con las impresoras al iniciar el turno.
+                                                        </p>
+                                                    </div>
+                                                )}
+                                                {editConfig.modo_impresion !== 'bridge' && (
+                                                    <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                                                        <button
+                                                            className="px-6 py-3 bg-white border border-blue-200 text-blue-600 font-bold text-xs rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
+                                                            onClick={async () => {
+                                                                try {
+                                                                    const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
+                                                                    if (!BluetoothPrinter.isSupported()) {
+                                                                        toast.error('Tu navegador no soporta Bluetooth. Usa Chrome en Android.');
+                                                                        return;
+                                                                    }
+                                                                    const printer = new BluetoothPrinter();
+                                                                    await printer.connect();
+                                                                    toast.success('Impresora de Cocina vinculada');
+                                                                    (window as any).kitchenPrinter = printer;
+                                                                } catch (e: any) {
+                                                                    console.error(e);
+                                                                    if (e.name === 'NotFoundError') {
+                                                                        toast.error('No se seleccionó ningún dispositivo');
+                                                                    } else {
+                                                                        toast.error('Error al vincular: Verifica que la impresora esté encendida');
+                                                                    }
                                                                 }
-                                                                const printer = new BluetoothPrinter();
-                                                                await printer.connect();
-                                                                toast.success('Impresora de Cocina vinculada');
-                                                                (window as any).kitchenPrinter = printer;
-                                                            } catch (e: any) {
-                                                                console.error(e);
-                                                                if (e.name === 'NotFoundError') {
-                                                                    toast.error('No se seleccionó ningún dispositivo');
-                                                                } else {
-                                                                    toast.error('Error al vincular: Verifica que la impresora esté encendida');
+                                                            }}
+                                                        >
+                                                            VINCULAR COCINA 🔵
+                                                        </button>
+                                                        <button
+                                                            className="px-6 py-3 bg-white border border-blue-200 text-blue-600 font-bold text-xs rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
+                                                            onClick={async () => {
+                                                                try {
+                                                                    const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
+                                                                    if (!BluetoothPrinter.isSupported()) {
+                                                                        toast.error('Tu navegador no soporta Bluetooth. Usa Chrome en Android.');
+                                                                        return;
+                                                                    }
+                                                                    const printer = new BluetoothPrinter();
+                                                                    await printer.connect();
+                                                                    toast.success('Impresora de Caja vinculada');
+                                                                    (window as any).cashierPrinter = printer;
+                                                                } catch (e: any) {
+                                                                    console.error(e);
+                                                                    if (e.name === 'NotFoundError') {
+                                                                        toast.error('No se seleccionó ningún dispositivo');
+                                                                    } else {
+                                                                        toast.error('Error al vincular: Verifica que la impresora esté encendida');
+                                                                    }
                                                                 }
-                                                            }
-                                                        }}
-                                                    >
-                                                        VINCULAR COCINA 🔵
-                                                    </button>
-                                                    <button
-                                                        className="px-6 py-3 bg-white border border-blue-200 text-blue-600 font-bold text-xs rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
-                                                        onClick={async () => {
-                                                            try {
-                                                                const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
-                                                                if (!BluetoothPrinter.isSupported()) {
-                                                                    toast.error('Tu navegador no soporta Bluetooth. Usa Chrome en Android.');
-                                                                    return;
-                                                                }
-                                                                const printer = new BluetoothPrinter();
-                                                                await printer.connect();
-                                                                toast.success('Impresora de Caja vinculada');
-                                                                (window as any).cashierPrinter = printer;
-                                                            } catch (e: any) {
-                                                                console.error(e);
-                                                                if (e.name === 'NotFoundError') {
-                                                                    toast.error('No se seleccionó ningún dispositivo');
-                                                                } else {
-                                                                    toast.error('Error al vincular: Verifica que la impresora esté encendida');
-                                                                }
-                                                            }
-                                                        }}
-                                                    >
-                                                        VINCULAR CAJA 💳
-                                                    </button>
-                                                </div>
+                                                            }}
+                                                        >
+                                                            VINCULAR CAJA 💳
+                                                        </button>
+                                                    </div>
+                                                )}
                                                 <p className="text-[9px] font-bold text-blue-300 uppercase tracking-widest">Requiere conexión HTTPS segura para funcionar</p>
                                             </div>
                                         )}
