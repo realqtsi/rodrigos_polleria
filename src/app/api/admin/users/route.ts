@@ -36,28 +36,34 @@ async function getSupabaseClient() {
 
 // Verificar si el usuario es administrador
 async function checkAdmin(supabase: any) {
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) return false;
+    try {
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError) return { success: false, error: `Error de Auth: ${authError.message}` };
+        if (!user) return { success: false, error: 'No se encontró sesión de usuario' };
 
-    const { data: profile, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('rol')
-        .eq('id', user.id)
-        .single();
+        const { data: profile, error: profileError } = await supabase
+            .from('user_profiles')
+            .select('rol')
+            .eq('id', user.id)
+            .single();
 
-    if (profileError || !profile || profile.rol !== 'admin') {
-        return false;
+        if (profileError) return { success: false, error: `Error de Perfil: ${profileError.message}` };
+        if (!profile) return { success: false, error: 'No se encontró perfil de usuario' };
+        if (profile.rol !== 'admin') return { success: false, error: `Rol insuficiente: ${profile.rol}` };
+
+        return { success: true };
+    } catch (err: any) {
+        return { success: false, error: `Error interno: ${err.message}` };
     }
-
-    return true;
 }
 
 // POST: Crear nuevo usuario
 export async function POST(request: Request) {
     const supabase = await getSupabaseClient();
 
-    if (!(await checkAdmin(supabase))) {
-        return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
+    const adminCheck = await checkAdmin(supabase);
+    if (!adminCheck.success) {
+        return NextResponse.json({ error: `Acceso denegado: ${adminCheck.error}` }, { status: 403 });
     }
 
     try {
@@ -109,8 +115,9 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
     const supabase = await getSupabaseClient();
 
-    if (!(await checkAdmin(supabase))) {
-        return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
+    const adminCheck = await checkAdmin(supabase);
+    if (!adminCheck.success) {
+        return NextResponse.json({ error: `Acceso denegado: ${adminCheck.error}` }, { status: 403 });
     }
 
     try {
