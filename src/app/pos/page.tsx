@@ -862,25 +862,27 @@ function CartPanel({
                 </div>
             ) : (
                 <>
-                    <div className="max-h-[400px] overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                    <div className={`${isMobileDrawer ? '' : 'max-h-[400px] overflow-y-auto'} p-4 space-y-3 custom-scrollbar`}>
                         {carrito.map((item, index) => (
                             <div key={index} className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl">
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-bold text-slate-900 uppercase italic truncate">{item.nombre}</p>
-                                    <div className="flex flex-wrap gap-1 mt-0.5">
+                                    <div className="flex flex-wrap gap-1.5 mt-1">
                                         {item.detalles?.parte && (
-                                            <span className="text-[9px] bg-rodrigo-terracotta/10 text-rodrigo-terracotta px-1.5 py-0.5 rounded font-black uppercase">
-                                                Presa: {item.detalles.parte}
+                                            <span className="text-[11px] bg-rodrigo-terracotta text-white px-2 py-0.5 rounded-md font-black uppercase shadow-sm">
+                                                {item.detalles.parte}
                                             </span>
                                         )}
                                         {item.detalles?.trozado && item.detalles.trozado !== 'entero' && (
-                                            <span className="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-black uppercase">
+                                            <span className="text-[11px] bg-slate-200 text-slate-800 px-2 py-0.5 rounded-md font-black uppercase">
                                                 {item.detalles.trozado}
                                             </span>
                                         )}
                                     </div>
                                     {item.detalles?.notas && (
-                                        <p className="text-[10px] text-slate-400 mt-1 leading-tight"><span className="font-bold">Nota:</span> {item.detalles.notas}</p>
+                                        <p className="text-[11px] text-slate-500 mt-2 p-2 bg-white rounded-lg border border-slate-100 italic leading-tight shadow-sm">
+                                            <span className="font-bold text-slate-400 not-italic uppercase text-[9px]">Nota:</span> {item.detalles.notas}
+                                        </p>
                                     )}
                                     <p className="text-xs font-mono text-rodrigo-terracotta mt-1">S/ {item.precio.toFixed(2)} c/u</p>
                                 </div>

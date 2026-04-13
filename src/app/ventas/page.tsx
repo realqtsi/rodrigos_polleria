@@ -441,21 +441,22 @@ function VentaCard({ venta, label, idx, onPay, onPrint, onCancel }: { venta: Ven
                         <span className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-sm border border-slate-100 text-[12px] font-black text-slate-900">{item.cantidad}</span>
                         <div className="flex-1 min-w-0">
                             <span className="text-slate-900 font-bold block italic uppercase tracking-tight">{item.nombre}</span>
-                            <div className="flex flex-wrap gap-1 mt-0.5">
+                            <div className="flex flex-wrap gap-1.5 mt-1">
                                 {item.detalles?.parte && (
-                                    <span className="text-[9px] bg-rodrigo-terracotta/10 text-rodrigo-terracotta px-1.5 py-0.5 rounded font-black uppercase">
-                                        Presa: {item.detalles.parte}
+                                    <span className="text-[10px] bg-rodrigo-terracotta text-white px-2 py-0.5 rounded-md font-black uppercase shadow-sm">
+                                        {item.detalles.parte}
                                     </span>
                                 )}
                                 {item.detalles?.trozado && item.detalles.trozado !== 'entero' && (
-                                    <span className="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-black uppercase">
+                                    <span className="text-[10px] bg-slate-200 text-slate-800 px-2 py-0.5 rounded-md font-black uppercase">
                                         {item.detalles.trozado}
                                     </span>
                                 )}
                             </div>
                             {item.detalles?.notas && (
-                                <span className="text-[10px] text-slate-400 font-bold uppercase italic block mt-1">
-                                    Nota: {item.detalles.notas}
+                                <span className="text-[11px] text-slate-500 font-bold uppercase italic block mt-2 p-2 bg-slate-50 rounded-lg border border-slate-100 uppercase">
+                                    <span className="text-[9px] text-slate-400 not-italic font-black block mb-0.5">NOTA:</span>
+                                    {item.detalles.notas}
                                 </span>
                             )}
                         </div>

@@ -1,5 +1,5 @@
 'use client';
-// Forzado de actualización de despliegue - v2
+// Forzado de actualización de despliegue - v3 (Final Fix)
 
 import { useState, useEffect } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -151,23 +151,24 @@ export default function DeliveryDashboard() {
                                                                     </div>
                                                                     <span className="text-sm font-bold text-slate-700 uppercase italic truncate">{item.nombre}</span>
                                                                 </div>
-                                                                <div className="flex flex-wrap gap-1 ml-9">
-                                                                    {(item as any).detalles?.parte && (
-                                                                        <span className="text-[8px] bg-rodrigo-terracotta/10 text-rodrigo-terracotta px-1.5 py-0.5 rounded font-black uppercase">
-                                                                            Presa: {(item as any).detalles.parte}
-                                                                        </span>
-                                                                    )}
-                                                                    {(item as any).detalles?.trozado && (item as any).detalles.trozado !== 'entero' && (
-                                                                        <span className="text-[8px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-black uppercase">
-                                                                            {(item as any).detalles.trozado}
-                                                                        </span>
-                                                                    )}
-                                                                    {(item as any).detalles?.notas && (
-                                                                        <p className="w-full text-[9px] text-slate-400 italic">
-                                                                            Nota: {(item as any).detalles.notas}
-                                                                        </p>
-                                                                    )}
-                                                                </div>
+                                                                    <div className="flex flex-wrap gap-1.5 mt-2 ml-9">
+                                                                        {item.detalles?.parte && (
+                                                                            <span className="text-[10px] bg-rodrigo-terracotta text-white px-2 py-0.5 rounded-md font-black uppercase shadow-sm">
+                                                                                {item.detalles.parte}
+                                                                            </span>
+                                                                        )}
+                                                                        {item.detalles?.trozado && item.detalles.trozado !== 'entero' && (
+                                                                            <span className="text-[10px] bg-slate-200 text-slate-800 px-2 py-0.5 rounded-md font-black uppercase">
+                                                                                {item.detalles.trozado}
+                                                                            </span>
+                                                                        )}
+                                                                        {item.detalles?.notas && (
+                                                                            <p className="w-full text-[11px] text-slate-500 italic mt-1 bg-white p-2 rounded-lg border border-slate-100 shadow-sm">
+                                                                                <span className="text-[9px] font-black text-slate-400 not-italic uppercase block mb-0.5">Nota:</span>
+                                                                                {item.detalles.notas}
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
                                                             </div>
                                                         ))}
                                                     </div>
