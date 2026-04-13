@@ -437,9 +437,9 @@ function VentaCard({ venta, label, idx, onPay, onPrint, onCancel }: { venta: Ven
             </div>
             <div className="flex justify-between items-end mb-4">
                 <div>
-                     {venta.tipo_pedido === 'delivery' && venta.costo_envio > 0 && (
+                     {venta.tipo_pedido === 'delivery' && (venta.costo_envio || 0) > 0 && (
                         <p className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md inline-block mb-1">
-                            FLETE: S/ {venta.costo_envio.toFixed(2)}
+                            FLETE: S/ {(venta.costo_envio || 0).toFixed(2)}
                         </p>
                      )}
                     <p className="text-3xl font-black text-slate-900 tracking-tighter">S/{(venta.total || 0).toFixed(2)}</p>
