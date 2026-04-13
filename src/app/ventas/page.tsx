@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, obtenerFechaHoy } from '@/lib/supabase';
 import type { Venta, Mesa, ItemCarrito, ItemVenta } from '@/lib/database.types';
 import { Users, DollarSign, Clock, ShoppingBag, Trash2, AlertTriangle, Printer, ChevronRight, CreditCard, Navigation } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
@@ -79,6 +79,8 @@ function MesasActivasContent() {
     const cargarPedidosPendientes = async () => {
         try {
             setLoading(true);
+            const hoy = obtenerFechaHoy();
+
             const { data: ventasPendientes, error: ventasError } = await supabase
                 .from('ventas')
                 .select(`
@@ -89,6 +91,7 @@ function MesasActivasContent() {
                     )
                 `)
                 .eq('estado_pago', 'pendiente')
+                .eq('fecha', hoy)
                 .order('created_at', { ascending: false });
 
             if (ventasError) throw ventasError;

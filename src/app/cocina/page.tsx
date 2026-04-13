@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, obtenerFechaHoy } from '@/lib/supabase';
 import { Venta, ItemVenta, Producto } from '@/lib/database.types';
 import PedidoCard from '@/components/PedidoCard';
 import KitchenTicketModal from '@/components/KitchenTicketModal';
@@ -40,10 +40,7 @@ function CocinaContent() {
 
     const cargarPedidos = async () => {
         try {
-            // Solo mostrar pedidos del día actual — los de días anteriores se ocultan automáticamente
-            const hoy = new Date();
-            hoy.setHours(0, 0, 0, 0);
-            const todayStart = hoy.toISOString();
+            const hoy = obtenerFechaHoy();
 
             const { data, error } = await supabase
                 .from('ventas')
@@ -54,7 +51,7 @@ function CocinaContent() {
                     )
                 `)
                 .eq('estado_pedido', 'pendiente')
-                .gte('created_at', todayStart)
+                .eq('fecha', hoy)
                 .order('created_at', { ascending: true });
 
             if (error) throw error;
@@ -283,8 +280,8 @@ function CocinaContent() {
                 }
             ` }} />
 
-            <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8 lg:p-12 pb-32 md:pb-8 print:hidden">
-                <div className="max-w-xl mx-auto space-y-8">
+            <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8 lg:p-10 pb-32 md:pb-8 print:hidden">
+                <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
                     {/* Premium Header */}
                     <header className="relative p-6 bg-white border border-slate-100 rounded-[2.5rem] overflow-hidden group shadow-sm">
                         <div className="absolute inset-0 bg-slate-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
@@ -326,13 +323,13 @@ function CocinaContent() {
                             <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-sm italic">Sincronizando Órdenes...</p>
                         </div>
                     ) : (
-                        <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                             <AnimatePresence mode="popLayout">
                                 {pedidos.length === 0 ? (
                                     <motion.div
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
-                                        className="text-center py-24 bg-white rounded-[3rem] border-2 border-dashed border-slate-100 shadow-sm"
+                                        className="col-span-full text-center py-24 bg-white rounded-[3rem] border-2 border-dashed border-slate-100 shadow-sm"
                                     >
                                         <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-slate-100">
                                             <ChefHat size={48} className="text-slate-200" />

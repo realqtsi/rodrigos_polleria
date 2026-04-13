@@ -25,8 +25,7 @@ import {
     Save,
     Bluetooth
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { toast } from 'react-hot-toast';
+import { supabase, obtenerFechaHoy } from '@/lib/supabase';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Producto, ItemCarrito, Mesa } from '@/lib/database.types';
 import { useInventario } from '@/hooks/useInventario';
@@ -187,6 +186,7 @@ function POSContent() {
                     .select('*')
                     .eq('mesa_id', mesa.id)
                     .eq('estado_pago', 'pendiente')
+                    .eq('fecha', obtenerFechaHoy())
                     .order('created_at', { ascending: false })
                     .limit(1)
                     .single();

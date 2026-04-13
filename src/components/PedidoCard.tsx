@@ -83,7 +83,7 @@ export default function PedidoCard({ venta, onComplete, onPrint, onCancel, onEdi
                 {/* Status Bar */}
                 <div className={`h-1.5 w-full ${isCrisis ? 'bg-red-500' : isDelayed ? 'bg-rodrigo-terracotta' : 'bg-rodrigo-mustard'}`}></div>
 
-                <div className="p-6">
+                <div className="p-4 md:p-6">
                     {/* Header */}
                     <div className="flex justify-between items-start mb-6">
                         <div>
@@ -110,7 +110,7 @@ export default function PedidoCard({ venta, onComplete, onPrint, onCancel, onEdi
                     </div>
 
                     {/* Items List */}
-                    <div className="space-y-4 mb-8">
+                    <div className="space-y-3 mb-6">
                         {venta.items.map((item, idx) => (
                             <div key={idx} className="relative group/item">
                                 <div className="flex items-start gap-4">
@@ -119,10 +119,10 @@ export default function PedidoCard({ venta, onComplete, onPrint, onCancel, onEdi
                                     </div>
                                     <div className="flex-1 pt-1">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-slate-900 font-black text-lg uppercase tracking-tight group-hover/item:text-rodrigo-terracotta transition-colors italic">
+                                            <span className="text-slate-900 font-black text-base md:text-lg uppercase tracking-tight group-hover/item:text-rodrigo-terracotta transition-colors italic">
                                                 {item.nombre}
                                             </span>
-                                            <div className="opacity-40">{getItemIcon(item.nombre)}</div>
+                                            <div className="opacity-40 scale-90">{getItemIcon(item.nombre)}</div>
                                         </div>
 
                                         {(item as any).detalles && (

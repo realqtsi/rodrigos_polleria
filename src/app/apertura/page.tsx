@@ -319,16 +319,16 @@ function AperturaContent() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group"
+                            className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group"
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-rodrigo-mustard/5 blur-3xl -mr-16 -mt-16 group-hover:bg-rodrigo-mustard/10 transition-colors"></div>
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm group-hover:border-rodrigo-mustard/30 transition-colors">
-                                    <span className="text-3xl">🥔</span>
+                            <div className="flex items-center gap-4 mb-4 md:mb-6">
+                                <div className="w-12 h-12 md:w-14 md:h-14 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm group-hover:border-rodrigo-mustard/30 transition-colors">
+                                    <span className="text-2xl md:text-3xl">🥔</span>
                                 </div>
                                 <div>
-                                    <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Papas (Kg)</h2>
-                                    <p className="text-[10px] font-bold text-rodrigo-mustard uppercase tracking-widest mt-1 italic">Papa Pelada</p>
+                                    <h2 className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Papas (Kg)</h2>
+                                    <p className="text-[9px] md:text-[10px] font-bold text-rodrigo-mustard uppercase tracking-widest mt-0.5 md:mt-1 italic">Papa Pelada</p>
                                 </div>
                             </div>
                             <div className="relative">
@@ -340,9 +340,9 @@ function AperturaContent() {
                                     onChange={(e) => setPapasIniciales(e.target.value)}
                                     placeholder="0.0"
                                     disabled={loading}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-5 text-4xl font-black text-slate-900 italic outline-none focus:border-rodrigo-mustard/30 focus:bg-white focus:ring-4 focus:ring-rodrigo-mustard/5 transition-all placeholder:text-slate-200"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 md:px-6 md:py-5 text-3xl md:text-4xl font-black text-slate-900 italic outline-none focus:border-rodrigo-mustard/30 focus:bg-white transition-all placeholder:text-slate-200"
                                 />
-                                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 font-black italic uppercase text-xs">Kilogramos</span>
+                                <span className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 font-black italic uppercase text-[10px] md:text-xs">Kg</span>
                             </div>
                         </motion.div>
 
@@ -351,16 +351,16 @@ function AperturaContent() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group lg:col-span-1 md:col-span-2"
+                            className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group lg:col-span-1 md:col-span-2"
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 blur-3xl -mr-16 -mt-16 group-hover:bg-purple-500/10 transition-colors"></div>
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm group-hover:border-purple-500/30 transition-colors">
-                                    <span className="text-3xl">🟣</span>
+                            <div className="flex items-center gap-4 mb-4 md:mb-6">
+                                <div className="w-12 h-12 md:w-14 md:h-14 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm group-hover:border-purple-500/30 transition-colors">
+                                    <span className="text-2xl md:text-3xl">🟣</span>
                                 </div>
                                 <div>
-                                    <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Chicha (L)</h2>
-                                    <p className="text-[10px] font-bold text-purple-600 uppercase tracking-widest mt-1 italic">Preparada</p>
+                                    <h2 className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Chicha (L)</h2>
+                                    <p className="text-[9px] md:text-[10px] font-bold text-purple-600 uppercase tracking-widest mt-0.5 md:mt-1 italic">Preparada</p>
                                 </div>
                             </div>
                             <div className="relative">
@@ -372,9 +372,9 @@ function AperturaContent() {
                                     onChange={(e) => setChichaInicial(e.target.value)}
                                     placeholder="0.00"
                                     disabled={loading}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-5 text-4xl font-black text-slate-900 italic outline-none focus:border-purple-500/30 focus:bg-white focus:ring-4 focus:ring-purple-500/5 transition-all placeholder:text-slate-200"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 md:px-6 md:py-5 text-3xl md:text-4xl font-black text-slate-900 italic outline-none focus:border-purple-500/30 focus:bg-white transition-all placeholder:text-slate-200"
                                 />
-                                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 font-black italic uppercase text-xs">Litros</span>
+                                <span className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 font-black italic uppercase text-[10px] md:text-xs">Litros</span>
                             </div>
                         </motion.div>
                     </div>
@@ -386,20 +386,20 @@ function AperturaContent() {
                         transition={{ delay: 0.3 }}
                         className="glass-panel relative overflow-hidden"
                     >
-                        <div className="p-8 border-b border-slate-100 bg-slate-50/50">
+                        <div className="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50">
                             <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-5">
-                                    <div className="w-14 h-14 bg-blue-500/10 rounded-[1.5rem] border border-blue-100 flex items-center justify-center text-blue-600">
-                                        <RefreshCw size={28} className={loadingPrevious ? 'animate-spin' : ''} />
+                                <div className="flex items-center gap-4 md:gap-5">
+                                    <div className="w-12 h-12 md:w-14 md:h-14 bg-blue-500/10 rounded-[1.2rem] md:rounded-[1.5rem] border border-blue-100 flex items-center justify-center text-blue-600">
+                                        <RefreshCw size={24} className={loadingPrevious ? 'animate-spin' : ''} />
                                     </div>
                                     <div>
-                                        <h2 className="text-xl font-black text-slate-900 uppercase italic tracking-tight">Stock de Bebidas</h2>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <span className="text-[10px] font-black text-blue-600/80 uppercase tracking-widest">
+                                        <h2 className="text-lg md:text-xl font-black text-slate-900 uppercase italic tracking-tight">Stock de Bebidas</h2>
+                                        <div className="flex items-center gap-2 mt-0.5 md:mt-1">
+                                            <span className="text-[9px] md:text-[10px] font-black text-blue-600/80 uppercase tracking-widest">
                                                 Total: {calculateTotalBeverages()} Unidades
                                             </span>
                                             {previousDayLoaded && (
-                                                <span className="flex items-center gap-1 text-[9px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                                                <span className="hidden sm:flex items-center gap-1 text-[8px] md:text-[9px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
                                                     <Check size={10} /> Sincronizado
                                                 </span>
                                             )}
@@ -409,15 +409,15 @@ function AperturaContent() {
                                 <button
                                     type="button"
                                     onClick={resetBeverages}
-                                    className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white border border-slate-200 text-slate-300 hover:text-rodrigo-terracotta hover:border-rodrigo-terracotta/30 transition-all shadow-sm"
+                                    className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-xl md:rounded-2xl bg-white border border-slate-200 text-slate-300 hover:text-rodrigo-terracotta transition-all shadow-sm"
                                     title="Reiniciar a cero"
                                 >
-                                    <RefreshCw size={18} />
+                                    <RefreshCw size={16} />
                                 </button>
                             </div>
                         </div>
 
-                        <div className="p-8">
+                        <div className="p-5 md:p-8">
                             {(loadingPrevious || loadingCatalog) ? (
                                 <div className="flex flex-col items-center justify-center py-12 gap-4">
                                     <div className="w-12 h-12 border-4 border-slate-100 border-t-rodrigo-mustard rounded-full animate-spin"></div>
