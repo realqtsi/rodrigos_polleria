@@ -235,6 +235,13 @@ function AperturaContent() {
                 .from('mesas')
                 .update({ estado: 'libre' });
 
+            // ANULAR PEDIDOS PENDIENTES DE DÍAS ANTERIORES
+            // Esto evita que aparezcan pedidos "fantasmas" al empezar el día
+            await supabase
+                .from('ventas')
+                .update({ estado_pago: 'anulado' })
+                .eq('estado_pago', 'pendiente');
+
             toast.success(
                 `¡Día iniciado exitosamente!\nPollos: ${pollos} | Chicha: ${chicha}L | Bebidas: ${totalBebidas}`,
                 { duration: 3000, icon: '✅' }
