@@ -165,9 +165,22 @@ export const ESCPOS = {
     ALIGN_RIGHT: new Uint8Array([0x1b, 0x61, 0x02]),
     FEED_AND_CUT: new Uint8Array([0x1d, 0x56, 0x41, 0x03]),
     PAPER_FEED: (n: number) => new Uint8Array([0x1b, 0x64, n]),
+    SELECT_CODE_PAGE_850: new Uint8Array([0x1b, 0x74, 0x02]), // Selecciona tabla de caracteres 850
 
     encodeText: (text: string) => {
-        const encoder = new TextEncoder();
-        return encoder.encode(text + '\n');
+        // Mapeo manual para caracteres españoles comunes en la mayoría de impresoras térmicas (CP850 / Latin1)
+        const charMap: { [key: string]: number } = {
+            'á': 0xA0, 'é': 0x82, 'í': 0xA1, 'ó': 0xA2, 'ú': 0xA3,
+            'Á': 0x41, 'É': 0x45, 'Í': 0x49, 'Ó': 0x4F, 'Ú': 0x55,
+            'ñ': 0xA4, 'Ñ': 0xA5, '¿': 0xA8, '¡': 0xAD, 'º': 0xA7, 'ª': 0xA6
+        };
+
+        const bytes = new Uint8Array(text.length + 1);
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            bytes[i] = charMap[char] || (char.charCodeAt(0) > 127 ? 0x3F : char.charCodeAt(0));
+        }
+        bytes[text.length] = 0x0A; // Newline
+        return bytes;
     }
 };

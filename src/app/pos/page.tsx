@@ -173,7 +173,8 @@ function POSContent() {
             setIsDelivery(false);
             setDeliveryInfo(null);
             setCurrentVentaId(null);
-            if (view === 'mesas') setCarrito([]);
+            setCarrito([]);
+            setOrderNotes('');
             setView('pedido');
             return;
         }
@@ -342,6 +343,7 @@ function POSContent() {
                             // 1. Imprimir a Cocina si hay impresora vinculada
                             if (kitchenPrinter) {
                                 let cmds = new Uint8Array([
+                                    ...ESCPOS.SELECT_CODE_PAGE_850,
                                     ...ESCPOS.RESET,
                                     ...ESCPOS.ALIGN_CENTER,
                                     ...ESCPOS.TEXT_SIZE_LARGE,
@@ -370,6 +372,7 @@ function POSContent() {
                             // 2. Imprimir Comprobante/Ticket a Caja si hay impresora vinculada
                             if (cashierPrinter) {
                                 let cmds = new Uint8Array([
+                                    ...ESCPOS.SELECT_CODE_PAGE_850,
                                     ...ESCPOS.RESET,
                                     ...ESCPOS.ALIGN_CENTER,
                                     ...ESCPOS.TEXT_SIZE_LARGE,
@@ -541,6 +544,10 @@ function POSContent() {
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
                             setIsDelivery(true);
+                            setIsParaLlevar(false);
+                            setSelectedTable(null);
+                            setCarrito([]);
+                            setOrderNotes('');
                             setView('pedido');
                             setShowDeliveryMap(true);
                         }}
@@ -593,7 +600,19 @@ function POSContent() {
         <div className="space-y-4 md:space-y-6 pb-32">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3 md:gap-4">
-                    <button onClick={() => setView(isParaLlevar || isDelivery ? 'start' : 'mesas')} className="w-10 h-10 md:w-12 md:h-12 bg-white border border-slate-200 rounded-xl md:rounded-2xl flex items-center justify-center text-slate-400 shadow-sm"><ArrowRight className="rotate-180" size={18} /></button>
+                    <button onClick={() => {
+                        if (isParaLlevar || isDelivery) {
+                            setCarrito([]);
+                            setOrderNotes('');
+                            setView('start');
+                        } else {
+                            // Si es mesa, podemos elegir resetear o no al salir. 
+                            // El usuario dijo "cada vez que salga de un pedido... tiene q resetearse"
+                            setCarrito([]);
+                            setOrderNotes('');
+                            setView('mesas');
+                        }
+                    }} className="w-10 h-10 md:w-12 md:h-12 bg-white border border-slate-200 rounded-xl md:rounded-2xl flex items-center justify-center text-slate-400 shadow-sm"><ArrowRight className="rotate-180" size={18} /></button>
                     <div>
                         <h1 className="text-xl md:text-2xl font-black text-slate-900 italic tracking-tight uppercase">
                             {isDelivery ? "Delivery" : isParaLlevar ? "Recojo" : `Mesa ${selectedTable?.numero}`}
