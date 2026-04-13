@@ -406,8 +406,7 @@ function POSContent() {
                         } else {
                             // Modo RED (Legacy/WiFi Local)
                             try {
-                                const hostIp = window.location.hostname;
-                                const printServerUrl = `http://${hostIp}:3001`;
+                                const printServerUrl = `http://localhost:3001`;
                                 await fetch(`${printServerUrl}/print-kitchen`, {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },

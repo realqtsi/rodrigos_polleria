@@ -137,8 +137,7 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
 
     const imprimirUSB = async () => {
         try {
-            const hostIp = window.location.hostname;
-            const printServerUrl = `http://${hostIp}:3001`; // Suponiendo que el bridge corre en la misma máquina o es accesible
+            const printServerUrl = `http://localhost:3001`; // Siempre apuntar a localhost para el Bridge local
 
             const response = await fetch(`${printServerUrl}/print-receipt-usb`, {
                 method: 'POST',
@@ -207,8 +206,8 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
         // 2. Intentar impresión directa vía USB (Bridge)
         imprimirUSB();
 
-        // 3. Abrir diálogo del navegador como respaldo
-        window.print();
+        // 3. Ya NO llamamos a window.print() automáticamente para evitar el cuadro de diálogo
+        // window.print();
     };
 
     // Auto-impresión al abrir el modal si es una venta o pre-cuenta nueva
