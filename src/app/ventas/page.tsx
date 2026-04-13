@@ -442,20 +442,20 @@ function VentaCard({ venta, label, idx, onPay, onPrint, onCancel }: { venta: Ven
                         <div className="flex-1 min-w-0">
                             <span className="text-slate-900 font-bold block italic uppercase tracking-tight">{item.nombre}</span>
                             <div className="flex flex-wrap gap-1 mt-0.5">
-                                {(item as any).detalles?.parte && (
+                                {item.detalles?.parte && (
                                     <span className="text-[9px] bg-rodrigo-terracotta/10 text-rodrigo-terracotta px-1.5 py-0.5 rounded font-black uppercase">
-                                        Presa: {(item as any).detalles.parte}
+                                        Presa: {item.detalles.parte}
                                     </span>
                                 )}
-                                {(item as any).detalles?.trozado && (item as any).detalles.trozado !== 'entero' && (
+                                {item.detalles?.trozado && item.detalles.trozado !== 'entero' && (
                                     <span className="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-black uppercase">
-                                        {(item as any).detalles.trozado}
+                                        {item.detalles.trozado}
                                     </span>
                                 )}
                             </div>
-                            {(item as any).detalles?.notas && (
+                            {item.detalles?.notas && (
                                 <span className="text-[10px] text-slate-400 font-bold uppercase italic block mt-1">
-                                    Nota: {(item as any).detalles.notas}
+                                    Nota: {item.detalles.notas}
                                 </span>
                             )}
                         </div>

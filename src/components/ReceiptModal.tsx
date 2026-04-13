@@ -276,7 +276,7 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                 {items.map((item, idx) => {
                     const cantidad = Number(item.cantidad) || 0;
                     const precio = Number(item.precio) || 0;
-                    const subtotal = Number((item as any).subtotal) || (cantidad * precio);
+                    const subtotal = Number(item.subtotal) || (cantidad * precio);
                         return (
                             <div key={idx} className="ticket-item" style={{ display: 'flex', flexDirection: 'column', padding: '2px 0', borderBottom: '1px dashed #eee' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -285,16 +285,16 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                                     <span className="item-precio" style={{ whiteSpace: 'nowrap', marginLeft: '8px', fontWeight: 'bold' }}>S/ {subtotal.toFixed(2)}</span>
                                 </div>
                                 <div style={{ marginLeft: '24px', fontSize: '9px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                                    {(item as any).detalles?.parte && (
-                                        <span>PRESA: {(item as any).detalles.parte.toUpperCase()}</span>
+                                    {item.detalles?.parte && (
+                                        <span>PRESA: {item.detalles.parte.toUpperCase()}</span>
                                     )}
-                                    {(item as any).detalles?.trozado && (item as any).detalles.trozado !== 'entero' && (
-                                        <span> / {(item as any).detalles.trozado.toUpperCase()}</span>
+                                    {item.detalles?.trozado && item.detalles.trozado !== 'entero' && (
+                                        <span> / {item.detalles.trozado.toUpperCase()}</span>
                                     )}
                                 </div>
-                                {(item as any).detalles?.notas && (
+                                {item.detalles?.notas && (
                                     <div style={{ marginLeft: '24px', fontSize: '9px', fontStyle: 'italic', color: '#666' }}>
-                                        Nota: {(item as any).detalles.notas}
+                                        Nota: {item.detalles.notas}
                                     </div>
                                 )}
                             </div>
@@ -449,7 +449,7 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                                         {items.map((item, idx) => {
                                             const cantidad = Number(item.cantidad) || 0;
                                             const precio = Number(item.precio) || 0;
-                                            const subtotal = Number((item as any).subtotal) || (cantidad * precio);
+                                            const subtotal = Number(item.subtotal) || (cantidad * precio);
                                             return (
                                                 <div key={idx} className="py-2 border-b border-gray-100 last:border-0">
                                                     <div className="flex justify-between text-black leading-snug items-start">
@@ -460,20 +460,20 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                                                         <span className="font-black whitespace-nowrap">S/ {subtotal.toFixed(2)}</span>
                                                     </div>
                                                     <div className="flex flex-wrap gap-1 mt-1 ml-6">
-                                                        {(item as any).detalles?.parte && (
+                                                        {item.detalles?.parte && (
                                                             <span className="text-[9px] bg-rodrigo-terracotta/10 text-rodrigo-terracotta px-1.5 py-0.5 rounded font-black">
-                                                                PRESA: {(item as any).detalles.parte.toUpperCase()}
+                                                                PRESA: {item.detalles.parte.toUpperCase()}
                                                             </span>
                                                         )}
-                                                        {(item as any).detalles?.trozado && (item as any).detalles.trozado !== 'entero' && (
+                                                        {item.detalles?.trozado && item.detalles.trozado !== 'entero' && (
                                                             <span className="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-black">
-                                                                {(item as any).detalles.trozado.toUpperCase()}
+                                                                {item.detalles.trozado.toUpperCase()}
                                                             </span>
                                                         )}
                                                     </div>
-                                                    {(item as any).detalles?.notas && (
+                                                    {item.detalles?.notas && (
                                                         <p className="text-[10px] text-gray-400 italic mt-1 ml-6 leading-tight">
-                                                            Nota: {(item as any).detalles.notas}
+                                                            Nota: {item.detalles.notas}
                                                         </p>
                                                     )}
                                                 </div>

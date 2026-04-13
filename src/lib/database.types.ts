@@ -58,6 +58,11 @@ export interface ItemVenta {
     };
     tipo?: 'pollo' | 'bebida' | 'complemento' | 'promocion';
     printed?: boolean;
+    detalles?: {
+        parte?: string;
+        trozado?: string;
+        notas?: string;
+    };
 }
 
 export interface Venta {
@@ -142,11 +147,6 @@ export interface BebidasDetalle {
 // Tipos para el carrito de compras
 export interface ItemCarrito extends ItemVenta {
     subtotal: number;
-    detalles?: {
-        parte?: string; // pecho, pierna, ala, encuentro, entrepierna, rabadilla
-        trozado?: string; // entero, 1/4, 1/8
-        notas?: string;
-    };
 }
 
 // Tipo para la respuesta de inserción
