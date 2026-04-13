@@ -141,13 +141,32 @@ export default function DeliveryDashboard() {
                                                     <div className="flex justify-between items-center mb-3">
                                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Contenido ({totalItems} items)</span>
                                                     </div>
-                                                    <div className="space-y-2">
+                                                    <div className="space-y-3">
                                                         {items.map((item, id) => (
-                                                            <div key={id} className="flex items-center gap-3">
-                                                                <div className="w-6 h-6 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-[11px] font-black text-slate-900 shadow-sm">
-                                                                    {item.cantidad}
+                                                            <div key={id} className="space-y-1">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="w-6 h-6 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-[11px] font-black text-slate-900 shadow-sm">
+                                                                        {item.cantidad}
+                                                                    </div>
+                                                                    <span className="text-sm font-bold text-slate-700 uppercase italic truncate">{item.nombre}</span>
                                                                 </div>
-                                                                <span className="text-sm font-bold text-slate-700 uppercase truncate italic">{item.nombre}</span>
+                                                                <div className="flex flex-wrap gap-1 ml-9">
+                                                                    {item.detalles?.parte && (
+                                                                        <span className="text-[8px] bg-rodrigo-terracotta/10 text-rodrigo-terracotta px-1.5 py-0.5 rounded font-black uppercase">
+                                                                            Presa: {item.detalles.parte}
+                                                                        </span>
+                                                                    )}
+                                                                    {item.detalles?.trozado && item.detalles.trozado !== 'entero' && (
+                                                                        <span className="text-[8px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-black uppercase">
+                                                                            {item.detalles.trozado}
+                                                                        </span>
+                                                                    )}
+                                                                    {item.detalles?.notas && (
+                                                                        <p className="w-full text-[9px] text-slate-400 italic">
+                                                                            Nota: {item.detalles.notas}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         ))}
                                                     </div>
