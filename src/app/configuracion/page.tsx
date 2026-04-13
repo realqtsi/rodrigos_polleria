@@ -694,13 +694,14 @@ function ConfiguracionContent() {
                                     ))}
                                 </tbody>
                             </table>
-                        </motion.div>
-                    )}
+                        </div>
+                    </motion.div>
+                )}
 
-                    {activeTab === 'bebidas' && user?.rol === 'admin' && (
-                        <motion.div
-                            key="bebidas"
-                            initial={{ opacity: 0, y: 10 }}
+                {activeTab === 'bebidas' && user?.rol === 'admin' && (
+                    <motion.div
+                        key="bebidas"
+                        initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
                             className="bg-white p-10 relative overflow-hidden border border-slate-100 rounded-[3rem] shadow-sm"
