@@ -608,13 +608,19 @@ function ConfiguracionContent() {
                                                     onClick={() => setEditConfig({ ...editConfig, modo_impresion: 'red' })}
                                                     className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${editConfig.modo_impresion === 'red' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400'}`}
                                                 >
-                                                    ETHERNET / RED
+                                                    RED / LOCAL
                                                 </button>
                                                 <button
                                                     onClick={() => setEditConfig({ ...editConfig, modo_impresion: 'bluetooth' })}
                                                     className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${editConfig.modo_impresion === 'bluetooth' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`}
                                                 >
-                                                    BLUETOOTH 🔵
+                                                    BLUETOOTH
+                                                </button>
+                                                <button
+                                                    onClick={() => setEditConfig({ ...editConfig, modo_impresion: 'bridge' })}
+                                                    className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${editConfig.modo_impresion === 'bridge' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400'}`}
+                                                >
+                                                    CLOUD BRIDGE 🌉
                                                 </button>
                                             </div>
                                         </div>

@@ -327,7 +327,6 @@ function POSContent() {
 
                         if (config?.modo_impresion === 'bluetooth' || hasBluetooth) {
                             // Modo Bluetooth: Usar las instancias guardadas en window
-
                             if (!kitchenPrinter && !cashierPrinter) {
                                 toast.error('Impresoras Bluetooth no vinculadas. Ve a Ajustes.');
                                 return;
@@ -394,21 +393,28 @@ function POSContent() {
                                 ]);
                                 await cashierPrinter.print(cmds);
                             }
+                            toast.success('Impresión Bluetooth enviada 🔵');
+                        } else if (config?.modo_impresion === 'bridge') {
+                            // Modo Bridge: No hacemos nada en el cliente, el Bridge en la laptop se encarga
+                            console.log('Modo Bridge detectado: El servidor local imprimirá automáticamente.');
+                            toast.success('Pedido enviado a cola de impresión 🚀');
                         } else {
-                            // Modo RED (Legacy/WiFi)
-                            const hostIp = window.location.hostname;
-                            const printServerUrl = `http://${hostIp}:3001`;
-                            await fetch(`${printServerUrl}/print-kitchen`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ ip: config?.ip_impresora_cocina || '192.168.1.100', mesa: selectedTable ? selectedTable.numero : 'LLEVAR', items: itemsParaCocina, notas: orderNotes })
-                            });
-                            await fetch(`${printServerUrl}/print-receipt`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ ip: config?.ip_impresora_caja || '192.168.1.101', items: itemsParaCocina, subtotal: calcularSubtotal(), total: calcularTotal(), envio: deliveryInfo?.cost || 0, esDelivery: isDelivery, direccion: deliveryInfo?.address })
-                            });
+                            // Modo RED (Legacy/WiFi Local)
+                            try {
+                                const hostIp = window.location.hostname;
+                                const printServerUrl = `http://${hostIp}:3001`;
+                                await fetch(`${printServerUrl}/print-kitchen`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ ip: config?.ip_impresora_cocina || '192.168.1.100', mesa: selectedTable ? selectedTable.numero : 'LLEVAR', items: itemsParaCocina, notas: orderNotes })
+                                });
+                                toast.success('Impresión enviada correctamente 🖨️');
+                            } catch (e) {
+                                console.warn('Error en print-server legacy:', e);
+                                // No mostramos error estridente si el usuario está en la nube
+                            }
                         }
+
                         const printedKeys = new Set(itemsParaCocina.map(p => `${p.producto_id}||${p.detalles?.parte || ''}||${p.detalles?.notas || ''}`));
                         setCarrito(prev => prev.map(item => {
                             const itemKey = `${item.producto_id}||${item.detalles?.parte || ''}||${item.detalles?.notas || ''}`;
@@ -417,9 +423,8 @@ function POSContent() {
                             }
                             return item;
                         }));
-                        toast.success('Impresión enviada correctamente 🖨️');
                     } catch (err) {
-                        toast.error('Error al imprimir. Verifica el print-server.');
+                        console.error('Error general de impresión:', err);
                     }
                 }
                 const audio = new Audio('/kitchen-bell.mp3');
