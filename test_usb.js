@@ -1,56 +1,69 @@
-const escpos = require('escpos');
 const usb = require('usb');
 
-console.log('🔍 Buscando dispositivos USB...');
+console.log('🔍 Iniciando Detección Manual (Evitando escpos-usb)...');
 
 try {
     const devices = usb.getDeviceList();
-    // Buscar específicamente el dispositivo "Hi Print" (VID 1110, PID 2056) que vimos en Zadig
+    // VID: 1110 (0x0456), PID: 2056 (0x0808)
     const myPrinter = devices.find(d => 
-        (d.deviceDescriptor.idVendor === 1110 && d.deviceDescriptor.idProduct === 2056) ||
-        d.deviceDescriptor.bDeviceClass === 7
+        (d.deviceDescriptor.idVendor === 1110 && d.deviceDescriptor.idProduct === 2056)
     );
 
     if (!myPrinter) {
-        console.log('❌ No se detectó la impresora Hi Print.');
-        console.log('Dispositivos encontrados:', devices.length);
-        devices.forEach(d => {
-            console.log(`- VID: ${d.deviceDescriptor.idVendor}, PID: ${d.deviceDescriptor.idProduct}`);
-        });
+        console.log('❌ No se detectó la impresora Hi Print (0456:0808).');
         return;
     }
 
-    console.log(`✅ Impresora detectada: VID ${myPrinter.deviceDescriptor.idVendor}, PID ${myPrinter.deviceDescriptor.idProduct}`);
+    console.log(`✅ Impresora encontrada. Intentando reclamar el dispositivo...`);
 
-    // Intentar inicializar escpos-usb manualmente con este dispositivo
-    escpos.USB = require('escpos-usb');
+    myPrinter.open();
     
-    try {
-        console.log('Encendiendo motor de impresión...');
-        
-        // Pasamos el VID y PID exactos al constructor
-        const device = new escpos.USB(myPrinter.deviceDescriptor.idVendor, myPrinter.deviceDescriptor.idProduct);
-        const printer = new escpos.Printer(device);
+    // Las impresoras térmicas suelen tener la interface 0
+    const iface = myPrinter.interfaces[0];
+    
+    // Si Windows tiene el driver enganchado, esto fallará. 
+    // Por eso usamos WinUSB/Zadig.
+    iface.claim();
+    
+    // Buscamos el endpoint de SALIDA (Out) para enviar datos
+    const outEndpoint = iface.endpoints.find(e => e.direction === 'out');
 
-        device.open((err) => {
-            if (err) {
-                console.error('❌ Error al abrir la impresora:', err.message);
-                return;
-            }
-            console.log('🖨️  Enviando ticket de prueba...');
-            printer
-                .font('a').align('ct').style('bu').size(1, 1).text('PRUEBA EXITOSA')
-                .size(0, 0).text('Rodrigo\'s Pollería').text('--------------------------------')
-                .text('Si sale este papel, ya podemos cobrar.')
-                .feed(3).cut().close();
-            console.log('🚀 ¡Prueba enviada! Debería salir el papel ahora.');
-        });
-    } catch (e) {
-        console.error('❌ Error de librería:', e.message);
-        console.log('\nSi el error es "usb.on is not a function", es un problema de versión de Node 24.');
-        console.log('Intente ejecutar este comando para arreglarlo:');
-        console.log('npm install usb@2.14.0');
+    if (!outEndpoint) {
+        console.log('❌ No se encontró el puerto de salida (Out Endpoint).');
+        return;
     }
+
+    console.log('🚀 Enviando comandos ESC/POS puros...');
+
+    // Buffer con comandos ESC/POS: Inicializar, Texto, Corte
+    const data = Buffer.concat([
+        Buffer.from([0x1B, 0x40]), // ESC @ (Inicializar)
+        Buffer.from('--------------------------------\n'),
+        Buffer.from('        PRUEBA DIRECTA USB      \n'),
+        Buffer.from('       RODRIGO\'S POLLERIA      \n'),
+        Buffer.from('--------------------------------\n'),
+        Buffer.from('Si sale este papel, lo logramos.\n'),
+        Buffer.from('\n\n\n'),
+        Buffer.from([0x1D, 0x56, 0x41, 0x03]) // GS V A (Corte parcial)
+    ]);
+
+    outEndpoint.transfer(data, (err) => {
+        if (err) {
+            console.error('❌ Error al transferir datos:', err.message);
+        } else {
+            console.log('🎉 ¡EXITO! El papel debería estar saliendo.');
+        }
+        
+        // Limpiamos y cerramos
+        iface.release(true, (err) => {
+            myPrinter.close();
+            console.log('🔌 Conexión cerrada.');
+        });
+    });
+
 } catch (error) {
-    console.error('💥 Error:', error);
+    console.error('💥 Error:', error.message);
+    if (error.message.includes('libusb')) {
+        console.log('Sugerencia: Reinstale el driver WinUSB en Zadig para este dispositivo.');
+    }
 }
