@@ -23,17 +23,22 @@ import {
     User,
     ChevronDown,
     Save,
-    Bluetooth
+    Bluetooth,
+    Store,
+    Printer,
+    ChevronRight,
+    Loader2
 } from 'lucide-react';
 import { supabase, obtenerFechaHoy } from '@/lib/supabase';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Producto, ItemCarrito, Mesa } from '@/lib/database.types';
+import ProductOptionsModal from '@/components/ProductOptionsModal';
+import toast from 'react-hot-toast';
 import { useInventario } from '@/hooks/useInventario';
 import { useMesas } from '@/hooks/useMesas';
 import { useEstadisticasProductos } from '@/hooks/useEstadisticasProductos';
 import { registrarVenta, actualizarVenta } from '@/lib/ventas';
 import ReceiptModal from '@/components/ReceiptModal';
-import ProductOptionsModal from '@/components/ProductOptionsModal';
 import dynamic from 'next/dynamic';
 const DeliverySelector = dynamic(() => import('@/components/DeliverySelector'), {
     ssr: false,
