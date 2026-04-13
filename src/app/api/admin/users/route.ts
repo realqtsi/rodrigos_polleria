@@ -35,11 +35,26 @@ async function getSupabaseClient() {
 }
 
 // Verificar si el usuario es administrador
-async function checkAdmin(supabase: any) {
+async function checkAdmin(supabase: any, request: Request) {
     try {
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        // Intentar obtener el token del header Authorization
+        let user: any = null;
+        let authError: any = null;
+        
+        const loginToken = request.headers.get('Authorization')?.split('Bearer ')[1];
+        
+        if (loginToken) {
+            const { data: { user: authUser }, error: err } = await supabase.auth.getUser(loginToken);
+            user = authUser;
+            authError = err;
+        } else {
+            const { data: { user: authUser }, error: err } = await supabase.auth.getUser();
+            user = authUser;
+            authError = err;
+        }
+
         if (authError) return { success: false, error: `Error de Auth: ${authError.message}` };
-        if (!user) return { success: false, error: 'No se encontró sesión de usuario' };
+        if (!user) return { success: false, error: 'No se encontró sesión de usuario (Auth session missing)' };
 
         const { data: profile, error: profileError } = await supabase
             .from('user_profiles')
@@ -61,7 +76,7 @@ async function checkAdmin(supabase: any) {
 export async function POST(request: Request) {
     const supabase = await getSupabaseClient();
 
-    const adminCheck = await checkAdmin(supabase);
+    const adminCheck = await checkAdmin(supabase, request);
     if (!adminCheck.success) {
         return NextResponse.json({ error: `Acceso denegado: ${adminCheck.error}` }, { status: 403 });
     }
@@ -115,7 +130,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
     const supabase = await getSupabaseClient();
 
-    const adminCheck = await checkAdmin(supabase);
+    const adminCheck = await checkAdmin(supabase, request);
     if (!adminCheck.success) {
         return NextResponse.json({ error: `Acceso denegado: ${adminCheck.error}` }, { status: 403 });
     }
@@ -162,8 +177,9 @@ export async function PUT(request: Request) {
 export async function DELETE(request: Request) {
     const supabase = await getSupabaseClient();
 
-    if (!(await checkAdmin(supabase))) {
-        return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
+    const adminCheck = await checkAdmin(supabase, request);
+    if (!adminCheck.success) {
+        return NextResponse.json({ error: `Acceso denegado: ${adminCheck.error}` }, { status: 403 });
     }
 
     try {

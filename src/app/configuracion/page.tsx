@@ -217,9 +217,15 @@ function ConfiguracionContent() {
 
         setSaving(true);
         try {
+            // Obtener el token de sesión actual
+            const { data: { session } } = await supabase.auth.getSession();
+            
             const res = await fetch('/api/admin/users', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session?.access_token}`
+                },
                 body: JSON.stringify({
                     id: emp.id,
                     nombre: editUserName.trim(),
@@ -253,9 +259,15 @@ function ConfiguracionContent() {
 
         setSaving(true);
         try {
+            // Obtener el token de sesión actual
+            const { data: { session } } = await supabase.auth.getSession();
+
             const res = await fetch('/api/admin/users', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session?.access_token}`
+                },
                 body: JSON.stringify({
                     nombre: newUserName.trim(),
                     email: newUserEmail.trim(),
@@ -292,9 +304,14 @@ function ConfiguracionContent() {
         }
 
         setSaving(true);
-        try {
+            // Obtener el token de sesión actual
+            const { data: { session } } = await supabase.auth.getSession();
+
             const res = await fetch(`/api/admin/users?id=${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${session?.access_token}`
+                }
             });
 
             const data = await res.json().catch(() => ({ error: 'Respuesta inválida del servidor' }));
