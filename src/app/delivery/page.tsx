@@ -152,19 +152,19 @@ export default function DeliveryDashboard() {
                                                                     <span className="text-sm font-bold text-slate-700 uppercase italic truncate">{item.nombre}</span>
                                                                 </div>
                                                                 <div className="flex flex-wrap gap-1 ml-9">
-                                                                    {item.detalles?.parte && (
+                                                                    {(item as any).detalles?.parte && (
                                                                         <span className="text-[8px] bg-rodrigo-terracotta/10 text-rodrigo-terracotta px-1.5 py-0.5 rounded font-black uppercase">
-                                                                            Presa: {item.detalles.parte}
+                                                                            Presa: {(item as any).detalles.parte}
                                                                         </span>
                                                                     )}
-                                                                    {item.detalles?.trozado && item.detalles.trozado !== 'entero' && (
+                                                                    {(item as any).detalles?.trozado && (item as any).detalles.trozado !== 'entero' && (
                                                                         <span className="text-[8px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-black uppercase">
-                                                                            {item.detalles.trozado}
+                                                                            {(item as any).detalles.trozado}
                                                                         </span>
                                                                     )}
-                                                                    {item.detalles?.notas && (
+                                                                    {(item as any).detalles?.notas && (
                                                                         <p className="w-full text-[9px] text-slate-400 italic">
-                                                                            Nota: {item.detalles.notas}
+                                                                            Nota: {(item as any).detalles.notas}
                                                                         </p>
                                                                     )}
                                                                 </div>
