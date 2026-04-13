@@ -304,6 +304,7 @@ function ConfiguracionContent() {
         }
 
         setSaving(true);
+        try {
             // Obtener el token de sesión actual
             const { data: { session } } = await supabase.auth.getSession();
 
