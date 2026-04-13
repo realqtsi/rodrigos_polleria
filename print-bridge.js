@@ -107,7 +107,12 @@ function manualEscPos(data) {
 
     line("--------------------------------");
     add(RIGHT);
-    line(`TOTAL: S/ ${Number(total || 0).toFixed(2)}`);
+    const envio = Number(data.envio || 0);
+    if (envio > 0) {
+        line(`SUBTOTAL: S/ ${(Number(total) - envio).toFixed(2)}`);
+        line(`ENVIO:    S/ ${envio.toFixed(2)}`);
+    }
+    line(`TOTAL:    S/ ${Number(total || 0).toFixed(2)}`);
     add(CENTER);
     line("\nGRACIAS POR SU PREFERENCIA");
     line("\n\n\n\n");

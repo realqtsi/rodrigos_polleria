@@ -17,6 +17,7 @@ interface ReceiptModalProps {
     mesaNumero?: number;
     title?: string;
     isNewSale?: boolean; // Prop to control counter increment
+    costoEnvio?: number;
 }
 
 interface ConfigNegocio {
@@ -33,7 +34,7 @@ interface ConfigNegocio {
     ciudad?: string;
 }
 
-export default function ReceiptModal({ isOpen, onClose, items, total, orderId, mesaNumero, title = 'BOLETA DE VENTA', isNewSale = false }: ReceiptModalProps) {
+export default function ReceiptModal({ isOpen, onClose, items, total, orderId, mesaNumero, title = 'BOLETA DE VENTA', isNewSale = false, costoEnvio = 0 }: ReceiptModalProps) {
     const [config, setConfig] = useState<ConfigNegocio>({
         ruc: '',
         razon_social: "RODRIGO'S BRASAS & BROASTERS",
@@ -145,9 +146,9 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                 body: JSON.stringify({
                     items,
                     total,
-                    subtotal: total, // Asumido igual si no hay desglose aquí
-                    envio: 0,
-                    esDelivery: false,
+                    subtotal: total - costoEnvio,
+                    envio: costoEnvio,
+                    esDelivery: costoEnvio > 0,
                     title: title,
                     mesa: mesaNumero
                 })
@@ -304,6 +305,18 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
 
             {/* Total */}
             <div className="ticket-total-box" style={{ marginTop: '8px', borderTop: '2px solid black', paddingTop: '8px' }}>
+                {costoEnvio > 0 && (
+                    <div className="ticket-total-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginBottom: '4px' }}>
+                        <span>TOTAL PRODUCTOS:</span>
+                        <span>S/ {(total - costoEnvio).toFixed(2)}</span>
+                    </div>
+                )}
+                {costoEnvio > 0 && (
+                    <div className="ticket-total-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginBottom: '4px' }}>
+                        <span>FLETE ENVIO:</span>
+                        <span>S/ {costoEnvio.toFixed(2)}</span>
+                    </div>
+                )}
                 <div className="ticket-total-row" style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '12px' }}>
                     <span className="ticket-total-label">TOTAL A PAGAR:</span>
                     <span className="ticket-total-amount">S/ {total.toFixed(2)}</span>
@@ -483,8 +496,20 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                                 </div>
 
                                 <div className="border-t-4 border-black pt-3 mb-4">
-                                    <div className="flex justify-between items-center">
-                                        <span className="font-black text-base text-black uppercase">TOTAL A PAGAR</span>
+                                    {costoEnvio > 0 && (
+                                        <>
+                                            <div className="flex justify-between items-center text-[11px] mb-1">
+                                                <span className="font-bold text-gray-500 uppercase">SUBTOTAL PROD.</span>
+                                                <span className="font-bold whitespace-nowrap">S/ {(total - costoEnvio).toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-[11px] mb-2">
+                                                <span className="font-bold text-gray-500 uppercase">FLETE DELIVERY</span>
+                                                <span className="font-bold whitespace-nowrap">S/ {costoEnvio.toFixed(2)}</span>
+                                            </div>
+                                        </>
+                                    )}
+                                    <div className="flex justify-between items-center pr-1">
+                                        <span className="font-black text-base text-black uppercase tracking-tighter">TOTAL A PAGAR</span>
                                         <span className="text-xl font-black text-black">S/ {total.toFixed(2)}</span>
                                     </div>
                                 </div>

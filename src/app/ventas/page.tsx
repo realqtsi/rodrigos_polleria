@@ -39,6 +39,7 @@ function MesasActivasContent() {
         mesaNumero?: number;
         title?: string;
         isNewSale?: boolean;
+        costoEnvio?: number;
     } | null>(null);
 
     const [showCancelModal, setShowCancelModal] = useState(false);
@@ -129,13 +130,14 @@ function MesasActivasContent() {
         }
     };
 
-    const handlePrintPreCuenta = (widthMesa: boolean, items: (ItemCarrito | ItemVenta)[], total: number, orderId: string, mesaNumero?: number) => {
+    const handlePrintPreCuenta = (widthMesa: boolean, items: (ItemCarrito | ItemVenta)[], total: number, orderId: string, mesaNumero?: number, costoEnvio?: number) => {
         setReceiptData({
             items,
             total,
             orderId,
             mesaNumero,
-            title: 'ESTADO DE CUENTA'
+            title: 'ESTADO DE CUENTA',
+            costoEnvio
         });
         setShowReceipt(true);
     };
@@ -350,7 +352,7 @@ function MesasActivasContent() {
                                                 label={`MESA ${mesa.numero}`}
                                                 idx={idx}
                                                 onPay={() => abrirModalCobro(mesa.venta!.id, mesa.id, mesa.numero, mesa.venta!.items, mesa.venta!.total)}
-                                                onPrint={() => handlePrintPreCuenta(true, mesa.venta!.items, mesa.venta!.total, mesa.venta!.id, mesa.numero)}
+                                                onPrint={() => handlePrintPreCuenta(true, mesa.venta!.items, mesa.venta!.total, mesa.venta!.id, mesa.numero, mesa.venta!.costo_envio)}
                                                 onCancel={() => handleCancelClick(mesa.venta!.id, mesa.id, `Mesa ${mesa.numero}`)}
                                             />
                                         ))}
@@ -383,6 +385,7 @@ function MesasActivasContent() {
                         mesaNumero={receiptData.mesaNumero}
                         title={receiptData.title}
                         isNewSale={receiptData.isNewSale}
+                        costoEnvio={receiptData.costoEnvio}
                     />
                 )}
 
@@ -432,8 +435,15 @@ function VentaCard({ venta, label, idx, onPay, onPrint, onCancel }: { venta: Ven
                     {new Date(venta.created_at).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
                 </span>
             </div>
-            <div className="text-right mb-4">
-                <p className="text-3xl font-black text-slate-900 tracking-tighter">S/{(venta.total || 0).toFixed(2)}</p>
+            <div className="flex justify-between items-end mb-4">
+                <div>
+                     {venta.tipo_pedido === 'delivery' && venta.costo_envio > 0 && (
+                        <p className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md inline-block mb-1">
+                            FLETE: S/ {venta.costo_envio.toFixed(2)}
+                        </p>
+                     )}
+                    <p className="text-3xl font-black text-slate-900 tracking-tighter">S/{(venta.total || 0).toFixed(2)}</p>
+                </div>
             </div>
             <div className="space-y-2 mb-6 max-h-64 overflow-y-auto pr-2 bg-slate-50/50 p-2 rounded-xl border border-slate-50">
                 {venta.items.map((item, id) => (
