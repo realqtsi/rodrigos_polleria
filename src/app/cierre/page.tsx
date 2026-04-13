@@ -42,7 +42,7 @@ function CierreCajaContent() {
 
     // Estados para inputs manuales
     const [pollosAderezados, setPollosAderezados] = useState('');
-    const [pollosEnCaja, setPollosEnCaja] = useState('');
+    const [pollosCrudos, setPollosCrudos] = useState('');
     const [cenaPersonal, setCenaPersonal] = useState('');
     const [pollosGolpeados, setPollosGolpeados] = useState('');
     const [stockGaseosasReal, setStockGaseosasReal] = useState('');
@@ -94,7 +94,7 @@ function CierreCajaContent() {
     }, [bebidasDetalle]);
 
     // Total de pollos sobrantes
-    const stockPollosReal = (parseFloat(pollosAderezados || '0') + parseFloat(pollosEnCaja || '0')).toString();
+    const stockPollosReal = (parseFloat(pollosAderezados || '0') + parseFloat(pollosCrudos || '0')).toString();
 
     const [procesando, setProcesando] = useState(false);
     const [cierreCompletado, setCierreCompletado] = useState(false);
@@ -299,7 +299,7 @@ ${gastosTexto}
    - Mostritos: ${desglosePollos.mostritos}
 ❌ Sobrantes Total: ${stockPollosReal}
    - 🍗 Aderezados: ${pollosAderezados || '0'}
-   - 📦 En Caja: ${pollosEnCaja || '0'}
+   - 📦 Crudo: ${pollosCrudos || '0'}
 🍽️ Cena del Personal: ${cenaPersonal || '0'}
 💥 Pollos Golpeados: ${pollosGolpeados || '0'}
 📊 Pollos Finales Netos: ${formatearFraccionPollo(parseFloat(stockPollosReal || '0') - parseFloat(cenaPersonal || '0') - parseFloat(pollosGolpeados || '0'))}
@@ -361,7 +361,7 @@ _Generado automáticamente por Rodrigo's - Brasas & Broasters POS_`;
                 totalGastos,
                 stockPollosReal,
                 pollosAderezados,
-                pollosEnCaja,
+                pollosCrudos,
                 cenaPersonal,
                 pollosGolpeados,
                 stockGaseosasReal,
@@ -612,12 +612,12 @@ _Generado automáticamente por Rodrigo's - Brasas & Broasters POS_`;
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">En Caja</label>
+                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Crudo</label>
                                             <input
                                                 type="number"
                                                 step="0.125"
-                                                value={pollosEnCaja}
-                                                onChange={e => setPollosEnCaja(e.target.value)}
+                                                value={pollosCrudos}
+                                                onChange={e => setPollosCrudos(e.target.value)}
                                                 className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-lg font-black text-slate-800 italic outline-none focus:border-blue-500/50 transition-all placeholder:text-slate-200 shadow-xs"
                                                 placeholder="0"
                                             />
@@ -841,7 +841,7 @@ _Generado automáticamente por Rodrigo's - Brasas & Broasters POS_`;
                 <div className="max-w-6xl mx-auto flex justify-end">
                     <motion.button
                         onClick={confirmarCierre}
-                        disabled={procesando || (pollosAderezados === '' && pollosEnCaja === '') || !stockGaseosasReal || !dineroCajaReal}
+                        disabled={procesando || !stock}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         className="btn-accent px-12 py-5 rounded-[2.5rem] font-black text-sm uppercase tracking-[0.3em] flex items-center gap-4 bg-slate-900 text-white shadow-xl disabled:opacity-50 disabled:grayscale transition-all italic"
