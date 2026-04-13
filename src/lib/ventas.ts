@@ -340,6 +340,7 @@ export const getDeliveryOrders = async (): Promise<Venta[]> => {
                 mesas (numero)
             `)
             .eq('tipo_pedido', 'delivery')
+            .eq('fecha', obtenerFechaHoy())
             .neq('estado_delivery', 'entregado')
             .order('created_at', { ascending: false });
 
