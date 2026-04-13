@@ -25,7 +25,8 @@ async function checkAdmin(supabase: any) {
 
 // POST: Crear nuevo usuario
 export async function POST(request: Request) {
-    const supabase = createRouteHandlerClient({ cookies });
+    const cookieStore = await cookies();
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
     if (!(await checkAdmin(supabase))) {
         return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
@@ -78,7 +79,8 @@ export async function POST(request: Request) {
 
 // PUT: Actualizar usuario (nombre, rol, contraseña)
 export async function PUT(request: Request) {
-    const supabase = createRouteHandlerClient({ cookies });
+    const cookieStore = await cookies();
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
     if (!(await checkAdmin(supabase))) {
         return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
@@ -124,7 +126,8 @@ export async function PUT(request: Request) {
 
 // DELETE: Eliminar usuario
 export async function DELETE(request: Request) {
-    const supabase = createRouteHandlerClient({ cookies });
+    const cookieStore = await cookies();
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
     if (!(await checkAdmin(supabase))) {
         return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
