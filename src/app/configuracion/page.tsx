@@ -217,9 +217,7 @@ function ConfiguracionContent() {
 
         setSaving(true);
         try {
-            // Obtener el token de sesión actual
             const { data: { session } } = await supabase.auth.getSession();
-            
             const res = await fetch('/api/admin/users', {
                 method: 'PUT',
                 headers: { 
@@ -259,9 +257,7 @@ function ConfiguracionContent() {
 
         setSaving(true);
         try {
-            // Obtener el token de sesión actual
             const { data: { session } } = await supabase.auth.getSession();
-
             const res = await fetch('/api/admin/users', {
                 method: 'POST',
                 headers: { 
@@ -305,9 +301,7 @@ function ConfiguracionContent() {
 
         setSaving(true);
         try {
-            // Obtener el token de sesión actual
             const { data: { session } } = await supabase.auth.getSession();
-
             const res = await fetch(`/api/admin/users?id=${id}`, {
                 method: 'DELETE',
                 headers: {
