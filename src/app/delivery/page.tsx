@@ -1,4 +1,5 @@
 'use client';
+// Forzado de actualización de despliegue - v2
 
 import { useState, useEffect } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';

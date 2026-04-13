@@ -116,13 +116,17 @@ const channel = supabase
 // --- INTEGRACIÓN DE SERVIDOR EXPRESS PARA IMPRESIÓN USB DESDE EL NAVEGADOR ---
 const express = require('express');
 const cors = require('cors');
-escpos.USB = require('escpos-usb');
+const usb = require('usb'); // Usar librería nativa usb directly
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const HTTP_PORT = 3001;
+
+// VID/PID detectados en la ticketera ADV-8011N del usuario
+const USB_VID = 1110;
+const USB_PID = 2056;
 
 function generarTicketVenta(printer, data) {
     const { items, total, title, mesa } = data;
@@ -134,8 +138,8 @@ function generarTicketVenta(printer, data) {
     if (mesa) printer.text(`MESA: ${mesa}`);
     printer.text('--------------------------------');
     items.forEach(item => {
-        const itemTotal = (item.cantidad * item.precio).toFixed(2);
-        let nombre = item.nombre.substring(0, 20).padEnd(20);
+        const itemTotal = (item.cantidad * (item.precio || 0)).toFixed(2);
+        let nombre = (item.nombre || '').substring(0, 20).padEnd(20);
         printer.text(`${item.cantidad} ${nombre} S/ ${itemTotal}`);
         if (item.detalles?.notas) printer.text(`   Nota: ${item.detalles.notas}`);
     });
@@ -148,21 +152,48 @@ function generarTicketVenta(printer, data) {
 app.post('/print-receipt-usb', (req, res) => {
     let device;
     try {
-        device = new escpos.USB();
-    } catch (e) {
-        return res.status(500).json({ success: false, message: "No se detectó la impresora USB ADV-8011N." });
-    }
-    const printer = new escpos.Printer(device);
-    device.open((error) => {
-        if (error) return res.status(500).json({ success: false, message: error.message });
-        try {
-            generarTicketVenta(printer, req.body);
-            printer.close();
-            res.json({ success: true, message: "Ticket impreso en USB" });
-        } catch (err) {
-            res.status(500).json({ success: false, message: err.message });
+        device = usb.findByIds(USB_VID, USB_PID);
+        if (!device) {
+            // Intento de búsqueda por clase de dispositivo si no coincide el ID exacto
+            const devices = usb.getDeviceList();
+            device = devices.find(d => d.deviceDescriptor.bDeviceClass === 7);
         }
-    });
+
+        if (!device) throw new Error("No se detectó la impresora USB.");
+
+        device.open();
+        const iface = device.interfaces[0];
+        iface.claim();
+        const outEndpoint = iface.endpoints.find(e => e.direction === 'out');
+
+        if (!outEndpoint) throw new Error("No se encontró puerto de salida USB.");
+
+        // Collector para capturar los comandos de escpos.Printer
+        let bufferCollector = [];
+        const internalDevice = {
+            write: (chunk) => {
+                bufferCollector.push(chunk);
+            }
+        };
+
+        const printer = new escpos.Printer(internalDevice);
+        generarTicketVenta(printer, req.body);
+        
+        // Enviar el buffer recolectado vía USB directo
+        outEndpoint.transfer(Buffer.concat(bufferCollector), (err) => {
+            iface.release(true, () => device.close());
+            if (err) {
+                console.error("Error en transferencia USB:", err);
+                return res.status(500).json({ success: false, message: err.message });
+            }
+            console.log("✅ Ticket impreso con éxito via USB Directo.");
+            res.json({ success: true, message: "Ticket impreso en USB (Directo)" });
+        });
+
+    } catch (e) {
+        console.error("Error en impresión USB:", e);
+        res.status(500).json({ success: false, message: e.message });
+    }
 });
 
 app.listen(HTTP_PORT, '0.0.0.0', () => {
