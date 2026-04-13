@@ -58,7 +58,7 @@ interface ReportData {
     totalGastos: number;
     stockPollosReal: string;
     pollosAderezados: string;
-    pollosEnCaja: string;
+    pollosCrudos: string;
     cenaPersonal: string;
     pollosGolpeados: string;
     stockGaseosasReal: string;
@@ -247,7 +247,7 @@ export async function generarReporteExcel(data: ReportData) {
     row = addDataRow(ws, row, '   — Mostritos', `${data.desglosePollos.mostritos}`, COLORS.white);
     row = addDataRow(ws, row, '❌ Sobrantes Total', formatearFraccionPollo(parseFloat(data.stockPollosReal || '0')), COLORS.cream, true);
     row = addDataRow(ws, row, '   🍗 Aderezados', formatearFraccionPollo(parseFloat(data.pollosAderezados || '0')), COLORS.white);
-    row = addDataRow(ws, row, '   📦 En Caja', formatearFraccionPollo(parseFloat(data.pollosEnCaja || '0')), COLORS.white);
+    row = addDataRow(ws, row, '   📦 Crudo', formatearFraccionPollo(parseFloat(data.pollosCrudos || '0')), COLORS.white);
     row = addDataRow(ws, row, '🍽️ Cena del Personal', formatearFraccionPollo(parseFloat(data.cenaPersonal || '0')), COLORS.lightGreen);
     row = addDataRow(ws, row, '💥 Pollos Golpeados', formatearFraccionPollo(parseFloat(data.pollosGolpeados || '0')), 'FFEBEE');
 
