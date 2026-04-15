@@ -364,15 +364,15 @@ function ConfiguracionContent() {
                         </p>
                     </div>
 
-                    {user?.rol === 'admin' && (
-                        <nav className="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200 self-start shadow-sm">
+                    {(user?.rol === 'admin' || user?.rol === 'cajero') && (
+                        <nav className="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200 self-start shadow-sm flex-wrap">
                             {[
-                                { id: 'precios', icon: Settings, label: 'Precios' },
-                                { id: 'usuarios', icon: Users, label: 'Usuarios' },
-                                { id: 'bebidas', icon: Package, label: 'Bebidas' },
-                                { id: 'stock', icon: RefreshCw, label: 'Stock' },
-                                { id: 'impresoras', icon: Package, label: 'Negocio' }
-                            ].map((tab) => (
+                                { id: 'precios', icon: Settings, label: 'Precios', roles: ['admin', 'cajero'] },
+                                { id: 'stock', icon: RefreshCw, label: 'Stock', roles: ['admin', 'cajero'] },
+                                { id: 'usuarios', icon: Users, label: 'Usuarios', roles: ['admin'] },
+                                { id: 'bebidas', icon: Package, label: 'Bebidas', roles: ['admin'] },
+                                { id: 'impresoras', icon: Package, label: 'Negocio', roles: ['admin'] }
+                            ].filter(tab => tab.roles.includes(user?.rol as string)).map((tab) => (
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id as any)}
@@ -832,7 +832,7 @@ function ConfiguracionContent() {
                     </motion.div>
                 )}
 
-                    {activeTab === 'stock' && user?.rol === 'admin' && (
+                    {(activeTab === 'stock' && (user?.rol === 'admin' || user?.rol === 'cajero')) && (
                         <StockAjustePanel allBrands={allBrands} saving={saving} setSaving={setSaving} />
                     )}
 
