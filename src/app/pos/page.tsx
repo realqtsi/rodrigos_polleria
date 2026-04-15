@@ -549,6 +549,7 @@ function POSContent() {
                         )}
                     </div>
                 </div>
+            </div>
 
             {/* Categorías y Acciones Rápidas */}
             <div className="flex flex-col gap-4 mb-6 sticky top-20 lg:top-0 z-30 bg-[#f8fafc]/90 backdrop-blur-md py-3 -mx-4 px-4 sm:mx-0 sm:px-0">
