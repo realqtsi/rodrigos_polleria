@@ -149,6 +149,7 @@ export default function Navbar() {
                     {[
                         { icon: Home, label: 'Inicio', href: '/', permission: 'dashboard' },
                         { icon: ShoppingCart, label: 'Pedidos', href: '/pos', permission: 'pos' },
+                        { icon: Package, label: 'Ventas', href: '/ventas', permission: 'ventas' },
                         { icon: ChefHat, label: 'Cocina', href: '/cocina', permission: 'cocina' },
                         { icon: Navigation, label: 'Entregas', href: '/delivery', permission: 'delivery' },
                     ].filter(item => hasPermission(user.rol, item.permission)).map((item) => {
@@ -211,7 +212,8 @@ export default function Navbar() {
                                 </button>
                             </div>
 
-                            {/* Navigation *                            <nav className="flex-1 py-6 px-4 overflow-y-auto no-scrollbar">
+                            {/* Navigation */}
+                            <nav className="flex-1 py-6 px-4 overflow-y-auto no-scrollbar">
                                 {filteredSections.map((section, sectionIndex) => (
                                     <div key={section.title} className="mb-8">
                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-4 mb-3 italic">
@@ -237,7 +239,6 @@ export default function Navbar() {
                                     </div>
                                 ))}
                             </nav>
-v>
 
                             {/* User Footer */}
                             <div className="border-t border-slate-100 p-4 bg-slate-50/50">
