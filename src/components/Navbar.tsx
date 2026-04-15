@@ -120,26 +120,58 @@ export default function Navbar() {
             </aside>
 
             {/* MOBILE HEADER - con botón hamburguesa */}
-            <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-100 px-4 py-3 flex items-center justify-between">
+            <header className="lg:hidden fixed top-0 left-0 right-0 z-[60] bg-white/80 backdrop-blur-xl border-b border-slate-100 px-4 py-3 flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setSidebarOpen(true)}
-                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 border border-slate-100 text-slate-600 hover:bg-slate-100 transition-colors"
+                        className="w-11 h-11 flex items-center justify-center rounded-xl bg-slate-50 border border-slate-100 text-slate-600 active:scale-95 transition-all"
                     >
-                        <Menu size={20} />
+                        <Menu size={22} />
                     </button>
-                    <div className="relative w-8 h-8 rounded-lg overflow-hidden shadow-sm border border-slate-100">
-                        <Image src="/images/logo-rodrigos.jpeg" alt="Logo" fill className="object-cover" />
-                    </div>
-                    <div className="leading-none">
-                        <span className="font-black text-slate-900 text-sm block">Rodrigo&apos;s</span>
-                        <span className="text-[9px] text-rodrigo-terracotta font-bold uppercase tracking-wider">Brasas & Broasters</span>
+                    <div className="flex items-center gap-2.5">
+                        <div className="relative w-9 h-9 rounded-xl overflow-hidden shadow-sm border border-slate-100">
+                            <Image src="/images/logo-rodrigos.jpeg" alt="Logo" fill className="object-cover" />
+                        </div>
+                        <div className="leading-none">
+                            <span className="font-black text-slate-900 text-sm block tracking-tight">Rodrigo&apos;s</span>
+                            <span className="text-[9px] text-rodrigo-terracotta font-extrabold uppercase tracking-widest">POS System</span>
+                        </div>
                     </div>
                 </div>
-                <div className="w-9 h-9 rounded-full bg-rodrigo-mustard/10 flex items-center justify-center text-rodrigo-mustard text-xs font-black border border-rodrigo-mustard/20">
+                <div className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-black shadow-md border-2 border-white">
                     {user.nombre.charAt(0)}
                 </div>
             </header>
+
+            {/* BOTTOM NAV (Mobile Only) */}
+            <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-[60] bg-white/95 backdrop-blur-xl border-t border-slate-100 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                <div className="flex items-center justify-around h-20 px-4">
+                    {[
+                        { icon: Home, label: 'Inicio', href: '/', permission: 'dashboard' },
+                        { icon: ShoppingCart, label: 'Pedidos', href: '/pos', permission: 'pos' },
+                        { icon: ChefHat, label: 'Cocina', href: '/cocina', permission: 'cocina' },
+                        { icon: Navigation, label: 'Entregas', href: '/delivery', permission: 'delivery' },
+                    ].filter(item => hasPermission(user.rol, item.permission)).map((item) => {
+                        const Icon = item.icon;
+                        const isActive = pathname === item.href;
+                        return (
+                            <Link key={item.href} href={item.href} className="flex-1 max-w-[80px]">
+                                <div className={`flex flex-col items-center justify-center gap-1.5 h-full transition-all duration-300 ${isActive ? 'text-rodrigo-terracotta' : 'text-slate-400'}`}>
+                                    <div className={`p-2 rounded-2xl transition-all ${isActive ? 'bg-rodrigo-terracotta/10 scale-110' : 'active:scale-90'}`}>
+                                        <Icon size={isActive ? 20 : 18} strokeWidth={isActive ? 3 : 2} />
+                                    </div>
+                                    <span className={`text-[9px] font-black uppercase tracking-widest transition-opacity ${isActive ? 'opacity-100' : 'opacity-60'}`}>
+                                        {item.label}
+                                    </span>
+                                    {isActive && (
+                                        <motion.div layoutId="bottom-dot" className="w-1 h-1 bg-rodrigo-terracotta rounded-full absolute bottom-2" />
+                                    )}
+                                </div>
+                            </Link>
+                        );
+                    })}
+                </div>
+            </nav>
 
             {/* MOBILE SIDEBAR - Overlay drawer */}
             <AnimatePresence>
@@ -179,28 +211,24 @@ export default function Navbar() {
                                 </button>
                             </div>
 
-                            {/* Navigation */}
-                            <nav className="flex-1 py-4 px-3 overflow-y-auto">
+                            {/* Navigation *                            <nav className="flex-1 py-6 px-4 overflow-y-auto no-scrollbar">
                                 {filteredSections.map((section, sectionIndex) => (
-                                    <div key={section.title} className="mb-4">
-                                        {sectionIndex > 0 && (
-                                            <div className="mx-2 mb-4 h-px bg-slate-100" />
-                                        )}
-                                        <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-[0.15em] px-4 mb-2">
+                                    <div key={section.title} className="mb-8">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-4 mb-3 italic">
                                             {section.title}
                                         </p>
-                                        <div className="space-y-0.5">
+                                        <div className="space-y-1">
                                             {section.items.map((item) => {
                                                 const Icon = item.icon;
                                                 const isActive = pathname === item.href;
                                                 return (
                                                     <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}>
-                                                        <div className={`flex items-center gap-3 px-4 py-3 rounded-xl text-[13px] transition-all ${isActive
-                                                            ? 'bg-rodrigo-terracotta text-white font-bold'
-                                                            : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-semibold'
+                                                        <div className={`flex items-center gap-4 px-5 py-4 rounded-2xl text-sm transition-all active:scale-[0.98] ${isActive
+                                                            ? 'bg-rodrigo-terracotta text-white font-black shadow-lg shadow-rodrigo-terracotta/20'
+                                                            : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-bold'
                                                             }`}>
-                                                            <item.icon size={18} className={isActive ? 'text-white' : 'text-slate-400'} />
-                                                            <span>{item.label}</span>
+                                                            <Icon size={20} className={isActive ? 'text-white' : 'text-slate-400'} />
+                                                            <span className="tracking-tight">{item.label}</span>
                                                         </div>
                                                     </Link>
                                                 );
@@ -209,6 +237,7 @@ export default function Navbar() {
                                     </div>
                                 ))}
                             </nav>
+v>
 
                             {/* User Footer */}
                             <div className="border-t border-slate-100 p-4 bg-slate-50/50">

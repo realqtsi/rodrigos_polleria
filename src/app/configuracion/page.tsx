@@ -449,74 +449,117 @@ function ConfiguracionContent() {
                                                     <span className="text-[10px] font-black text-slate-200 font-mono italic">[{prods.length}]</span>
                                                 </div>
 
-                                                <div className="bg-white border border-slate-100 rounded-[3rem] shadow-sm overflow-hidden">
-                                                    <table className="w-full border-collapse text-left">
-                                                        <thead>
-                                                            <tr className="bg-slate-50/50 border-b border-slate-100">
-                                                                <th className="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] italic">Descripción</th>
-                                                                <th className="px-8 py-5 text-right text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] w-48 italic">Ajuste de Precio</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {prods.map((producto) => (
-                                                                <tr key={producto.id} className="group border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
-                                                                    <td className="px-8 py-6">
-                                                                        <div className="flex items-center gap-4">
-                                                                            <span className={`text-lg font-bold tracking-tight italic transition-colors ${editingId === producto.id ? 'text-rodrigo-terracotta' : 'text-slate-900'}`}>
-                                                                                {producto.nombre}
-                                                                            </span>
-                                                                            {!producto.activo && (
-                                                                                <span className="text-[8px] font-black bg-rodrigo-terracotta/20 text-rodrigo-terracotta px-2 py-0.5 rounded-full uppercase tracking-widest border border-rodrigo-terracotta/30">
-                                                                                    Inactivo
-                                                                                </span>
-                                                                            )}
-                                                                        </div>
-                                                                    </td>
-                                                                    <td className="px-8 py-6 text-right">
-                                                                        <AnimatePresence mode="wait">
-                                                                            {editingId === producto.id ? (
-                                                                                <motion.div key="edit" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center justify-end gap-3">
-                                                                                    <span className="text-xl font-black text-rodrigo-terracotta italic">S/</span>
-                                                                                    <input
-                                                                                        type="number"
-                                                                                        step="0.10"
-                                                                                        value={editPrecio}
-                                                                                        onChange={(e) => setEditPrecio(e.target.value)}
-                                                                                        onKeyDown={(e) => {
-                                                                                            if (e.key === 'Enter') guardarPrecio(producto);
-                                                                                            if (e.key === 'Escape') cancelarEdicion();
-                                                                                        }}
-                                                                                        className="w-24 bg-slate-50 border-2 border-slate-100 rounded-xl px-3 py-2 text-right text-lg font-black text-slate-900 italic outline-none focus:border-rodrigo-terracotta/30 transition-all placeholder:text-slate-200"
-                                                                                        autoFocus
-                                                                                    />
-                                                                                    <div className="flex gap-2">
-                                                                                        <button onClick={() => guardarPrecio(producto)} disabled={saving} className="p-2 bg-slate-900 text-white rounded-lg shadow-lg"><Check size={16} strokeWidth={3} /></button>
-                                                                                        <button onClick={cancelarEdicion} className="p-2 bg-slate-100 text-slate-400 rounded-lg hover:text-slate-600"><X size={16} strokeWidth={3} /></button>
-                                                                                    </div>
-                                                                                </motion.div>
-                                                                            ) : (
-                                                                                <motion.button
-                                                                                    key="display"
-                                                                                    initial={{ opacity: 0 }}
-                                                                                    animate={{ opacity: 1 }}
-                                                                                    onClick={() => iniciarEdicion(producto)}
-                                                                                    className="flex items-center justify-end gap-4 w-full group/btn text-right"
-                                                                                >
-                                                                                    <div className="flex flex-col items-end">
-                                                                                        <span className="text-2xl font-black text-slate-900 italic tracking-tighter group-hover/btn:text-rodrigo-terracotta transition-colors">
-                                                                                            S/ {producto.precio.toFixed(2)}
-                                                                                        </span>
-                                                                                        <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest opacity-0 group-hover/btn:opacity-100 transition-all -translate-y-1 group-hover/btn:translate-y-0">Editar Tarifa</span>
-                                                                                    </div>
-                                                                                    <Pencil size={16} className="text-slate-100 transition-all group-hover/btn:text-rodrigo-terracotta/40" />
-                                                                                </motion.button>
-                                                                            )}
-                                                                        </AnimatePresence>
-                                                                    </td>
+                                                <div className="bg-white border border-slate-100 rounded-[2rem] sm:rounded-[3rem] shadow-sm overflow-hidden">
+                                                    {/* Desktop Table */}
+                                                    <div className="hidden sm:block overflow-x-auto">
+                                                        <table className="w-full border-collapse text-left">
+                                                            <thead>
+                                                                <tr className="bg-slate-50/50 border-b border-slate-100">
+                                                                    <th className="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] italic">Descripción</th>
+                                                                    <th className="px-8 py-5 text-right text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] w-48 italic">Ajuste de Precio</th>
                                                                 </tr>
-                                                            ))}
-                                                        </tbody>
-                                                    </table>
+                                                            </thead>
+                                                            <tbody>
+                                                                {prods.map((producto) => (
+                                                                    <tr key={producto.id} className="group border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
+                                                                        <td className="px-8 py-6">
+                                                                            <div className="flex items-center gap-4">
+                                                                                <span className={`text-lg font-bold tracking-tight italic transition-colors ${editingId === producto.id ? 'text-rodrigo-terracotta' : 'text-slate-900'}`}>
+                                                                                    {producto.nombre}
+                                                                                </span>
+                                                                                {!producto.activo && (
+                                                                                    <span className="text-[8px] font-black bg-rodrigo-terracotta/20 text-rodrigo-terracotta px-2 py-0.5 rounded-full uppercase tracking-widest border border-rodrigo-terracotta/30">
+                                                                                        Inactivo
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="px-8 py-6 text-right">
+                                                                            <AnimatePresence mode="wait">
+                                                                                {editingId === producto.id ? (
+                                                                                    <motion.div key="edit" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center justify-end gap-3">
+                                                                                        <span className="text-xl font-black text-rodrigo-terracotta italic">S/</span>
+                                                                                        <input
+                                                                                            type="number"
+                                                                                            step="0.10"
+                                                                                            value={editPrecio}
+                                                                                            onChange={(e) => setEditPrecio(e.target.value)}
+                                                                                            className="w-24 bg-slate-50 border-2 border-slate-100 rounded-xl px-3 py-2 text-right text-lg font-black text-slate-900 italic outline-none focus:border-rodrigo-terracotta/30 transition-all placeholder:text-slate-200"
+                                                                                            autoFocus
+                                                                                        />
+                                                                                        <div className="flex gap-2">
+                                                                                            <button onClick={() => guardarPrecio(producto)} disabled={saving} className="p-2 bg-slate-900 text-white rounded-lg shadow-lg"><Check size={16} strokeWidth={3} /></button>
+                                                                                            <button onClick={cancelarEdicion} className="p-2 bg-slate-100 text-slate-400 rounded-lg hover:text-slate-600"><X size={16} strokeWidth={3} /></button>
+                                                                                        </div>
+                                                                                    </motion.div>
+                                                                                ) : (
+                                                                                    <motion.button
+                                                                                        key="display"
+                                                                                        initial={{ opacity: 0 }}
+                                                                                        animate={{ opacity: 1 }}
+                                                                                        onClick={() => iniciarEdicion(producto)}
+                                                                                        className="flex items-center justify-end gap-4 w-full group/btn text-right"
+                                                                                    >
+                                                                                        <div className="flex flex-col items-end">
+                                                                                            <span className="text-2xl font-black text-slate-900 italic tracking-tighter group-hover/btn:text-rodrigo-terracotta transition-colors">
+                                                                                                S/ {producto.precio.toFixed(2)}
+                                                                                            </span>
+                                                                                            <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest opacity-0 group-hover/btn:opacity-100 transition-all -translate-y-1 group-hover/btn:translate-y-0">Editar Tarifa</span>
+                                                                                        </div>
+                                                                                        <Pencil size={16} className="text-slate-100 transition-all group-hover/btn:text-rodrigo-terracotta/40" />
+                                                                                    </motion.button>
+                                                                                )}
+                                                                            </AnimatePresence>
+                                                                        </td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
+                                                    {/* Mobile Card Stack */}
+                                                    <div className="sm:hidden divide-y divide-slate-100">
+                                                        {prods.map((producto) => (
+                                                            <div key={producto.id} className="p-5 flex flex-col gap-4">
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="flex flex-col">
+                                                                        <span className="text-sm font-black text-slate-900 uppercase italic tracking-tight">{producto.nombre}</span>
+                                                                        {!producto.activo && (
+                                                                            <span className="text-[8px] font-black text-rodrigo-terracotta uppercase mt-1 tracking-widest">Inactivo</span>
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Precio Actual</p>
+                                                                        <p className="text-xl font-black text-slate-900 italic tracking-tighter">S/ {producto.precio.toFixed(2)}</p>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <AnimatePresence mode="wait">
+                                                                    {editingId === producto.id ? (
+                                                                        <motion.div key="edit-mobile" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="bg-slate-50 p-4 rounded-2xl flex items-center gap-3">
+                                                                            <input
+                                                                                type="number"
+                                                                                step="0.10"
+                                                                                value={editPrecio}
+                                                                                onChange={(e) => setEditPrecio(e.target.value)}
+                                                                                className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-lg font-black text-slate-900 italic outline-none"
+                                                                                autoFocus
+                                                                            />
+                                                                            <button onClick={() => guardarPrecio(producto)} disabled={saving} className="w-12 h-12 bg-slate-900 text-white rounded-xl flex items-center justify-center shadow-lg"><Check size={20} strokeWidth={3} /></button>
+                                                                            <button onClick={cancelarEdicion} className="w-12 h-12 bg-slate-200 text-slate-500 rounded-xl flex items-center justify-center"><X size={20} strokeWidth={3} /></button>
+                                                                        </motion.div>
+                                                                    ) : (
+                                                                        <button
+                                                                            onClick={() => iniciarEdicion(producto)}
+                                                                            className="w-full py-3 bg-slate-100 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
+                                                                        >
+                                                                            <Pencil size={14} /> Ajustar Tarifa
+                                                                        </button>
+                                                                    )}
+                                                                </AnimatePresence>
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
                                         );
@@ -611,102 +654,180 @@ function ConfiguracionContent() {
                                 )}
                             </AnimatePresence>
 
-                            <div className="bg-white border border-slate-100 rounded-[3rem] shadow-sm overflow-hidden">
-                                <table className="w-full border-collapse">
-                                    <thead>
-                                        <tr className="bg-slate-50/50 border-b border-slate-100">
-                                            <th className="text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-8 py-6 italic">Personal</th>
-                                            <th className="text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-8 py-6 italic">Gestión de Cuenta</th>
-                                            <th className="text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-8 py-6 italic w-20">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                            <div className="bg-white border border-slate-100 rounded-[2rem] sm:rounded-[3rem] shadow-sm overflow-hidden">
+                                {/* Desktop View */}
+                                <div className="hidden sm:block overflow-x-auto">
+                                    <table className="w-full border-collapse">
+                                        <thead>
+                                            <tr className="bg-slate-50/50 border-b border-slate-100">
+                                                <th className="text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-8 py-6 italic">Personal</th>
+                                                <th className="text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-8 py-6 italic">Gestión de Cuenta</th>
+                                                <th className="text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-8 py-6 italic w-20">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {empleados.map((emp) => (
+                                            <tr key={emp.id} className="group border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
+                                                <td className="px-8 py-6">
+                                                    <div className="flex flex-col">
+                                                        <span className={`text-[10px] font-black uppercase tracking-widest mb-1 ${emp.rol === 'admin' ? 'text-rodrigo-mustard' : 'text-rodrigo-terracotta'}`}>
+                                                            {emp.rol}
+                                                        </span>
+                                                        <span className="text-xs font-bold text-slate-400 font-mono tracking-tighter italic">{emp.email}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-8 py-6">
+                                                    <AnimatePresence mode="wait">
+                                                        {editingUserId === emp.id ? (
+                                                            <motion.div key="edit" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-wrap items-center gap-3">
+                                                                <div className="flex-1 space-y-1 min-w-[150px]">
+                                                                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-2">Nombre</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={editUserName}
+                                                                        onChange={e => setEditUserName(e.target.value)}
+                                                                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 font-black italic focus:border-rodrigo-mustard/30 outline-none"
+                                                                        placeholder="Nombre"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1 space-y-1 min-w-[150px]">
+                                                                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-2">Nueva Contraseña (Opcional)</label>
+                                                                    <input
+                                                                        type="password"
+                                                                        value={editUserPassword}
+                                                                        onChange={e => setEditUserPassword(e.target.value)}
+                                                                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 font-black italic focus:border-rodrigo-mustard/30 outline-none"
+                                                                        placeholder="••••••••"
+                                                                    />
+                                                                </div>
+                                                                <div className="space-y-1 w-full md:w-auto">
+                                                                    <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-2">Rol</label>
+                                                                    <select 
+                                                                        value={editUserRole}
+                                                                        onChange={e => setEditUserRole(e.target.value)}
+                                                                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 font-black italic focus:border-rodrigo-mustard/30 outline-none"
+                                                                    >
+                                                                        <option value="mozo">Mozo</option>
+                                                                        <option value="admin">Administrador</option>
+                                                                        <option value="cajero">Cajero (Caja)</option>
+                                                                        <option value="cocinero">Cocina</option>
+                                                                        <option value="repartidor">Repartidor (Delivery)</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div className="flex gap-2">
+                                                                    <button onClick={() => guardarUsuario(emp)} disabled={saving} className="p-2 bg-emerald-500 text-white rounded-lg hover:brightness-110 shadow-sm"><Check size={16} strokeWidth={3} /></button>
+                                                                    <button onClick={cancelarEdicionUsuario} className="p-2 bg-slate-100 text-slate-400 rounded-lg hover:text-slate-600"><X size={16} strokeWidth={3} /></button>
+                                                                </div>
+                                                            </motion.div>
+                                                        ) : (
+                                                            <motion.button
+                                                                key="display"
+                                                                initial={{ opacity: 0 }}
+                                                                animate={{ opacity: 1 }}
+                                                                onClick={() => iniciarEdicionUsuario(emp)}
+                                                                className="flex flex-col items-start gap-1 group/btn w-full"
+                                                            >
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-lg font-black text-slate-900 italic group-hover/btn:text-rodrigo-terracotta transition-colors tracking-tighter">
+                                                                        {emp.nombre}
+                                                                    </span>
+                                                                    <Pencil size={12} className="text-slate-200 opacity-0 group-hover/btn:opacity-100 transition-all" />
+                                                                </div>
+                                                                <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Click para editar cuenta y contraseña</span>
+                                                            </motion.button>
+                                                        )}
+                                                    </AnimatePresence>
+                                                </td>
+                                                <td className="px-8 py-6 text-right">
+                                                    <button 
+                                                        onClick={() => eliminarUsuario(emp.id, emp.nombre)}
+                                                        disabled={saving || emp.id === user?.id}
+                                                        className="p-3 bg-slate-50 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all disabled:opacity-0"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {/* Mobile View (Card Stack) */}
+                                <div className="sm:hidden divide-y divide-slate-100">
                                     {empleados.map((emp) => (
-                                        <tr key={emp.id} className="group border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
-                                            <td className="px-8 py-6">
+                                        <div key={emp.id} className="p-5 space-y-4">
+                                            <div className="flex items-start justify-between">
                                                 <div className="flex flex-col">
                                                     <span className={`text-[10px] font-black uppercase tracking-widest mb-1 ${emp.rol === 'admin' ? 'text-rodrigo-mustard' : 'text-rodrigo-terracotta'}`}>
                                                         {emp.rol}
                                                     </span>
-                                                    <span className="text-xs font-bold text-slate-400 font-mono tracking-tighter italic">{emp.email}</span>
+                                                    <span className="text-sm font-black text-slate-900 italic tracking-tight uppercase">{emp.nombre}</span>
+                                                    <span className="text-[10px] font-bold text-slate-400 mt-1">{emp.email}</span>
                                                 </div>
-                                            </td>
-                                            <td className="px-8 py-6">
-                                                <AnimatePresence mode="wait">
-                                                    {editingUserId === emp.id ? (
-                                                        <motion.div key="edit" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col md:flex-row items-center gap-3">
-                                                            <div className="flex-1 space-y-1 w-full">
-                                                                <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-2">Nombre</label>
-                                                                <input
-                                                                    type="text"
-                                                                    value={editUserName}
-                                                                    onChange={e => setEditUserName(e.target.value)}
-                                                                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 font-black italic focus:border-rodrigo-mustard/30 outline-none"
-                                                                    placeholder="Nombre"
-                                                                />
-                                                            </div>
-                                                            <div className="flex-1 space-y-1 w-full">
-                                                                <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-2">Nueva Contraseña (Opcional)</label>
-                                                                <input
-                                                                    type="password"
-                                                                    value={editUserPassword}
-                                                                    onChange={e => setEditUserPassword(e.target.value)}
-                                                                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 font-black italic focus:border-rodrigo-mustard/30 outline-none"
-                                                                    placeholder="••••••••"
-                                                                />
-                                                            </div>
-                                                            <div className="space-y-1 w-full md:w-auto">
-                                                                <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-2">Rol</label>
-                                                                <select 
-                                                                    value={editUserRole}
-                                                                    onChange={e => setEditUserRole(e.target.value)}
-                                                                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 font-black italic focus:border-rodrigo-mustard/30 outline-none"
-                                                                >
-                                                                    <option value="mozo">Mozo</option>
-                                                                    <option value="admin">Administrador</option>
-                                                                    <option value="cajero">Cajero (Caja)</option>
-                                                                    <option value="cocinero">Cocina</option>
-                                                                    <option value="repartidor">Repartidor (Delivery)</option>
-                                                                </select>
-                                                            </div>
-                                                            <div className="flex gap-2 pt-4 md:pt-4">
-                                                                <button onClick={() => guardarUsuario(emp)} disabled={saving} className="p-2 bg-emerald-500 text-white rounded-lg hover:brightness-110 shadow-sm"><Check size={16} strokeWidth={3} /></button>
-                                                                <button onClick={cancelarEdicionUsuario} className="p-2 bg-slate-100 text-slate-400 rounded-lg hover:text-slate-600"><X size={16} strokeWidth={3} /></button>
-                                                            </div>
-                                                        </motion.div>
-                                                    ) : (
-                                                        <motion.button
-                                                            key="display"
-                                                            initial={{ opacity: 0 }}
-                                                            animate={{ opacity: 1 }}
-                                                            onClick={() => iniciarEdicionUsuario(emp)}
-                                                            className="flex flex-col items-start gap-1 group/btn w-full"
-                                                        >
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-lg font-black text-slate-900 italic group-hover/btn:text-rodrigo-terracotta transition-colors tracking-tighter">
-                                                                    {emp.nombre}
-                                                                </span>
-                                                                <Pencil size={12} className="text-slate-200 opacity-0 group-hover/btn:opacity-100 transition-all" />
-                                                            </div>
-                                                            <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Click para editar cuenta y contraseña</span>
-                                                        </motion.button>
-                                                    )}
-                                                </AnimatePresence>
-                                            </td>
-                                            <td className="px-8 py-6 text-right">
                                                 <button 
                                                     onClick={() => eliminarUsuario(emp.id, emp.nombre)}
                                                     disabled={saving || emp.id === user?.id}
-                                                    className="p-3 bg-slate-50 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all disabled:opacity-0"
+                                                    className="p-3 bg-red-50 text-red-500 rounded-xl active:bg-red-100 disabled:opacity-0"
                                                 >
                                                     <Trash2 size={16} />
                                                 </button>
-                                            </td>
-                                        </tr>
+                                            </div>
+
+                                            <AnimatePresence mode="wait">
+                                                {editingUserId === emp.id ? (
+                                                    <motion.div key="edit-mobile" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-slate-50 p-4 rounded-2xl space-y-4">
+                                                        <div className="space-y-1">
+                                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Nombre Completo</label>
+                                                            <input
+                                                                type="text"
+                                                                value={editUserName}
+                                                                onChange={e => setEditUserName(e.target.value)}
+                                                                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold italic"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Nueva Contraseña (Opcional)</label>
+                                                            <input
+                                                                type="password"
+                                                                value={editUserPassword}
+                                                                onChange={e => setEditUserPassword(e.target.value)}
+                                                                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold italic"
+                                                                placeholder="Dejar en blanco para no cambiar"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Rol de Usuario</label>
+                                                            <select 
+                                                                value={editUserRole}
+                                                                onChange={e => setEditUserRole(e.target.value)}
+                                                                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold italic"
+                                                            >
+                                                                <option value="mozo">Mozo</option>
+                                                                <option value="admin">Administrador</option>
+                                                                <option value="cajero">Cajero (Caja)</option>
+                                                                <option value="cocinero">Cocina</option>
+                                                                <option value="repartidor">Repartidor (Delivery)</option>
+                                                            </select>
+                                                        </div>
+                                                        <div className="flex gap-2">
+                                                            <button onClick={() => guardarUsuario(emp)} disabled={saving} className="flex-1 py-3 bg-emerald-500 text-white rounded-xl font-black uppercase text-[10px] tracking-widest">Guardar Cambios</button>
+                                                            <button onClick={cancelarEdicionUsuario} className="px-6 py-3 bg-slate-200 text-slate-500 rounded-xl font-black uppercase text-[10px] tracking-widest">Cancelar</button>
+                                                        </div>
+                                                    </motion.div>
+                                                ) : (
+                                                    <button 
+                                                        onClick={() => iniciarEdicionUsuario(emp)}
+                                                        className="w-full py-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 active:bg-slate-100"
+                                                    >
+                                                        <Pencil size={14} /> Editar Cuenta
+                                                    </button>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
                                     ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                </div>
+                            </div>
                     </motion.div>
                 )}
 
@@ -826,12 +947,6 @@ function ConfiguracionContent() {
                                                     RED / LOCAL
                                                 </button>
                                                 <button
-                                                    onClick={() => setEditConfig({ ...editConfig, modo_impresion: 'bluetooth' })}
-                                                    className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${editConfig.modo_impresion === 'bluetooth' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`}
-                                                >
-                                                    BLUETOOTH
-                                                </button>
-                                                <button
                                                     onClick={() => setEditConfig({ ...editConfig, modo_impresion: 'bridge' })}
                                                     className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${editConfig.modo_impresion === 'bridge' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400'}`}
                                                 >
@@ -864,82 +979,14 @@ function ConfiguracionContent() {
                                                     />
                                                     <p className="text-[10px] text-slate-400">Dirección IP estática de la impresora de caja principal.</p>
                                                 </div>
-                                            </div>
-                                        ) : (
-                                            <div className="p-8 bg-blue-50/50 rounded-2xl border border-blue-100/50 text-center space-y-4">
-                                                <div className="w-16 h-16 bg-blue-100 rounded-3xl flex items-center justify-center text-blue-600 mx-auto shadow-sm">
-                                                    <Settings size={32} />
-                                                </div>
-                                                {editConfig.modo_impresion === 'bridge' ? (
+                                                                     {editConfig.modo_impresion === 'bridge' && (
                                                     <div>
                                                         <h4 className="font-bold text-emerald-900">Modo Cloud Bridge Activo 🌉</h4>
                                                         <p className="text-xs text-emerald-600 mt-1 max-w-sm mx-auto">
                                                             La impresión se gestiona automáticamente desde la laptop del local. Asegúrate de tener abierta la ventana negra del Bridge.
                                                         </p>
                                                     </div>
-                                                ) : (
-                                                    <div>
-                                                        <h4 className="font-bold text-blue-900">Modo Bluetooth Activado</h4>
-                                                        <p className="text-xs text-blue-500 mt-1 max-w-sm mx-auto">
-                                                            Cada mozo deberá vincular su celular directamente con las impresoras al iniciar el turno.
-                                                        </p>
-                                                    </div>
-                                                )}
-                                                {editConfig.modo_impresion !== 'bridge' && (
-                                                    <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-                                                        <button
-                                                            className="px-6 py-3 bg-white border border-blue-200 text-blue-600 font-bold text-xs rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
-                                                            onClick={async () => {
-                                                                try {
-                                                                    const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
-                                                                    if (!BluetoothPrinter.isSupported()) {
-                                                                        toast.error('Tu navegador no soporta Bluetooth. Usa Chrome en Android.');
-                                                                        return;
-                                                                    }
-                                                                    const printer = new BluetoothPrinter();
-                                                                    await printer.connect();
-                                                                    toast.success('Impresora de Cocina vinculada');
-                                                                    (window as any).kitchenPrinter = printer;
-                                                                } catch (e: any) {
-                                                                    console.error(e);
-                                                                    if (e.name === 'NotFoundError') {
-                                                                        toast.error('No se seleccionó ningún dispositivo');
-                                                                    } else {
-                                                                        toast.error('Error al vincular: Verifica que la impresora esté encendida');
-                                                                    }
-                                                                }
-                                                            }}
-                                                        >
-                                                            VINCULAR COCINA 🔵
-                                                        </button>
-                                                        <button
-                                                            className="px-6 py-3 bg-white border border-blue-200 text-blue-600 font-bold text-xs rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
-                                                            onClick={async () => {
-                                                                try {
-                                                                    const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
-                                                                    if (!BluetoothPrinter.isSupported()) {
-                                                                        toast.error('Tu navegador no soporta Bluetooth. Usa Chrome en Android.');
-                                                                        return;
-                                                                    }
-                                                                    const printer = new BluetoothPrinter();
-                                                                    await printer.connect();
-                                                                    toast.success('Impresora de Caja vinculada');
-                                                                    (window as any).cashierPrinter = printer;
-                                                                } catch (e: any) {
-                                                                    console.error(e);
-                                                                    if (e.name === 'NotFoundError') {
-                                                                        toast.error('No se seleccionó ningún dispositivo');
-                                                                    } else {
-                                                                        toast.error('Error al vincular: Verifica que la impresora esté encendida');
-                                                                    }
-                                                                }
-                                                            }}
-                                                        >
-                                                            VINCULAR CAJA 💳
-                                                        </button>
-                                                    </div>
-                                                )}
-                                                <p className="text-[9px] font-bold text-blue-300 uppercase tracking-widest">Requiere conexión HTTPS segura para funcionar</p>
+                                                )}iere conexión HTTPS segura para funcionar</p>
                                             </div>
                                         )}
                                     </div>

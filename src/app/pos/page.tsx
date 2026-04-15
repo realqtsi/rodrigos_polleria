@@ -631,65 +631,81 @@ function POSContent() {
                         )}
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <button
-                        title="Vincular Impresora de Cocina"
-                        onClick={async () => {
-                            try {
-                                const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
-                                const printer = new BluetoothPrinter();
-                                await printer.connect();
-                                (window as any).kitchenPrinter = printer;
-                                toast.success('Cocina Vinculada 🔵');
-                            } catch (e) {
-                                toast.error('Error al vincular Cocina');
-                            }
-                        }}
-                        className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${(window as any).kitchenPrinter ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-white text-slate-400 border-slate-200 hover:border-blue-300'}`}
-                    >
-                        <Bluetooth size={18} />
-                    </button>
-                    <button
-                        title="Vincular Impresora de Caja"
-                        onClick={async () => {
-                            try {
-                                const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
-                                const printer = new BluetoothPrinter();
-                                await printer.connect();
-                                (window as any).cashierPrinter = printer;
-                                toast.success('Caja Vinculada 💳');
-                            } catch (e) {
-                                toast.error('Error al vincular Caja');
-                            }
-                        }}
-                        className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${(window as any).cashierPrinter ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-white text-slate-400 border-slate-200 hover:border-blue-300'}`}
-                    >
-                        <Save size={18} />
-                    </button>
+            {/* Categorías y Acciones Rápidas */}
+            <div className="flex flex-col gap-4 mb-6 sticky top-20 lg:top-0 z-30 bg-[#f8fafc]/90 backdrop-blur-md py-3 -mx-4 px-4 sm:mx-0 sm:px-0">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar touch-pan-x flex-1 mr-4">
+                        {categorias.map((cat) => (
+                            <button 
+                                key={cat.id} 
+                                onClick={() => setCategoriaActiva(cat.id)} 
+                                className={`whitespace-nowrap px-4 py-2.5 rounded-xl font-black uppercase tracking-widest text-[9px] border transition-all active:scale-95 ${categoriaActiva === cat.id ? 'bg-rodrigo-terracotta text-white border-rodrigo-terracotta shadow-md shadow-rodrigo-terracotta/20' : 'bg-white text-slate-400 border-slate-100 hover:border-slate-200'}`}
+                            >
+                                {cat.nombre}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                        <button
+                            title="Vincular Cocina"
+                            onClick={async () => {
+                                try {
+                                    const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
+                                    const printer = new BluetoothPrinter();
+                                    await printer.connect();
+                                    (window as any).kitchenPrinter = printer;
+                                    toast.success('Cocina Vinculada 🍗');
+                                } catch (e) {
+                                    toast.error('Error al vincular Cocina');
+                                }
+                            }}
+                            className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${(window as any).kitchenPrinter ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-white text-slate-400 border-slate-200 hover:border-emerald-300'}`}
+                        >
+                            <Bluetooth size={18} />
+                        </button>
+                        <button
+                            title="Vincular Impresora de Caja"
+                            onClick={async () => {
+                                try {
+                                    const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
+                                    const printer = new BluetoothPrinter();
+                                    await printer.connect();
+                                    (window as any).cashierPrinter = printer;
+                                    toast.success('Caja Vinculada 💳');
+                                } catch (e) {
+                                    toast.error('Error al vincular Caja');
+                                }
+                            }}
+                            className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${(window as any).cashierPrinter ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-white text-slate-400 border-slate-200 hover:border-blue-300'}`}
+                        >
+                            <Save size={18} />
+                        </button>
+                    </div>
                 </div>
-                <nav className="flex items-center gap-2 overflow-x-auto pb-4 md:pb-0 no-scrollbar touch-pan-x">
-                    {categorias.map((cat) => (
-                        <button key={cat.id} onClick={() => setCategoriaActiva(cat.id)} className={`whitespace-nowrap px-4 md:px-5 py-2.5 md:py-3 rounded-xl font-black uppercase tracking-widest text-[9px] md:text-[10px] border transition-all ${categoriaActiva === cat.id ? 'bg-rodrigo-terracotta text-white border-rodrigo-terracotta shadow-md' : 'bg-white text-slate-400 border-slate-100 hover:border-slate-200'}`}>{cat.nombre}</button>
-                    ))}
-                </nav>
+
+                <div className="relative group">
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                    <input 
+                        type="text" 
+                        placeholder="BUSCAR PRODUCTO..." 
+                        className="w-full bg-white border-2 border-slate-100 rounded-2xl py-4 pl-14 pr-8 text-sm font-bold text-slate-900 placeholder:text-slate-300 transition-all outline-none focus:border-rodrigo-terracotta/20 shadow-sm" 
+                        value={searchTerm} 
+                        onChange={(e) => setSearchTerm(e.target.value)} 
+                    />
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative">
-                <div className="md:col-span-8 space-y-4 max-h-[calc(100vh-220px)] overflow-y-auto pr-2 custom-scrollbar">
-                    <div className="relative group">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                        <input type="text" placeholder="BUSCAR PRODUCTO..." className="w-full bg-white border-2 border-slate-100 rounded-[2rem] md:rounded-3xl py-4 md:py-5 pl-14 md:pl-16 pr-8 text-sm md:text-md font-bold text-slate-900 placeholder:text-slate-300 transition-all outline-none focus:border-rodrigo-mustard/30 shadow-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+                    <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                         {productosFiltrados.map((producto) => (
                             <motion.button
+                                whileTap={{ scale: 0.95 }}
                                 key={producto.id}
                                 onClick={() => handleProductClick(producto)}
-                                className="group bg-white p-3 rounded-2xl border border-slate-100 shadow-sm hover:border-rodrigo-terracotta/30 hover:shadow-md transition-all text-center"
+                                className="group bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:border-rodrigo-terracotta/30 hover:shadow-lg transition-all text-center flex flex-col items-center justify-center min-h-[100px]"
                             >
-                                <h3 className="text-[10px] font-bold text-slate-900 uppercase italic tracking-tight leading-tight line-clamp-2">{producto.nombre}</h3>
-                                <p className="text-sm font-black text-rodrigo-terracotta mt-1 italic">S/ {producto.precio.toFixed(2)}</p>
+                                <h3 className="text-[10px] font-black text-slate-900 uppercase italic tracking-tight leading-tight line-clamp-2 mb-2 group-hover:text-rodrigo-terracotta transition-colors">{producto.nombre}</h3>
+                                <p className="text-sm font-black text-slate-900 bg-slate-50 px-3 py-1 rounded-lg italic">S/ {producto.precio.toFixed(2)}</p>
                             </motion.button>
                         ))}
                     </div>
@@ -719,23 +735,26 @@ function POSContent() {
                         initial={{ y: 100 }}
                         animate={{ y: 0 }}
                         exit={{ y: 100 }}
-                        className="md:hidden fixed bottom-24 left-4 right-4 z-50 bg-slate-900 text-white rounded-[2rem] shadow-2xl overflow-hidden border border-white/10"
+                        className="md:hidden fixed bottom-24 left-4 right-4 z-50 overflow-hidden"
                     >
                         <button
                             onClick={() => setIsCartDrawerOpen(true)}
-                            className="w-full flex items-center justify-between p-5 active:bg-slate-800 transition-colors"
+                            className="w-full bg-slate-900 text-white rounded-2xl shadow-2xl border border-white/10 flex items-center justify-between p-4 active:scale-[0.98] transition-all"
                         >
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 bg-rodrigo-terracotta rounded-xl flex items-center justify-center shadow-lg shadow-rodrigo-terracotta/20">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-rodrigo-terracotta rounded-xl flex items-center justify-center shadow-lg shadow-rodrigo-terracotta/20 relative">
                                     <ShoppingBag size={20} />
+                                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-rodrigo-mustard text-rodrigo-brown text-[10px] font-black rounded-full flex items-center justify-center border-2 border-slate-900">
+                                        {carrito.reduce((acc, it) => acc + it.cantidad, 0)}
+                                    </span>
                                 </div>
                                 <div className="text-left">
-                                    <p className="text-[10px] text-white/40 font-black uppercase tracking-widest leading-none mb-1">Tu Pedido</p>
-                                    <p className="text-lg font-black italic tracking-tighter leading-none">{carrito.length} {carrito.length === 1 ? 'Item' : 'Items'}</p>
+                                    <p className="text-[10px] text-white/40 font-black uppercase tracking-widest leading-none mb-1">Revisar Pedido</p>
+                                    <p className="text-lg font-black italic tracking-tighter leading-none">Ver Carrito</p>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="text-[10px] text-rodrigo-mustard font-black uppercase tracking-widest leading-none mb-1">Total</p>
+                                <p className="text-[10px] text-rodrigo-mustard font-black uppercase tracking-widest leading-none mb-1">Total a Pagar</p>
                                 <p className="text-2xl font-black italic tracking-tighter text-rodrigo-mustard leading-none">S/ {calcularTotal().toFixed(2)}</p>
                             </div>
                         </button>

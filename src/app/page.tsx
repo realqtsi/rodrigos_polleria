@@ -115,26 +115,28 @@ function DashboardContent() {
       )}
 
       {/* MÉTRICAS (Adaptable Grid) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         {[
           { label: 'Ingresos Totales', value: `S/ ${metricas.totalIngresos.toFixed(2)}`, icon: Wallet, colorClass: 'metric-icon-income', trend: 'Hoy', adminOnly: true },
           { label: 'Pedidos Totales', value: String(metricas.cantidadPedidos), icon: ShoppingCart, colorClass: 'metric-icon-orders', trend: 'Procesados' },
           { label: 'Ticket Promedio', value: `S/ ${metricas.promedioPorPedido.toFixed(2)}`, icon: Receipt, colorClass: 'metric-icon-avg', trend: 'Pedido', adminOnly: true },
           { label: 'Pollos Vendidos', value: formatearFraccionPollo(metricas.pollosVendidos), icon: Package, colorClass: 'metric-icon-sold', trend: 'Consumo' },
         ].filter(m => !m.adminOnly || (user?.rol === 'admin' || user?.rol === 'cajero')).map((m, i) => (
-          <motion.div key={m.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
-            className="glass-card p-5 md:p-6 border shadow-sm hover:shadow-xl transition-all group overflow-hidden relative min-h-[140px] md:min-h-0">
-            <div className="absolute top-0 right-0 w-20 h-20 md:w-24 md:h-24 opacity-[0.02] transform translate-x-8 -translate-y-8 group-hover:scale-110 transition-transform">
-              <m.icon size={80} className="md:w-24 md:h-24" />
+          <motion.div key={m.label} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}
+            className="glass-card p-4 sm:p-6 border shadow-sm hover:shadow-xl transition-all group overflow-hidden relative min-h-[140px] flex flex-col justify-between">
+            <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 opacity-[0.03] transform translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform">
+              <m.icon size={64} className="sm:w-24 sm:h-24" />
             </div>
-            <div className="flex items-center justify-between mb-4 md:mb-6">
-              <div className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center ${m.colorClass} shadow-inner transition-transform group-hover:scale-110`}>
-                <m.icon size={20} className="md:w-6 md:h-6" strokeWidth={2.5} />
+            <div className="flex items-center justify-between">
+              <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center ${m.colorClass} shadow-inner transition-transform group-hover:scale-105`}>
+                <m.icon size={18} className="sm:w-6 sm:h-6" strokeWidth={2.5} />
               </div>
-              <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{m.trend}</span>
+              <span className="text-[8px] sm:text-[9px] font-black text-slate-300 uppercase tracking-widest">{m.trend}</span>
             </div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">{m.label}</p>
-            <p className="text-2xl md:text-4xl font-black text-slate-900 tracking-tighter italic">{m.value}</p>
+            <div className="mt-4">
+              <p className="text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{m.label}</p>
+              <p className="text-lg sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tighter italic leading-none">{m.value}</p>
+            </div>
           </motion.div>
         ))}
       </div>
@@ -184,49 +186,49 @@ function DashboardContent() {
             </div>
 
             {!stock ? (
-              <div className="py-24 text-center">
-                <Package size={64} className="text-slate-100 mx-auto mb-4" />
-                <p className="text-sm text-slate-400 font-black uppercase tracking-widest">Inicia la jornada para ver el stock</p>
+              <div className="py-20 text-center">
+                <Package size={48} className="text-slate-100 mx-auto mb-4" />
+                <p className="text-xs text-slate-400 font-black uppercase tracking-widest px-4">Inicia la jornada para ver el stock</p>
               </div>
             ) : (
-              <div className="p-8">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+              <div className="p-4 sm:p-8">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
                   {/* Pollo */}
-                  <div className="p-6 bg-slate-50 border border-slate-100 rounded-[2rem] hover:border-rodrigo-terracotta/30 transition-colors group">
+                  <div className="p-5 sm:p-6 bg-slate-50 border border-slate-100 rounded-[2rem] hover:border-rodrigo-terracotta/30 transition-colors group">
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pollos Brasa</span>
                       <Flame className="text-rodrigo-terracotta/40 group-hover:text-rodrigo-terracotta group-hover:scale-125 transition-all" size={20} />
                     </div>
-                    <p className="text-4xl font-black text-slate-900 tracking-tighter mb-2 italic">{formatearFraccionPollo(stock.pollos_disponibles)}</p>
+                    <p className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter mb-2 italic">{formatearFraccionPollo(stock.pollos_disponibles)}</p>
                     <div className="h-2 bg-slate-200 rounded-full overflow-hidden mb-2">
-                      <motion.div initial={{ width: 0 }} animate={{ width: `${(stock.pollos_disponibles / stock.pollos_iniciales) * 100}%` }} className="h-full bg-rodrigo-terracotta rounded-full" />
+                      <motion.div initial={{ width: 0 }} animate={{ width: `${(stock.pollos_disponibles / (stock.pollos_iniciales || 1)) * 100}%` }} className="h-full bg-rodrigo-terracotta rounded-full" />
                     </div>
                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">de {stock.pollos_iniciales}u iniciales</p>
                   </div>
 
                   {/* Chicha */}
-                  <div className="p-6 bg-slate-50 border border-slate-100 rounded-[2rem] hover:border-purple-200 transition-colors group">
+                  <div className="p-5 sm:p-6 bg-slate-50 border border-slate-100 rounded-[2rem] hover:border-purple-200 transition-colors group">
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Chicha Morada</span>
                       <div className="w-2.5 h-2.5 bg-purple-500 rounded-full shadow-[0_0_10px_purple]" />
                     </div>
-                    <p className="text-4xl font-black text-slate-900 tracking-tighter mb-2 italic">{(stock.chicha_disponible || 0).toFixed(1)}</p>
+                    <p className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter mb-2 italic">{(stock.chicha_disponible || 0).toFixed(1)}</p>
                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Litros disponibles</p>
                   </div>
 
                   {/* Gaseosas */}
-                  <div className="p-6 bg-slate-50 border border-slate-100 rounded-[2rem] hover:border-blue-200 transition-colors group">
+                  <div className="p-5 sm:p-6 bg-slate-50 border border-slate-100 rounded-[2rem] hover:border-blue-200 transition-colors group">
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Refrescos</span>
                       <div className="w-3.5 h-3.5 bg-blue-500 rounded-lg shadow-[0_0_10px_blue]" />
                     </div>
-                    <p className="text-4xl font-black text-slate-900 tracking-tighter mb-2 italic">{stock.gaseosas_disponibles}</p>
+                    <p className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter mb-2 italic">{stock.gaseosas_disponibles}</p>
                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Unidades en stock</p>
                   </div>
                 </div>
 
-                <button onClick={() => setShowBebidasDetalle(!showBebidasDetalle)} className="w-full h-14 rounded-2xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 active:scale-95">
-                  {showBebidasDetalle ? 'Ocultar Detalle' : 'Ver Inventario Bebidas'}
+                <button onClick={() => setShowBebidasDetalle(!showBebidasDetalle)} className="w-full h-14 rounded-2xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 active:scale-95 shadow-sm">
+                  {showBebidasDetalle ? 'Ocultar Detalle' : 'Inventario de Bebidas'}
                   <ArrowRight className={`transition-transform duration-300 ${showBebidasDetalle ? 'rotate-90' : ''}`} size={16} />
                 </button>
               </div>

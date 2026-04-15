@@ -56,14 +56,14 @@ export default function RootLayout({
           />
           <OfflineIndicator />
           {isLoginPage ? (
-            <main className="min-h-screen">{children}</main>
+            <main className="min-h-screen w-full overflow-x-hidden">{children}</main>
           ) : (
-            <div id="app-root" className="flex min-h-screen">
+            <div id="app-root" className="flex min-h-screen w-full overflow-x-hidden bg-[#f8fafc]">
               <div className="print:hidden">
                 <Navbar />
               </div>
-              <div className="flex-1 flex flex-col min-h-screen w-full lg:pl-60">
-                <main className="flex-1 p-5 lg:p-8 pt-20 lg:pt-6 pb-24 lg:pb-8">
+              <div className="flex-1 flex flex-col min-h-screen w-full lg:pl-60 relative">
+                <main className="flex-1 w-full max-w-[100vw] p-4 sm:p-6 lg:p-8 pt-20 lg:pt-6 pb-24 lg:pb-8">
                   {children}
                 </main>
               </div>
