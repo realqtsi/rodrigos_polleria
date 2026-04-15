@@ -191,7 +191,8 @@ export const registrarVenta = async (
         direccion_envio?: string;
         distancia_km?: number;
         metodo_pago?: 'efectivo' | 'tarjeta' | 'yape' | 'plin' | 'mixto';
-    }
+    },
+    usuarioNombre?: string
 ): Promise<VentaResponse> => {
     try {
         // Validar stock disponible
@@ -231,7 +232,8 @@ export const registrarVenta = async (
                 direccion_envio: deliveryData?.direccion_envio || null,
                 distancia_km: deliveryData?.distancia_km || 0,
                 estado_delivery: deliveryData?.tipo_pedido === 'delivery' ? 'buscando_repartidor' : null,
-                metodo_pago: deliveryData?.metodo_pago || 'efectivo'
+                metodo_pago: deliveryData?.metodo_pago || 'efectivo',
+                usuario_nombre: usuarioNombre || null
             })
             .select()
             .single();
@@ -268,7 +270,8 @@ export const registrarVenta = async (
  */
 export const actualizarVenta = async (
     ventaId: string,
-    itemsActualizados: ItemCarrito[]
+    itemsActualizados: ItemCarrito[],
+    usuarioNombre?: string
 ): Promise<VentaResponse> => {
     try {
         // 1. Obtener la venta actual
@@ -309,7 +312,8 @@ export const actualizarVenta = async (
                 pollos_restados: nuevoPollos,
                 gaseosas_restadas: nuevoGaseosas,
                 chicha_restada: nuevoChicha,
-                bebidas_detalle: nuevoDetalle
+                bebidas_detalle: nuevoDetalle,
+                usuario_nombre: usuarioNombre || undefined
             })
             .eq('id', ventaId)
             .select()

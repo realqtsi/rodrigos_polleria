@@ -18,6 +18,7 @@ interface ReceiptModalProps {
     title?: string;
     isNewSale?: boolean; // Prop to control counter increment
     costoEnvio?: number;
+    usuarioNombre?: string;
 }
 
 interface ConfigNegocio {
@@ -34,7 +35,7 @@ interface ConfigNegocio {
     ciudad?: string;
 }
 
-export default function ReceiptModal({ isOpen, onClose, items, total, orderId, mesaNumero, title = 'BOLETA DE VENTA', isNewSale = false, costoEnvio = 0 }: ReceiptModalProps) {
+export default function ReceiptModal({ isOpen, onClose, items, total, orderId, mesaNumero, title = 'BOLETA DE VENTA', isNewSale = false, costoEnvio = 0, usuarioNombre }: ReceiptModalProps) {
     const [config, setConfig] = useState<ConfigNegocio>({
         ruc: '',
         razon_social: "RODRIGO'S BRASAS & BROASTERS",
@@ -150,7 +151,8 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                     envio: costoEnvio,
                     esDelivery: costoEnvio > 0,
                     title: title,
-                    mesa: mesaNumero
+                    mesa: mesaNumero,
+                    vendedor: usuarioNombre
                 })
             });
 
@@ -262,6 +264,11 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
             {mesaNumero && (
                 <div className="ticket-mesa" style={{ fontSize: '10px', textAlign: 'center', marginTop: '4px' }}>
                     <strong>MESA: {mesaNumero}</strong>
+                </div>
+            )}
+            {usuarioNombre && (
+                <div className="ticket-usuario" style={{ fontSize: '9px', textAlign: 'center', marginTop: '2px' }}>
+                    <span>ATENDIDO POR: {usuarioNombre.toUpperCase()}</span>
                 </div>
             )}
 
@@ -448,6 +455,9 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                                         <p className="text-[11px] text-gray-400 mt-1">{fechaFormateada} - {horaFormateada}</p>
                                         {mesaNumero && (
                                             <p className="text-[11px] bg-rodrigo-terracotta text-white font-bold rounded-full px-3 py-0.5 inline-block mt-2">MESA: {mesaNumero}</p>
+                                        )}
+                                        {usuarioNombre && (
+                                            <p className="text-[10px] text-gray-500 font-bold mt-1 uppercase">ATENDIDO POR: {usuarioNombre}</p>
                                         )}
                                     </div>
                                 </div>

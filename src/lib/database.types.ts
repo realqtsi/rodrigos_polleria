@@ -92,6 +92,7 @@ export interface Venta {
     distancia_km?: number; // Distancia para delivery en km
     repartidor_id?: string; // UUID del repartidor asignado
     estado_delivery?: 'buscando_repartidor' | 'asignado' | 'en_camino' | 'entregado';
+    usuario_nombre?: string; // Nombre de quien atendió
     created_at: string;
     updated_at?: string; // Add updated_at
     mesas?: { numero: number } | null; // Join result

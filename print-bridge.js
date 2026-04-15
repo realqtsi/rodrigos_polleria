@@ -44,7 +44,8 @@ async function imprimirComanda(venta) {
                 .font('a').align('ct').style('bu').size(1, 1).text('COMANDA DE COCINA').size(0, 0)
                 .text('--------------------------------').align('lt')
                 .text(`MESA: ${venta.mesa_id ? 'Mesa ' + venta.mesa_id : 'PARA LLEVAR'}`)
-                .text(`FECHA: ${new Date(venta.created_at).toLocaleString()}`)
+                .text(`MESERO: ${venta.usuario_nombre || 'SISTEMA'}`)
+                .text(`FECHA: ${new Date(venta.created_at || new Date()).toLocaleString()}`)
                 .text('--------------------------------').style('b');
 
             venta.items.forEach(item => {
@@ -67,7 +68,7 @@ async function imprimirComanda(venta) {
 
 // --- GENERADOR MANUAL ESC/POS ULTRA-COMPATIBLE PARA USB ---
 function manualEscPos(data) {
-    const { items, total, title, mesa } = data;
+    const { items, total, title, mesa, vendedor } = data;
     let chunks = [];
 
     // Usamos ASCII puro para evitar cualquier problema de codificación en el cabezal térmico
@@ -93,6 +94,7 @@ function manualEscPos(data) {
     
     add(LEFT);
     if (mesa) line(`MESA: ${mesa}`);
+    if (vendedor) line(`ATENDIDO POR: ${vendedor.toUpperCase().substring(0, 18)}`);
     line("--------------------------------");
 
     (items || []).forEach(item => {

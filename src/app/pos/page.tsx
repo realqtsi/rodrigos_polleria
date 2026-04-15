@@ -39,6 +39,7 @@ import { useMesas } from '@/hooks/useMesas';
 import { useEstadisticasProductos } from '@/hooks/useEstadisticasProductos';
 import { registrarVenta, actualizarVenta } from '@/lib/ventas';
 import ReceiptModal from '@/components/ReceiptModal';
+import { useAuth } from '@/contexts/AuthContext';
 import dynamic from 'next/dynamic';
 const DeliverySelector = dynamic(() => import('@/components/DeliverySelector'), {
     ssr: false,
@@ -55,6 +56,7 @@ export default function POSPage() {
 type Categoria = 'todos' | 'populares' | 'pollos' | 'combos' | 'promociones' | 'bebidas' | 'complementos' | 'especiales' | 'extras';
 
 function POSContent() {
+    const { user } = useAuth();
     const [view, setView] = useState<'start' | 'mesas' | 'pedido'>('start');
     const [productos, setProductos] = useState<Producto[]>([]);
     const [carrito, setCarrito] = useState<ItemCarrito[]>([]);
@@ -313,9 +315,9 @@ function POSContent() {
 
             let resultado;
             if (currentVentaId) {
-                resultado = await actualizarVenta(currentVentaId, carrito);
+                resultado = await actualizarVenta(currentVentaId, carrito, user?.nombre || undefined);
             } else {
-                resultado = await registrarVenta(carrito, selectedTable?.id, orderNotes, deliveryData);
+                resultado = await registrarVenta(carrito, selectedTable?.id, orderNotes, deliveryData, user?.nombre || undefined);
                 if (resultado.success && selectedTable) {
                     await ocuparMesa(selectedTable.id);
                 }
@@ -351,6 +353,7 @@ function POSContent() {
                                     ...ESCPOS.encodeText('COMANDA COCINA'),
                                     ...ESCPOS.TEXT_SIZE_NORMAL,
                                     ...ESCPOS.encodeText(`MESA: ${selectedTable ? selectedTable.numero : 'LLEVAR'}`),
+                                    ...ESCPOS.encodeText(`MESERO: ${user?.nombre || 'SISTEMA'}`),
                                     ...ESCPOS.encodeText(`FECHA: ${new Date().toLocaleString()}`),
                                     ...ESCPOS.encodeText('--------------------------------'),
                                     ...ESCPOS.ALIGN_LEFT,
@@ -802,6 +805,7 @@ function POSContent() {
                         mesaNumero={selectedTable ? selectedTable.numero : undefined}
                         title={receiptTitle}
                         isNewSale={currentVentaId === null}
+                        usuarioNombre={user?.nombre || undefined}
                     />
                 )}
             </AnimatePresence>
