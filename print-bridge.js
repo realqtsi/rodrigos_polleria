@@ -177,10 +177,18 @@ app.post('/print-receipt-usb', (req, res) => {
 
 // ESCUCHAR SUPABASE (Para Cocina)
 supabase.channel('nuevas-ventas').on('postgres_changes', { event: '*', schema: 'public', table: 'ventas' }, payload => {
-    const venta = payload.new || payload.old;
     if (payload.eventType === 'INSERT') {
-        imprimirComanda(venta);
-    } else if (payload.eventType === 'UPDATE' && payload.new.estado_pago !== 'pagado') {
+        imprimirComanda(payload.new);
+    } else if (payload.eventType === 'UPDATE') {
+        const { estado_pedido, estado_pago } = payload.new;
+        
+        // NO imprimir si el pedido ya está listo, entregado o pagado
+        // Esto evita que se vuelva a imprimir cuando el cocinero desliza para completar
+        if (estado_pedido === 'listo' || estado_pedido === 'entregado' || estado_pago === 'pagado') {
+            console.log(`ℹ️ Pedido #${payload.new.id.substring(0, 8)} actualizado a ${estado_pedido}. Ignorando impresión.`);
+            return;
+        }
+        
         imprimirComanda(payload.new);
     }
 }).subscribe();
