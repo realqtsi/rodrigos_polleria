@@ -993,47 +993,48 @@ function ConfiguracionContent() {
                                             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-6 text-center">Requiere conexión HTTPS segura para funcionar</p>
                                         </div>
                                     </div>
-
-                            <div className="bg-white p-10 border border-slate-100 rounded-[3rem] shadow-sm">
-                                <h3 className="text-xs font-black text-rodrigo-terracotta uppercase tracking-[0.4em] mb-8 flex items-center gap-3 italic">
-                                    <div className="w-8 h-px bg-rodrigo-terracotta" />
-                                    Identidad del Local
-                                </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    {[
-                                        { label: 'Nombre Comercial', key: 'nombre_negocio' },
-                                        { label: 'RUC', key: 'ruc' },
-                                        { label: 'Teléfono', key: 'telefono' },
-                                        { label: 'Dirección', key: 'direccion', full: true }
-                                    ].map((field) => (
-                                        <div key={field.key} className={`space-y-3 ${field.full ? 'md:col-span-2' : ''}`}>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">{field.label}</label>
-                                            <input
-                                                type="text"
-                                                value={(editConfig as any)[field.key]}
-                                                onChange={e => setEditConfig({ ...editConfig, [field.key]: e.target.value })}
-                                                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-slate-900 font-bold focus:border-rodrigo-terracotta/30 outline-none transition-all italic tracking-tight"
-                                            />
-                                        </div>
-                                    ))}
                                 </div>
-                            </div>
 
-                            <div className="flex justify-end pt-4">
-                                <button
-                                    onClick={guardarConfig}
-                                    disabled={saving}
-                                    className="px-12 py-5 bg-gradient-to-r from-rodrigo-terracotta to-rodrigo-mustard text-stone-950 font-black text-xs uppercase tracking-[0.3em] rounded-2xl shadow-xl shadow-rodrigo-mustard/10 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 italic"
-                                >
-                                    {saving ? 'Procesando...' : 'Confirmar Cambios'}
-                                </button>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                                <div className="bg-white p-10 border border-slate-100 rounded-[3rem] shadow-sm">
+                                    <h3 className="text-xs font-black text-rodrigo-terracotta uppercase tracking-[0.4em] mb-8 flex items-center gap-3 italic">
+                                        <div className="w-8 h-px bg-rodrigo-terracotta" />
+                                        Identidad del Local
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        {[
+                                            { label: 'Nombre Comercial', key: 'nombre_negocio' },
+                                            { label: 'RUC', key: 'ruc' },
+                                            { label: 'Teléfono', key: 'telefono' },
+                                            { label: 'Dirección', key: 'direccion', full: true }
+                                        ].map((field) => (
+                                            <div key={field.key} className={`space-y-3 ${field.full ? 'md:col-span-2' : ''}`}>
+                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">{field.label}</label>
+                                                <input
+                                                    type="text"
+                                                    value={(editConfig as any)[field.key]}
+                                                    onChange={e => setEditConfig({ ...editConfig, [field.key]: e.target.value })}
+                                                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-slate-900 font-bold focus:border-rodrigo-terracotta/30 outline-none transition-all italic tracking-tight"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end pt-4">
+                                    <button
+                                        onClick={guardarConfig}
+                                        disabled={saving}
+                                        className="px-12 py-5 bg-gradient-to-r from-rodrigo-terracotta to-rodrigo-mustard text-stone-950 font-black text-xs uppercase tracking-[0.3em] rounded-2xl shadow-xl shadow-rodrigo-mustard/10 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 italic"
+                                    >
+                                        {saving ? 'Procesando...' : 'Confirmar Cambios'}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
             </div>
-        </div>
-    );
+        );
 }
 
 export default function ConfiguracionPage() {
