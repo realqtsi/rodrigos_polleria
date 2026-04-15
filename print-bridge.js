@@ -49,7 +49,11 @@ async function imprimirComanda(venta) {
 
             venta.items.forEach(item => {
                 printer.text(`${item.cantidad}x ${item.nombre}`);
-                if (item.detalles?.notas) printer.text(`   NOTA: ${item.detalles.notas}`);
+                if (item.detalles) {
+                    if (item.detalles.parte) printer.text(`   PARTE: ${item.detalles.parte.toUpperCase()}`);
+                    if (item.detalles.trozado && item.detalles.trozado !== 'entero') printer.text(`   ${item.detalles.trozado.toUpperCase()}`);
+                    if (item.detalles.notas) printer.text(`   NOTA: ${item.detalles.notas}`);
+                }
             });
 
             printer.text('--------------------------------').feed(3).cut().close();
