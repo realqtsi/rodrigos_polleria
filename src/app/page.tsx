@@ -15,12 +15,14 @@ import { supabase, obtenerFechaHoy } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 import AdminAjusteModal from '@/components/AdminAjusteModal';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBebidasConfig } from '@/hooks/useBebidasConfig';
 
 function DashboardContent() {
   const { stock, loading, refetch } = useInventario();
   const { ventas, refetch: refetchVentas } = useVentas();
   const metricasReales = useMetricas(ventas);
   const { user } = useAuth();
+  const { allBrands } = useBebidasConfig();
 
   const metricas = stock ? metricasReales : {
     totalIngresos: 0, cantidadPedidos: 0, promedioPorPedido: 0,
@@ -231,6 +233,48 @@ function DashboardContent() {
                   {showBebidasDetalle ? 'Ocultar Detalle' : 'Inventario de Bebidas'}
                   <ArrowRight className={`transition-transform duration-300 ${showBebidasDetalle ? 'rotate-90' : ''}`} size={16} />
                 </button>
+
+                <AnimatePresence>
+                  {showBebidasDetalle && stock.bebidas_detalle && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-6 space-y-4 overflow-hidden"
+                    >
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {allBrands.map((marca) => {
+                          const brandData = (stock.bebidas_detalle as any)?.[marca.key] as Record<string, number> | undefined;
+                          if (!brandData) return null;
+                          const totalUnidades = Object.values(brandData).reduce((s, v) => s + (v || 0), 0);
+                          if (totalUnidades === 0) return null;
+
+                          return (
+                            <div key={marca.key} className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                              <div className="flex items-center gap-3 mb-3 pb-2 border-b border-slate-50">
+                                <div className={`w-2.5 h-2.5 rounded-full ${marca.dot}`} />
+                                <span className="text-[10px] font-black uppercase text-slate-800 tracking-tight">{marca.name}</span>
+                                <span className="ml-auto text-[9px] font-bold text-slate-400">{totalUnidades}u</span>
+                              </div>
+                              <div className="space-y-1.5">
+                                {marca.sizes.map((size) => {
+                                  const qty = brandData[size.key] || 0;
+                                  if (qty === 0) return null;
+                                  return (
+                                    <div key={size.key} className="flex justify-between items-center text-[10px]">
+                                      <span className="font-bold text-slate-500 uppercase tracking-tighter">{size.label}</span>
+                                      <span className="font-black text-slate-900">{qty}u</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )}
           </div>

@@ -160,6 +160,20 @@ function CierreCajaContent() {
         .map(([nombre, cantidad]) => ({ nombre, cantidad }))
         .sort((a, b) => b.cantidad - a.cantidad);
 
+    // NUEVO: Agrupar ventas de bebidas por marca y tipo (usando bebidas_detalle de cada venta)
+    const ventasBebidasDesglose = ventas.reduce((acc, venta) => {
+        if (venta.bebidas_detalle) {
+            const detalle = venta.bebidas_detalle as BebidasDetalle;
+            for (const [marca, tipos] of Object.entries(detalle)) {
+                if (!acc[marca]) acc[marca] = {};
+                for (const [tipo, qty] of Object.entries(tipos || {})) {
+                    acc[marca][tipo] = (acc[marca][tipo] || 0) + (qty as number);
+                }
+            }
+        }
+        return acc;
+    }, {} as Record<string, Record<string, number>>);
+
     const calcularDiferencias = () => {
         if (!stock) return { diffPollos: 0, diffGaseosas: 0 };
 
@@ -235,31 +249,59 @@ function CierreCajaContent() {
             const gastosTexto = gastosDelDia.length > 0
                 ? gastosDelDia.map(g => `- ${g.descripcion}: S/ ${g.monto.toFixed(2)}`).join('\n')
                 : 'No hubo gastos registrados.';
-
+    
             // Formatear platillos vendidos para el mensaje de WhatsApp
             const platillosTexto = listaPlatosVendidos.length > 0
                 ? listaPlatosVendidos.map(item => `- ${item.nombre}: ${item.cantidad}`).join('\n')
                 : 'No se vendieron platillos hoy.';
-
-            // Formatear detalle de bebidas sobrantes
-            const MARCA_LABEL: Record<string, string> = { inca_kola: 'Inca Kola', coca_cola: 'Coca Cola', sprite: 'Sprite', fanta: 'Fanta', agua_mineral: 'Agua Mineral' };
-            const TIPO_LABEL: Record<string, string> = { personal_retornable: 'Personal Ret.', descartable: 'Descartable', gordita: 'Gordita', litro: '1L', litro_medio: '1.5L', tres_litros: '3L', mediana: '2.25L', personal: '600ml', grande: '2.5L' };
-            let bebidasTexto = '';
+    
+            // Función auxiliar para obtener labels legibles de marcas y tamaños
+            const getLabels = (brandKey: string, sizeKey: string) => {
+                const brand = allBrands.find(b => b.key === brandKey);
+                const size = brand?.sizes.find(s => s.key === sizeKey);
+                return {
+                    brandName: brand?.name || brandKey,
+                    sizeLabel: size?.label || sizeKey
+                };
+            };
+    
+            // Formatear detalle de bebidas VENDIDAS
+            let bebidasVendidasTexto = '';
+            const lineasVendidas: string[] = [];
+            for (const [marca, tipos] of Object.entries(ventasBebidasDesglose)) {
+                const items = Object.entries(tipos).filter(([, qty]) => qty > 0);
+                if (items.length > 0) {
+                    const firstSize = items[0][0];
+                    const { brandName } = getLabels(marca, firstSize);
+                    lineasVendidas.push(`*${brandName}*`);
+                    for (const [tipo, qty] of items) {
+                        const { sizeLabel } = getLabels(marca, tipo);
+                        lineasVendidas.push(`   ${sizeLabel}: ${qty}`);
+                    }
+                }
+            }
+            bebidasVendidasTexto = lineasVendidas.length > 0 ? lineasVendidas.join('\n') : 'Sin ventas de bebidas detalladas.';
+    
+            // Formatear detalle de bebidas SOBRANTES (actuales)
+            let bebidasSobrantesTexto = '';
             if (stock?.bebidas_detalle) {
-                const lineas: string[] = [];
+                const lineasSobrantes: string[] = [];
                 for (const [marca, tipos] of Object.entries(stock.bebidas_detalle)) {
                     const tiposObj = tipos as Record<string, number>;
                     const items = Object.entries(tiposObj).filter(([, qty]) => qty > 0);
                     if (items.length > 0) {
-                        lineas.push(`*${MARCA_LABEL[marca] || marca}*`);
+                        const firstSize = items[0][0];
+                        const { brandName } = getLabels(marca, firstSize);
+                        lineasSobrantes.push(`*${brandName}*`);
                         for (const [tipo, qty] of items) {
-                            lineas.push(`   ${TIPO_LABEL[tipo] || tipo}: ${qty}`);
+                            const { sizeLabel } = getLabels(marca, tipo);
+                            lineasSobrantes.push(`   ${sizeLabel}: ${qty}`);
                         }
                     }
                 }
-                bebidasTexto = lineas.length > 0 ? lineas.join('\n') : 'Sin bebidas restantes.';
+                bebidasSobrantesTexto = lineasSobrantes.length > 0 ? lineasSobrantes.join('\n') : 'Sin bebidas restantes.';
             } else {
-                bebidasTexto = 'Sin detalle disponible.';
+                bebidasSobrantesTexto = 'Sin detalle disponible.';
             }
 
             if (error) {
@@ -314,9 +356,13 @@ Consumo Aprox: ${((stock?.papas_iniciales || 0) - (parseFloat(stockPapasFinal) |
 --------------------------------
 ${platillosTexto}
 
+🥤 *BEBIDAS VENDIDAS (Desglose)*
+--------------------------------
+${bebidasVendidasTexto}
+
 🥤 *BEBIDAS SOBRANTES (para mañana)*
 --------------------------------
-${bebidasTexto}
+${bebidasSobrantesTexto}
 
 📊 *CUADRE DE STOCK*
 --------------------------------
@@ -350,6 +396,15 @@ _Generado automáticamente por Rodrigo's - Brasas & Broasters POS_`;
     const descargarExcel = async () => {
         if (!stock) return;
         try {
+            // Preparar mapa de labels para el reporte Excel
+            const labelsMap: Record<string, { brand: string; sizes: Record<string, string> }> = {};
+            allBrands.forEach(b => {
+                labelsMap[b.key] = {
+                    brand: b.name,
+                    sizes: b.sizes.reduce((acc, s) => ({ ...acc, [s.key]: s.label }), {})
+                };
+            });
+
             const fileName = await generarReporteExcel({
                 fecha: new Date().toLocaleDateString('es-PE'),
                 stock,
@@ -370,6 +425,8 @@ _Generado automáticamente por Rodrigo's - Brasas & Broasters POS_`;
                 observaciones,
                 diffPollos,
                 diffGaseosas,
+                ventasBebidasDesglose,
+                labelsMap
             });
             toast.success(`Excel descargado: ${fileName}`, { icon: '📊' });
         } catch (error) {

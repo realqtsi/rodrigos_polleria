@@ -45,6 +45,8 @@ const TIPO_LABEL: Record<string, string> = {
     mediana: '2.25L',
     personal: '600ml',
     grande: '2.5L',
+    familiar: 'Familiar',
+    un_litro: '1L',
 };
 
 interface ReportData {
@@ -67,6 +69,8 @@ interface ReportData {
     observaciones: string;
     diffPollos: number;
     diffGaseosas: number;
+    ventasBebidasDesglose?: Record<string, Record<string, number>>;
+    labelsMap?: Record<string, { brand: string; sizes: Record<string, string> }>;
 }
 
 function applyHeaderStyle(row: ExcelJS.Row, bgColor: string, fontColor: string = COLORS.white) {
@@ -282,37 +286,58 @@ export async function generarReporteExcel(data: ReportData) {
 
     row++; // spacer
 
+    // === BEBIDAS VENDIDAS ===
+    if (data.ventasBebidasDesglose && Object.keys(data.ventasBebidasDesglose).length > 0) {
+        row = applySectionHeader(ws, row, '🥤  BEBIDAS VENDIDAS (Desglose)', COLORS.blue);
+        
+        for (const [marca, tipos] of Object.entries(data.ventasBebidasDesglose)) {
+            const items = Object.entries(tipos).filter(([, qty]) => qty > 0);
+            if (items.length === 0) continue;
+            
+            const total = items.reduce((s, [, qty]) => s + qty, 0);
+            const brandLabel = data.labelsMap?.[marca]?.brand || MARCA_LABEL[marca] || marca;
+
+            ws.mergeCells(row, 1, row, 4);
+            const brandCell = ws.getCell(row, 1);
+            brandCell.value = `  ${brandLabel} (Saldadas: ${total})`;
+            brandCell.font = { bold: true, size: 10 };
+            brandCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.lightGray } };
+            row++;
+
+            for (const [tipo, qty] of items) {
+                const sizeLabel = data.labelsMap?.[marca]?.sizes?.[tipo] || TIPO_LABEL[tipo] || tipo;
+                row = addDataRow(ws, row, `    ${sizeLabel}`, `${qty}`, COLORS.white);
+            }
+        }
+        row++; // spacer
+    }
+
     // === BEBIDAS SOBRANTES ===
-    row = applySectionHeader(ws, row, '🥤  BEBIDAS SOBRANTES (para mañana)', COLORS.blue);
+    row = applySectionHeader(ws, row, '📦  BEBIDAS SOBRANTES (para mañana)', COLORS.green);
 
     if (data.stock?.bebidas_detalle) {
-        const MARCA_COLORS: Record<string, string> = {
-            inca_kola: COLORS.yellow,
-            coca_cola: 'FFEBEE',
-            sprite: COLORS.lightGreen,
-            fanta: COLORS.lightOrange,
-            agua_mineral: COLORS.lightBlue,
-        };
-
         for (const [marca, tipos] of Object.entries(data.stock.bebidas_detalle)) {
             const tiposObj = tipos as Record<string, number>;
-            const items = Object.entries(tiposObj);
-            const total = Object.values(tiposObj).reduce((s, n) => s + n, 0);
-            const bgColor = MARCA_COLORS[marca] || COLORS.lightGray;
+            const items = Object.entries(tiposObj).filter(([, qty]) => qty > 0);
+            if (items.length === 0) continue;
+
+            const total = Object.values(tiposObj).reduce((s, n) => s + (n || 0), 0);
+            const brandLabel = data.labelsMap?.[marca]?.brand || MARCA_LABEL[marca] || marca;
 
             // Brand header
             ws.mergeCells(row, 1, row, 4);
             const brandCell = ws.getCell(row, 1);
-            brandCell.value = `  ${MARCA_LABEL[marca] || marca}  (Total: ${total})`;
+            brandCell.value = `  ${brandLabel}  (Total: ${total})`;
             brandCell.font = { bold: true, size: 10, color: { argb: COLORS.darkGray } };
-            brandCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+            brandCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.cream } };
             brandCell.alignment = { vertical: 'middle', indent: 1 };
             brandCell.border = { bottom: { style: 'thin', color: { argb: COLORS.medGray } } };
             ws.getRow(row).height = 24;
             row++;
 
             for (const [tipo, qty] of items) {
-                row = addDataRow(ws, row, `    ${TIPO_LABEL[tipo] || tipo}`, `${qty}`, COLORS.white);
+                const sizeLabel = data.labelsMap?.[marca]?.sizes?.[tipo] || TIPO_LABEL[tipo] || tipo;
+                row = addDataRow(ws, row, `    ${sizeLabel}`, `${qty}`, COLORS.white);
             }
         }
     }
