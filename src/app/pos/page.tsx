@@ -23,7 +23,6 @@ import {
     User,
     ChevronDown,
     Save,
-    Bluetooth,
     Store,
     Printer,
     ChevronRight,
@@ -329,88 +328,10 @@ function POSContent() {
                     try {
                         const { data: config } = await supabase.from('configuracion_negocio').select('ip_impresora_cocina, ip_impresora_caja, modo_impresion, nombre_negocio, telefono').eq('id', 1).single();
 
-                        const kitchenPrinter = (window as any).kitchenPrinter;
-                        const cashierPrinter = (window as any).cashierPrinter;
-                        const hasBluetooth = kitchenPrinter || cashierPrinter;
-
-                        if (config?.modo_impresion === 'bluetooth' || hasBluetooth) {
-                            // Modo Bluetooth: Usar las instancias guardadas en window
-                            if (!kitchenPrinter && !cashierPrinter) {
-                                toast.error('Impresoras Bluetooth no vinculadas. Ve a Ajustes.');
-                                return;
-                            }
-
-                            const { ESCPOS } = await import('@/lib/bluetoothPrinter');
-
-                            // 1. Imprimir a Cocina si hay impresora vinculada
-                            if (kitchenPrinter) {
-                                let cmds = new Uint8Array([
-                                    ...ESCPOS.SELECT_CODE_PAGE_850,
-                                    ...ESCPOS.RESET,
-                                    ...ESCPOS.ALIGN_CENTER,
-                                    ...ESCPOS.TEXT_SIZE_LARGE,
-                                    ...ESCPOS.TEXT_BOLD_ON,
-                                    ...ESCPOS.encodeText('COMANDA COCINA'),
-                                    ...ESCPOS.TEXT_SIZE_NORMAL,
-                                    ...ESCPOS.encodeText(`MESA: ${selectedTable ? selectedTable.numero : 'LLEVAR'}`),
-                                    ...ESCPOS.encodeText(`MESERO: ${user?.nombre || 'SISTEMA'}`),
-                                    ...ESCPOS.encodeText(`FECHA: ${new Date().toLocaleString()}`),
-                                    ...ESCPOS.encodeText('--------------------------------'),
-                                    ...ESCPOS.ALIGN_LEFT,
-                                    ...itemsParaCocina.flatMap(it => [
-                                        ...ESCPOS.TEXT_BOLD_ON,
-                                        ...ESCPOS.encodeText(`${it.cantidad}x ${it.nombre}`),
-                                        ...ESCPOS.TEXT_BOLD_OFF,
-                                        ...(it.detalles?.parte ? ESCPOS.encodeText(`   PARTE: ${it.detalles.parte}`) : []),
-                                        ...(it.detalles?.notas ? ESCPOS.encodeText(`   NOTA: ${it.detalles.notas}`) : []),
-                                        ...ESCPOS.encodeText(' ')
-                                    ] as any),
-                                    ...ESCPOS.encodeText('--------------------------------'),
-                                    ...ESCPOS.PAPER_FEED(3),
-                                    ...ESCPOS.FEED_AND_CUT
-                                ]);
-                                await kitchenPrinter.print(cmds);
-                            }
-
-                            // 2. Imprimir Comprobante/Ticket a Caja si hay impresora vinculada
-                            if (cashierPrinter) {
-                                let cmds = new Uint8Array([
-                                    ...ESCPOS.SELECT_CODE_PAGE_850,
-                                    ...ESCPOS.RESET,
-                                    ...ESCPOS.ALIGN_CENTER,
-                                    ...ESCPOS.TEXT_SIZE_LARGE,
-                                    ...ESCPOS.TEXT_BOLD_ON,
-                                    ...ESCPOS.encodeText(config?.nombre_negocio || "RODRIGO'S"),
-                                    ...ESCPOS.TEXT_SIZE_NORMAL,
-                                    ...ESCPOS.encodeText('TICKET DE VENTA'),
-                                    ...ESCPOS.encodeText('--------------------------------'),
-                                    ...ESCPOS.ALIGN_LEFT,
-                                    ...itemsParaCocina.flatMap(it => [
-                                        ...ESCPOS.encodeText(`${it.cantidad}x ${it.nombre.substring(0, 20).padEnd(20)} S/ ${(it.cantidad * it.precio).toFixed(2)}`)
-                                    ] as any),
-                                    ...ESCPOS.encodeText('--------------------------------'),
-                                    ...ESCPOS.TEXT_BOLD_ON,
-                                    ...ESCPOS.ALIGN_RIGHT,
-                                    ...ESCPOS.encodeText(`SUBTOTAL: S/ ${calcularSubtotal().toFixed(2)}`),
-                                    ...(isDelivery ? ESCPOS.encodeText(`ENVIO: S/ ${(deliveryInfo?.cost || 0).toFixed(2)}`) : []),
-                                    ...ESCPOS.TEXT_SIZE_LARGE,
-                                    ...ESCPOS.encodeText(`TOTAL: S/ ${calcularTotal().toFixed(2)}`),
-                                    ...ESCPOS.TEXT_SIZE_NORMAL,
-                                    ...ESCPOS.TEXT_BOLD_OFF,
-                                    ...ESCPOS.ALIGN_CENTER,
-                                    ...ESCPOS.encodeText('¡Gracias por su preferencia!'),
-                                    ...ESCPOS.PAPER_FEED(3),
-                                    ...ESCPOS.FEED_AND_CUT
-                                ]);
-                                await cashierPrinter.print(cmds);
-                            }
-                            toast.success('Impresión Bluetooth enviada 🔵');
-                        } else if (config?.modo_impresion === 'bridge') {
-                            // Modo Bridge: No hacemos nada en el cliente, el Bridge en la laptop se encarga
+                        if (config?.modo_impresion === 'bridge') {
                             console.log('Modo Bridge detectado: El servidor local imprimirá automáticamente.');
                             toast.success('Pedido enviado a cola de impresión 🚀');
                         } else {
-                            // Modo RED (Legacy/WiFi Local)
                             try {
                                 const printServerUrl = `http://localhost:3001`;
                                 await fetch(`${printServerUrl}/print-kitchen`, {
@@ -421,7 +342,6 @@ function POSContent() {
                                 toast.success('Impresión enviada correctamente 🖨️');
                             } catch (e) {
                                 console.warn('Error en print-server legacy:', e);
-                                // No mostramos error estridente si el usuario está en la nube
                             }
                         }
 
@@ -609,8 +529,6 @@ function POSContent() {
                             setOrderNotes('');
                             setView('start');
                         } else {
-                            // Si es mesa, podemos elegir resetear o no al salir. 
-                            // El usuario dijo "cada vez que salga de un pedido... tiene q resetearse"
                             setCarrito([]);
                             setOrderNotes('');
                             setView('mesas');
@@ -631,6 +549,8 @@ function POSContent() {
                         )}
                     </div>
                 </div>
+            </div>
+
             {/* Categorías y Acciones Rápidas */}
             <div className="flex flex-col gap-4 mb-6 sticky top-20 lg:top-0 z-30 bg-[#f8fafc]/90 backdrop-blur-md py-3 -mx-4 px-4 sm:mx-0 sm:px-0">
                 <div className="flex items-center justify-between">
@@ -645,41 +565,8 @@ function POSContent() {
                             </button>
                         ))}
                     </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                        <button
-                            title="Vincular Cocina"
-                            onClick={async () => {
-                                try {
-                                    const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
-                                    const printer = new BluetoothPrinter();
-                                    await printer.connect();
-                                    (window as any).kitchenPrinter = printer;
-                                    toast.success('Cocina Vinculada 🍗');
-                                } catch (e) {
-                                    toast.error('Error al vincular Cocina');
-                                }
-                            }}
-                            className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${(window as any).kitchenPrinter ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-white text-slate-400 border-slate-200 hover:border-emerald-300'}`}
-                        >
-                            <Bluetooth size={18} />
-                        </button>
-                        <button
-                            title="Vincular Impresora de Caja"
-                            onClick={async () => {
-                                try {
-                                    const { BluetoothPrinter } = await import('@/lib/bluetoothPrinter');
-                                    const printer = new BluetoothPrinter();
-                                    await printer.connect();
-                                    (window as any).cashierPrinter = printer;
-                                    toast.success('Caja Vinculada 💳');
-                                } catch (e) {
-                                    toast.error('Error al vincular Caja');
-                                }
-                            }}
-                            className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${(window as any).cashierPrinter ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-white text-slate-400 border-slate-200 hover:border-blue-300'}`}
-                        >
-                            <Save size={18} />
-                        </button>
+                    <div className="flex items-center gap-2 invisible">
+                        {/* Botones de vinculación eliminados por solicitud del usuario */}
                     </div>
                 </div>
 
