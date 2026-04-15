@@ -43,7 +43,11 @@ async function imprimirComanda(venta) {
             printer
                 .font('a').align('ct').style('bu').size(1, 1).text('COMANDA DE COCINA').size(0, 0)
                 .text('--------------------------------').align('lt')
-                .text(`MESA: ${venta.mesa_id ? 'Mesa ' + venta.mesa_id : 'PARA LLEVAR'}`)
+                .text(`DESTINO: ${
+                    venta.tipo_pedido === 'delivery' ? 'DELIVERY' : 
+                    venta.tipo_pedido === 'llevar' ? 'PARA LLEVAR' : 
+                    venta.mesa_id ? 'MESA ' + venta.mesa_id : 'PARA LLEVAR'
+                }`)
                 .text(`MESERO: ${venta.usuario_nombre || 'SISTEMA'}`)
                 .text(`FECHA: ${new Date(venta.created_at || new Date()).toLocaleString()}`)
                 .text('--------------------------------').style('b');
@@ -108,13 +112,17 @@ function manualEscPos(data) {
         const can = item.cantidad || 0;
         const pre = item.precio || 0;
         const sub = (can * pre).toFixed(2);
-        const name = (item.nombre || '').replace(/[^\x00-\x7F]/g, "").toUpperCase().substring(0, 18);
-        line(`${can} ${name.padEnd(18)} S/ ${sub}`);
+        const name = (item.nombre || '').replace(/[^\x00-\x7F]/g, "").toUpperCase();
+        line(`${can} ${name}`);
+        add(RIGHT);
+        line(`S/ ${sub}`);
+        add(LEFT);
         
         if (item.detalles) {
             if (item.detalles.parte) line(`   > PRESA: ${item.detalles.parte.toUpperCase()}`);
             if (item.detalles.trozado && item.detalles.trozado !== 'entero') line(`   > ${item.detalles.trozado.toUpperCase()}`);
-            if (item.detalles.notas) line(`   > NOTA: ${item.detalles.notas.replace(/[^\x00-\x7F]/g, "")}`);
+            // Las notas no se imprimen en el ticket de venta a pedido del usuario
+            // if (item.detalles.notas) line(`   > NOTA: ${item.detalles.notas.replace(/[^\x00-\x7F]/g, "")}`);
         }
     });
 

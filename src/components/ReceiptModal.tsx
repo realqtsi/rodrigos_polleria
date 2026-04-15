@@ -300,11 +300,7 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                                         <span> / {i.detalles.trozado.toUpperCase()}</span>
                                     )}
                                 </div>
-                                {i.detalles?.notas && (
-                                    <div style={{ marginLeft: '24px', fontSize: '9px', fontStyle: 'italic', color: '#666' }}>
-                                        Nota: {i.detalles.notas}
-                                    </div>
-                                )}
+                                { /* Las notas no se muestran en el ticket de venta a pedido del cliente */ }
                             </div>
                         );
                 })}
@@ -494,11 +490,7 @@ export default function ReceiptModal({ isOpen, onClose, items, total, orderId, m
                                                             </span>
                                                         )}
                                                     </div>
-                                                    {i.detalles?.notas && (
-                                                        <p className="text-[10px] text-gray-400 italic mt-1 ml-6 leading-tight">
-                                                            Nota: {i.detalles.notas}
-                                                        </p>
-                                                    )}
+                                                    { /* Notas ocultas en recibo de venta */ }
                                                 </div>
                                             );
                                         })}

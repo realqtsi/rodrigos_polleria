@@ -161,7 +161,11 @@ export default function KitchenTicketModal({ isOpen, onClose, venta }: KitchenTi
                 <div class="divider"></div>
                 
                 <div class="mesa">
-                    <span>${mesaNumero ? `MESA ${mesaNumero}` : 'PARA LLEVAR'}</span>
+                    <span>${
+                        venta.tipo_pedido === 'delivery' ? 'DELIVERY' : 
+                        venta.tipo_pedido === 'llevar' ? 'PARA LLEVAR' : 
+                        mesaNumero ? `MESA ${mesaNumero}` : 'PARA LLEVAR'
+                    }</span>
                 </div>
                 
                 <div class="divider"></div>
@@ -222,7 +226,9 @@ export default function KitchenTicketModal({ isOpen, onClose, venta }: KitchenTi
                             </div>
                             <h2 className="text-xl font-bold">Comanda de Cocina</h2>
                             <p className="text-white/80 text-sm">
-                                {mesaNumero ? `Mesa ${mesaNumero}` : 'Para Llevar 🥡'}
+                                {venta.tipo_pedido === 'delivery' ? 'Delivery 🚀' : 
+                                 venta.tipo_pedido === 'llevar' ? 'Para Llevar 🥡' : 
+                                 mesaNumero ? `Mesa ${mesaNumero}` : 'Para Llevar 🥡'}
                             </p>
                         </div>
 
@@ -233,13 +239,23 @@ export default function KitchenTicketModal({ isOpen, onClose, venta }: KitchenTi
                                 <div className="text-center border-b border-dashed border-gray-300 pb-3 mb-3">
                                     <p className="font-black text-lg text-black">🍗 COMANDA 🍗</p>
                                     <p className="text-xs mt-1">Hora: {horaFormateada}</p>
-                                    {mesaNumero && (
-                                        <p className="text-base font-black bg-amber-100 rounded px-3 py-1 inline-block mt-2">
+                                    {venta.tipo_pedido === 'delivery' && (
+                                        <p className="text-base font-black bg-blue-100 text-blue-800 rounded px-3 py-1 inline-block mt-2">
+                                            DELIVERY
+                                        </p>
+                                    )}
+                                    {venta.tipo_pedido === 'llevar' && (
+                                        <p className="text-base font-black bg-green-100 text-green-800 rounded px-3 py-1 inline-block mt-2">
+                                            PARA LLEVAR
+                                        </p>
+                                    )}
+                                    {venta.tipo_pedido === 'mesa' && mesaNumero && (
+                                        <p className="text-base font-black bg-amber-100 text-amber-800 rounded px-3 py-1 inline-block mt-2">
                                             MESA {mesaNumero}
                                         </p>
                                     )}
-                                    {!mesaNumero && (
-                                        <p className="text-base font-black bg-green-100 rounded px-3 py-1 inline-block mt-2">
+                                    {!venta.tipo_pedido && !mesaNumero && (
+                                        <p className="text-base font-black bg-green-100 text-green-800 rounded px-3 py-1 inline-block mt-2">
                                             PARA LLEVAR
                                         </p>
                                     )}
