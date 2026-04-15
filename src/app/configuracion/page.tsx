@@ -955,45 +955,45 @@ function ConfiguracionContent() {
                                             </div>
                                         </div>
 
-                                            {editConfig.modo_impresion === 'red' && (
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                    <div className="space-y-2">
-                                                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">IP Impresora Cocina</label>
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Ej: 192.168.1.100"
-                                                            value={editConfig.ip_impresora_cocina}
-                                                            onChange={e => setEditConfig({ ...editConfig, ip_impresora_cocina: e.target.value })}
-                                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rodrigo-mustard outline-none transition-all font-mono"
-                                                        />
-                                                        <p className="text-[10px] text-slate-400">Dirección IP estática de la impresora de cocina.</p>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest">IP Impresora Caja</label>
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Ej: 192.168.1.101"
-                                                            value={editConfig.ip_impresora_caja}
-                                                            onChange={e => setEditConfig({ ...editConfig, ip_impresora_caja: e.target.value })}
-                                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rodrigo-mustard outline-none transition-all font-mono"
-                                                        />
-                                                    </div>
+                                        {editConfig.modo_impresion === 'red' && (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="space-y-2">
+                                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest">IP Impresora Cocina</label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Ej: 192.168.1.100"
+                                                        value={editConfig.ip_impresora_cocina}
+                                                        onChange={e => setEditConfig({ ...editConfig, ip_impresora_cocina: e.target.value })}
+                                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rodrigo-mustard outline-none transition-all font-mono"
+                                                    />
+                                                    <p className="text-[10px] text-slate-400">Dirección IP estática de la impresora de cocina.</p>
                                                 </div>
-                                            )}
+                                                <div className="space-y-2">
+                                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest">IP Impresora Caja</label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Ej: 192.168.1.101"
+                                                        value={editConfig.ip_impresora_caja}
+                                                        onChange={e => setEditConfig({ ...editConfig, ip_impresora_caja: e.target.value })}
+                                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rodrigo-mustard outline-none transition-all font-mono"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
 
-                                            {editConfig.modo_impresion === 'bridge' && (
-                                                <div className="p-8 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
-                                                    <h4 className="font-black text-emerald-900 uppercase tracking-widest text-sm">Modo Cloud Bridge Activo 🌉</h4>
-                                                    <p className="text-xs text-emerald-600 mt-2 max-w-sm mx-auto">
-                                                        La impresión se gestiona automáticamente desde la laptop del local. Asegúrate de tener abierta la ventana negra del Bridge.
-                                                    </p>
-                                                </div>
-                                            )}
-                                            
-                                            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-6 text-center">Requiere conexión HTTPS segura para funcionar</p>
-                                        </div>
+                                        {editConfig.modo_impresion === 'bridge' && (
+                                            <div className="p-8 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
+                                                <h4 className="font-black text-emerald-900 uppercase tracking-widest text-sm">Modo Cloud Bridge Activo 🌉</h4>
+                                                <p className="text-xs text-emerald-600 mt-2 max-w-sm mx-auto">
+                                                    La impresión se gestiona automáticamente desde la laptop del local. Asegúrate de tener abierta la ventana negra del Bridge.
+                                                </p>
+                                            </div>
+                                        )}
+
+                                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-6 text-center italic">Requiere conexión local estable para funcionar</p>
                                     </div>
                                 </div>
+                            </div>
 
                                 <div className="bg-white p-10 border border-slate-100 rounded-[3rem] shadow-sm">
                                     <h3 className="text-xs font-black text-rodrigo-terracotta uppercase tracking-[0.4em] mb-8 flex items-center gap-3 italic">
