@@ -993,8 +993,6 @@ function ConfiguracionContent() {
                                             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-6 text-center">Requiere conexión HTTPS segura para funcionar</p>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
 
                             <div className="bg-white p-10 border border-slate-100 rounded-[3rem] shadow-sm">
                                 <h3 className="text-xs font-black text-rodrigo-terracotta uppercase tracking-[0.4em] mb-8 flex items-center gap-3 italic">
