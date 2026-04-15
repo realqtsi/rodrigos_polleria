@@ -48,7 +48,14 @@ async function imprimirComanda(venta) {
                 .text(`FECHA: ${new Date(venta.created_at || new Date()).toLocaleString()}`)
                 .text('--------------------------------').style('b');
 
-            venta.items.forEach(item => {
+            const itemsParaImprimir = venta.items.filter(item => !item.printed);
+            if (itemsParaImprimir.length === 0) {
+                console.log('ℹ️ No hay items nuevos para imprimir en cocina.');
+                device.close();
+                return;
+            }
+
+            itemsParaImprimir.forEach(item => {
                 printer.text(`${item.cantidad}x ${item.nombre}`);
                 if (item.detalles) {
                     if (item.detalles.parte) printer.text(`   PARTE: ${item.detalles.parte.toUpperCase()}`);
