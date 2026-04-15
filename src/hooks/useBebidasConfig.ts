@@ -183,6 +183,7 @@ export function useBebidasConfig() {
             }
 
             // Also create productos entries for each formato so they're sellable in POS
+            const CATEGORIA_BEBIDAS_ID = 'fe4fd5ae-c14e-4ef4-95c1-73cb72ac80bf';
             for (const formato of nueva.formatos) {
                 const nombreProducto = `${nueva.nombre} ${formato.label}`;
                 await supabase.from('productos').insert({
@@ -193,6 +194,7 @@ export function useBebidasConfig() {
                     activo: true,
                     marca_gaseosa: slug,
                     tipo_gaseosa: formato.key,
+                    categoria_id: CATEGORIA_BEBIDAS_ID
                 });
             }
 

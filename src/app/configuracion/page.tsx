@@ -29,8 +29,8 @@ function ConfiguracionContent() {
     const [filtroTipo, setFiltroTipo] = useState<TipoProducto | 'todos'>('todos');
 
     const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState<'precios' | 'usuarios' | 'impresoras' | 'bebidas'>('precios');
-    const { customBrands, deleteBeverage, loading: loadingBebidas } = useBebidasConfig();
+    const [activeTab, setActiveTab] = useState<'precios' | 'usuarios' | 'impresoras' | 'bebidas' | 'stock'>('precios');
+    const { allBrands, customBrands, deleteBeverage, loading: loadingBebidas } = useBebidasConfig();
     const [config, setConfig] = useState<any>(null);
     const [editConfig, setEditConfig] = useState({
         ip_impresora_cocina: '',
@@ -370,6 +370,7 @@ function ConfiguracionContent() {
                                 { id: 'precios', icon: Settings, label: 'Precios' },
                                 { id: 'usuarios', icon: Users, label: 'Usuarios' },
                                 { id: 'bebidas', icon: Package, label: 'Bebidas' },
+                                { id: 'stock', icon: RefreshCw, label: 'Stock' },
                                 { id: 'impresoras', icon: Package, label: 'Negocio' }
                             ].map((tab) => (
                                 <button
@@ -831,7 +832,11 @@ function ConfiguracionContent() {
                     </motion.div>
                 )}
 
-                {activeTab === 'bebidas' && user?.rol === 'admin' && (
+                    {activeTab === 'stock' && user?.rol === 'admin' && (
+                        <StockAjustePanel allBrands={allBrands} saving={saving} setSaving={setSaving} />
+                    )}
+
+                    {activeTab === 'bebidas' && user?.rol === 'admin' && (
                     <motion.div
                         key="bebidas"
                         initial={{ opacity: 0, y: 10 }}
@@ -1035,6 +1040,121 @@ function ConfiguracionContent() {
                 </div>
             </div>
         );
+}
+
+function StockAjustePanel({ allBrands, saving, setSaving }: { allBrands: any[], saving: boolean, setSaving: (s: boolean) => void }) {
+    const [stockHoy, setStockHoy] = useState<any>(null);
+    const [editDetalle, setEditDetalle] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    const cargarStock = async () => {
+        setLoading(true);
+        try {
+            const hoy = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+            const { data, error } = await supabase
+                .from('inventario_diario')
+                .select('*')
+                .eq('fecha', hoy)
+                .single();
+
+            if (data && !error) {
+                setStockHoy(data);
+                setEditDetalle(data.bebidas_detalle || {});
+            }
+        } catch (err) {
+            console.error('Error cargando stock:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        cargarStock();
+    }, []);
+
+    const handleChange = (brandKey: string, sizeKey: string, val: string) => {
+        const num = parseInt(val) || 0;
+        setEditDetalle((prev: any) => ({
+            ...prev,
+            [brandKey]: {
+                ...(prev[brandKey] || {}),
+                [sizeKey]: num
+            }
+        }));
+    };
+
+    const guardarStock = async () => {
+        if (!stockHoy) return;
+        setSaving(true);
+        try {
+            const { error } = await supabase
+                .from('inventario_diario')
+                .update({ bebidas_detalle: editDetalle })
+                .eq('id', stockHoy.id);
+
+            if (error) throw error;
+            toast.success('Stock actualizado en tiempo real');
+        } catch (err) {
+            console.error(err);
+            toast.error('Error al guardar stock');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    if (loading) return <div className="py-20 text-center text-[10px] font-black uppercase tracking-widest text-slate-400">Cargando datos del día...</div>;
+    if (!stockHoy) return <div className="py-20 text-center text-sm font-bold text-slate-400">No se ha realizado la apertura de hoy.</div>;
+
+    return (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+            <div className="bg-white p-10 border border-slate-100 rounded-[3rem] shadow-sm">
+                <div className="flex items-center justify-between mb-10">
+                    <div>
+                        <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.4em] mb-2 italic flex items-center gap-3">
+                            <div className="w-8 h-px bg-slate-900" />
+                            Ajuste de Stock en Tiempo Real
+                        </h3>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-11">Abastece stock sin esperar al cierre</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {allBrands.map(marca => (
+                        <div key={marca.key} className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
+                            <div className="flex items-center gap-3 mb-4 pb-2 border-b border-slate-200">
+                                <div className={`w-3 h-3 rounded-full ${marca.dot}`} />
+                                <span className="text-[11px] font-black uppercase text-slate-900 tracking-tight">{marca.name}</span>
+                            </div>
+                            <div className="space-y-4">
+                                {marca.sizes.map((size: any) => (
+                                    <div key={size.key} className="flex items-center justify-between">
+                                        <span className="text-[10px] font-bold text-slate-500 uppercase">{size.label}</span>
+                                        <input
+                                            type="number"
+                                            value={editDetalle?.[marca.key]?.[size.key] ?? 0}
+                                            onChange={(e) => handleChange(marca.key, size.key, e.target.value)}
+                                            className="w-16 bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-right text-xs font-black text-slate-900 outline-none focus:border-rodrigo-terracotta/30"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="mt-12 flex justify-end">
+                    <button
+                        onClick={guardarStock}
+                        disabled={saving}
+                        className="px-12 py-5 bg-slate-900 text-white font-black text-xs uppercase tracking-[0.3em] rounded-2xl shadow-xl hover:bg-slate-800 transition-all flex items-center gap-3 italic"
+                    >
+                        {saving && <Loader2 className="animate-spin" size={16} />}
+                        Guardar Stock Actualizado
+                    </button>
+                </div>
+            </div>
+        </motion.div>
+    );
 }
 
 export default function ConfiguracionPage() {
