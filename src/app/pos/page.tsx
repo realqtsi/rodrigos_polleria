@@ -549,7 +549,6 @@ function POSContent() {
                         )}
                     </div>
                 </div>
-            </div>
 
             {/* Categorías y Acciones Rápidas */}
             <div className="flex flex-col gap-4 mb-6 sticky top-20 lg:top-0 z-30 bg-[#f8fafc]/90 backdrop-blur-md py-3 -mx-4 px-4 sm:mx-0 sm:px-0">
@@ -582,7 +581,8 @@ function POSContent() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative px-1">
+                <div className="md:col-span-8">
                     <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                         {productosFiltrados.map((producto) => (
                             <motion.button

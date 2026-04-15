@@ -979,16 +979,19 @@ function ConfiguracionContent() {
                                                     />
                                                     <p className="text-[10px] text-slate-400">Dirección IP estática de la impresora de caja principal.</p>
                                                 </div>
-                                                                     {editConfig.modo_impresion === 'bridge' && (
-                                                    <div>
-                                                        <h4 className="font-bold text-emerald-900">Modo Cloud Bridge Activo 🌉</h4>
-                                                        <p className="text-xs text-emerald-600 mt-1 max-w-sm mx-auto">
-                                                            La impresión se gestiona automáticamente desde la laptop del local. Asegúrate de tener abierta la ventana negra del Bridge.
-                                                        </p>
-                                                    </div>
-                                                )}iere conexión HTTPS segura para funcionar</p>
                                             </div>
                                         )}
+
+                                        {editConfig.modo_impresion === 'bridge' && (
+                                            <div className="p-8 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
+                                                <h4 className="font-black text-emerald-900 uppercase tracking-widest text-sm">Modo Cloud Bridge Activo 🌉</h4>
+                                                <p className="text-xs text-emerald-600 mt-2 max-w-sm mx-auto">
+                                                    La impresión se gestiona automáticamente desde la laptop del local. Asegúrate de tener abierta la ventana negra del Bridge.
+                                                </p>
+                                            </div>
+                                        )}
+                                        
+                                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-6 text-center">Requiere conexión HTTPS segura para funcionar</p>
                                     </div>
                                 </div>
                             </div>
