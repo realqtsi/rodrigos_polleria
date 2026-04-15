@@ -119,15 +119,27 @@ export const useInventario = (): UseInventarioResult => {
                 ? calcularBebidasActuales(bebidasInicial, ventasBebidasArray)
                 : bebidasInicial;
 
+            // Función auxiliar para sumar todas las unidades de bebidas
+            const sumarTodo = (det: BebidasDetalle) => {
+                let s = 0;
+                Object.values(det).forEach(m => {
+                    if (m) Object.values(m).forEach(c => s += (c || 0));
+                });
+                return s;
+            };
+
+            const totalInicialDetalle = sumarTodo(bebidasInicial);
+            const totalActualDetalle = sumarTodo(bebidasActuales);
+
             // 5. Armar el stock completo
             const stockCalculado: StockActual = {
                 fecha: inventario.fecha,
                 pollos_enteros: inventario.pollos_enteros || 0,
-                gaseosas: inventario.gaseosas || 0,
+                gaseosas: totalInicialDetalle || inventario.gaseosas || 0,
                 pollos_disponibles: (inventario.pollos_enteros || 0) - pollosVendidos,
-                gaseosas_disponibles: (inventario.gaseosas || 0) - gaseosasVendidas,
+                gaseosas_disponibles: totalActualDetalle || (inventario.gaseosas || 0) - gaseosasVendidas,
                 pollos_iniciales: inventario.pollos_enteros || 0,
-                gaseosas_iniciales: inventario.gaseosas || 0,
+                gaseosas_iniciales: totalInicialDetalle || inventario.gaseosas || 0,
                 pollos_vendidos: pollosVendidos,
                 gaseosas_vendidas: gaseosasVendidas,
                 papas_iniciales: inventario.papas_iniciales || 0,
