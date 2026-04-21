@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ShoppingCart, BarChart, Lock, ClipboardList, ChefHat, Package, Menu, X, Settings, RotateCcw, Navigation, LogOut } from 'lucide-react';
+import { Home, ShoppingCart, BarChart3, Lock, ClipboardList, ChefHat, Package, Menu, X, Settings, RotateCcw, Navigation, LogOut, Boxes, Users } from 'lucide-react';
+import KodifyLogo from './KodifyLogo';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBusiness } from '@/contexts/BusinessContext';
@@ -11,12 +12,6 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const menuSections = [
-    {
-        title: 'Tablero',
-        items: [
-            { icon: Home, label: 'Inicio', href: '/', permission: 'dashboard' },
-        ]
-    },
     {
         title: 'Operaciones',
         items: [
@@ -36,9 +31,25 @@ const menuSections = [
     {
         title: 'Administración',
         items: [
-            { icon: BarChart, label: 'Reportes', href: '/reportes', permission: 'reportes' },
-            { icon: RotateCcw, label: 'Restablecer', href: '/mantenimiento', permission: 'configuracion' },
+            { icon: BarChart3, label: 'Reportes', href: '/reportes', permission: 'reportes' },
             { icon: Settings, label: 'Configuración', href: '/configuracion', permission: 'configuracion' },
+        ]
+    }
+];
+
+const superadminSections = [
+    {
+        title: 'Gestión Cloud',
+        items: [
+            { icon: Home, label: 'Panel Maestro', href: '/superadmin', permission: 'superadmin_panel' },
+            { icon: Boxes, label: 'Negocios', href: '/superadmin', permission: 'superadmin_panel' },
+        ]
+    },
+    {
+        title: 'Configuración SaaS',
+        items: [
+            { icon: Users, label: 'Usuarios Globales', href: '/superadmin', permission: 'superadmin_panel' },
+            { icon: Settings, label: 'Ajustes KODIFY', href: '/superadmin', permission: 'superadmin_panel' },
         ]
     }
 ];
@@ -54,7 +65,10 @@ export default function Navbar() {
 
     if (authLoading || !user || !isMounted) return null;
 
-    const filteredSections = menuSections.map(section => ({
+    const isSuperAdminMode = (user.rol === 'superadmin' && !negocio) || (user.rol === 'superadmin' && pathname.startsWith('/superadmin'));
+    const baseSections = isSuperAdminMode ? superadminSections : menuSections;
+
+    const filteredSections = baseSections.map(section => ({
         ...section,
         items: section.items.filter(item => hasPermission(user.rol, item.permission))
     })).filter(section => section.items.length > 0);
@@ -62,15 +76,21 @@ export default function Navbar() {
     return (
         <>
             {/* SIDEBAR (Desktop) - siempre visible */}
-            <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-60 flex-col z-50 bg-white border-r border-slate-100 shadow-[2px_0_10px_rgba(0,0,0,0.02)]">
-                <div className="flex items-center gap-3 px-5 py-6 border-b border-slate-50">
-                    <div className="relative w-10 h-10 shrink-0 rounded-xl overflow-hidden shadow-sm border border-slate-100">
-                        <Image src={negocio?.logo_url || "/images/logo-rodrigos.jpeg"} alt={negocio?.nombre || "Rodrigo's"} fill className="object-cover" />
-                    </div>
-                    <div>
-                        <h1 className="text-sm font-black text-slate-900 leading-none tracking-tight">{negocio?.nombre || "Rodrigo's"}</h1>
-                        <p className="text-[10px] text-rodrigo-terracotta font-bold uppercase tracking-wider mt-1">{negocio?.config_json?.tagline?.substring(0,20) || "Brasas & Broasters"}</p>
-                    </div>
+            <aside className={`hidden lg:flex fixed left-0 top-0 bottom-0 w-60 flex-col z-50 border-r border-slate-100 shadow-[2px_0_10px_rgba(0,0,0,0.02)] ${isSuperAdminMode ? 'bg-[#0a0a0f] border-white/5' : 'bg-white'}`}>
+                <div className={`flex items-center gap-3 px-5 py-6 border-b ${isSuperAdminMode ? 'border-white/5' : 'border-slate-50'}`}>
+                    {negocio && !isSuperAdminMode ? (
+                        <>
+                            <div className="relative w-10 h-10 shrink-0 rounded-xl overflow-hidden shadow-sm border border-slate-100">
+                                <Image src={negocio.logo_url || "/images/logo-rodrigos.jpeg"} alt={negocio.nombre} fill className="object-cover" />
+                            </div>
+                            <div>
+                                <h1 className="text-sm font-black text-slate-900 leading-none tracking-tight">{negocio.nombre}</h1>
+                                <p className="text-[10px] text-rodrigo-terracotta font-bold uppercase tracking-wider mt-1">{negocio.config_json?.tagline?.substring(0,20) || "POS System"}</p>
+                            </div>
+                        </>
+                    ) : (
+                        <KodifyLogo size={40} showText light={isSuperAdminMode} />
+                    )}
                 </div>
 
                 <nav className="flex-1 py-4 px-3 overflow-y-auto no-scrollbar">
@@ -89,10 +109,10 @@ export default function Navbar() {
                                     return (
                                         <Link key={item.href} href={item.href}>
                                             <div className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-[13px] transition-all duration-200 group ${isActive
-                                                ? 'bg-rodrigo-terracotta text-white font-bold shadow-md shadow-rodrigo-terracotta/20'
-                                                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-semibold'
+                                                ? (isSuperAdminMode ? 'bg-indigo-600 text-white shadow-lg' : 'bg-rodrigo-terracotta text-white shadow-lg')
+                                                : (isSuperAdminMode ? 'text-slate-400 hover:text-indigo-400 hover:bg-white/5' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-semibold')
                                                 }`}>
-                                                <item.icon size={18} className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-rodrigo-terracotta transition-colors'} />
+                                                <Icon size={18} className={isActive ? 'text-white' : (isSuperAdminMode ? 'text-slate-500 group-hover:text-indigo-400' : 'text-slate-400 group-hover:text-rodrigo-terracotta')} />
                                                 <span>{item.label}</span>
                                             </div>
                                         </Link>
@@ -122,22 +142,28 @@ export default function Navbar() {
             </aside>
 
             {/* MOBILE HEADER - con botón hamburguesa */}
-            <header className="lg:hidden fixed top-0 left-0 right-0 z-[60] bg-white/80 backdrop-blur-xl border-b border-slate-100 px-4 py-3 flex items-center justify-between shadow-sm">
+            <header className={`lg:hidden fixed top-0 left-0 right-0 z-[60] backdrop-blur-xl border-b px-4 py-3 flex items-center justify-between shadow-sm ${isSuperAdminMode ? 'bg-[#0a0a0f]/80 border-white/5' : 'bg-white/80 border-slate-100'}`}>
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setSidebarOpen(true)}
-                        className="w-11 h-11 flex items-center justify-center rounded-xl bg-slate-50 border border-slate-100 text-slate-600 active:scale-95 transition-all"
+                        className={`w-11 h-11 flex items-center justify-center rounded-xl border active:scale-95 transition-all ${isSuperAdminMode ? 'bg-white/5 border-white/10 text-slate-300' : 'bg-slate-50 border-slate-100 text-slate-600'}`}
                     >
                         <Menu size={22} />
                     </button>
                     <div className="flex items-center gap-2.5">
-                        <div className="relative w-9 h-9 rounded-xl overflow-hidden shadow-sm border border-slate-100">
-                            <Image src={negocio?.logo_url || "/images/logo-rodrigos.jpeg"} alt="Logo" fill className="object-cover" />
-                        </div>
-                        <div className="leading-none">
-                            <span className="font-black text-slate-900 text-sm block tracking-tight">{negocio?.nombre || "Rodrigo's"}</span>
-                            <span className="text-[9px] text-rodrigo-terracotta font-extrabold uppercase tracking-widest">{negocio?.config_json?.tagline?.substring(0,10) || "POS System"}</span>
-                        </div>
+                        {negocio && !isSuperAdminMode ? (
+                            <>
+                                <div className="relative w-9 h-9 rounded-xl overflow-hidden shadow-sm border border-slate-100">
+                                    <Image src={negocio.logo_url || "/images/logo-rodrigos.jpeg"} alt="Logo" fill className="object-cover" />
+                                </div>
+                                <div className="leading-none">
+                                    <span className={`font-black text-sm block tracking-tight ${isSuperAdminMode ? 'text-white' : 'text-slate-900'}`}>{negocio.nombre}</span>
+                                    <span className="text-[9px] text-rodrigo-terracotta font-extrabold uppercase tracking-widest">{negocio.config_json?.tagline?.substring(0,10) || "POS System"}</span>
+                                </div>
+                            </>
+                        ) : (
+                            <KodifyLogo size={32} showText light={isSuperAdminMode} />
+                        )}
                     </div>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-black shadow-md border-2 border-white">
