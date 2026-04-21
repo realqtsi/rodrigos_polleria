@@ -29,12 +29,6 @@ interface SidebarProps {
 
 const menuSections: MenuSection[] = [
     {
-        title: 'Tablero',
-        items: [
-            { icon: Home, label: 'Inicio', href: '/', permission: 'dashboard' },
-        ]
-    },
-    {
         title: 'Operaciones',
         items: [
             { icon: ShoppingCart, label: 'Pedidos', href: '/pos', permission: 'pos' },
@@ -54,14 +48,25 @@ const menuSections: MenuSection[] = [
         title: 'Administración',
         items: [
             { icon: BarChart, label: 'Reportes', href: '/reportes', permission: 'reportes' },
-            { icon: RotateCcw, label: 'Restablecer Sistema', href: '/mantenimiento', permission: 'configuracion' },
             { icon: Settings, label: 'Configuración', href: '/configuracion', permission: 'configuracion' },
+        ]
+    }
+];
+
+// Menú exclusivo para Super Administradores (Plataforma)
+const superadminSections: MenuSection[] = [
+    {
+        title: 'Gestión Cloud',
+        items: [
+            { icon: Home, label: 'Panel Maestro', href: '/superadmin', permission: 'superadmin_panel' },
+            { icon: Boxes, label: 'Negocios (Tenants)', href: '/superadmin', permission: 'superadmin_panel' },
         ]
     },
     {
-        title: 'SaaS Platform',
+        title: 'Configuración SaaS',
         items: [
-            { icon: Boxes, label: 'Negocios (SaaS)', href: '/superadmin', permission: 'superadmin_panel' },
+            { icon: Users, label: 'Usuarios Globales', href: '/superadmin', permission: 'superadmin_panel' },
+            { icon: Settings, label: 'Ajustes KODIFY', href: '/superadmin', permission: 'superadmin_panel' },
         ]
     }
 ];
@@ -117,8 +122,12 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         return null;
     }
 
+    // Decidir qué secciones mostrar
+    const isSuperAdminMode = user.rol === 'superadmin' && !negocio;
+    const baseSections = isSuperAdminMode ? superadminSections : menuSections;
+
     // Filtrar secciones según el rol del usuario
-    const filteredSections = menuSections.map(section => ({
+    const filteredSections = baseSections.map(section => ({
         ...section,
         items: section.items.filter(item => hasPermission(user.rol, item.permission))
     })).filter(section => section.items.length > 0);
@@ -229,8 +238,8 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                                                 flex items-center gap-3 px-3 py-2.5 rounded-xl
                                                 transition-all duration-200 relative
                                                 ${isActive
-                                                    ? 'bg-rodrigo-terracotta text-white shadow-lg'
-                                                    : 'text-slate-600 hover:bg-slate-50 hover:text-rodrigo-terracotta'
+                                                    ? (isSuperAdminMode ? 'bg-indigo-600 text-white shadow-lg' : 'bg-rodrigo-terracotta text-white shadow-lg')
+                                                    : (isSuperAdminMode ? 'text-slate-400 hover:bg-slate-800/50 hover:text-indigo-400' : 'text-slate-600 hover:bg-slate-50 hover:text-rodrigo-terracotta')
                                                 }
                                             `}
                                         >
@@ -275,8 +284,8 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
 
     return (
         <>
-            {/* Desktop Sidebar - siempre visible */}
-            <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-64 glass-red z-50 overflow-hidden flex-col">
+             {/* Desktop Sidebar - siempre visible */}
+            <aside className={`hidden lg:flex fixed left-0 top-0 h-screen w-64 z-50 overflow-hidden flex-col ${isSuperAdminMode ? 'bg-[#0a0a0f] border-r border-white/5' : 'glass-red'}`}>
                 <SidebarContent />
             </aside>
 
