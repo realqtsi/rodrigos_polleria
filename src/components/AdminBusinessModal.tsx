@@ -108,52 +108,52 @@ export default function AdminBusinessModal({ isOpen, onClose, negocio, onSave }:
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
             >
-                <motion.div
+                    <motion.div
                     initial={{ scale: 0.95, opacity: 0, y: 20 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
                     exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                    className="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+                    className="kodify-glass backdrop-blur-2xl rounded-[2.5rem] w-full max-w-xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col max-h-[90vh] border border-white/10"
                 >
                     {/* Encabezado */}
-                    <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-white/5">
                         <div>
-                            <h2 className="text-xl font-black text-slate-900 tracking-tight">
+                            <h2 className="text-2xl font-black text-white tracking-tight">
                                 {negocio ? 'Editar Negocio' : 'Nuevo Negocio (Tenant)'}
                             </h2>
-                            <p className="text-sm font-medium text-slate-500">
+                            <p className="text-sm font-medium text-slate-400">
                                 {negocio ? 'Modificar datos o branding' : 'Crear un nuevo restaurante aislado'}
                             </p>
                         </div>
                         <button
                             onClick={onClose}
-                            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                            className="p-3 text-slate-400 hover:text-white hover:bg-white/10 rounded-2xl transition-all"
                         >
-                            <X size={20} />
+                            <X size={24} />
                         </button>
                     </div>
 
                     {/* Contenido (Formulario) */}
-                    <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
-                        <div className="space-y-4">
+                    <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-8 py-8 space-y-8 no-scrollbar">
+                        <div className="space-y-6">
                             <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-1.5">Nombre del Negocio *</label>
+                                <label className="block text-sm font-black text-slate-300 mb-2 uppercase tracking-widest text-[10px]">Nombre del Negocio *</label>
                                 <input
                                     type="text"
                                     required
                                     value={formData.nombre}
                                     onChange={e => setFormData({...formData, nombre: e.target.value})}
-                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-all placeholder:font-normal"
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-slate-600 shadow-inner"
                                     placeholder="Ej: Pocholo's Restobar"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-1.5 flex justify-between">
+                                <label className="block text-sm font-black text-slate-300 mb-2 uppercase tracking-widest text-[10px] flex justify-between">
                                     Slug URL *
-                                    <span className="text-slate-400 font-normal">subdominio único</span>
+                                    <span className="text-slate-500 font-normal">subdominio único</span>
                                 </label>
-                                <div className="flex border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-slate-900 focus-within:border-transparent transition-all">
-                                    <span className="bg-slate-100 px-4 flex items-center text-slate-500 text-sm font-medium border-r border-slate-200">
+                                <div className="flex border border-white/10 rounded-2xl overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent transition-all bg-white/5 shadow-inner">
+                                    <span className="bg-white/5 px-5 flex items-center text-slate-400 text-sm font-bold border-r border-white/5">
                                         /n/
                                     </span>
                                     <input
@@ -161,50 +161,50 @@ export default function AdminBusinessModal({ isOpen, onClose, negocio, onSave }:
                                         required
                                         value={formData.slug}
                                         onChange={e => setFormData({...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '')})}
-                                        className="w-full px-4 py-3 bg-slate-50 border-none rounded-r-xl text-slate-900 font-bold focus:ring-0 outline-none placeholder:font-normal"
+                                        className="w-full px-5 py-4 bg-transparent border-none rounded-r-2xl text-indigo-400 font-bold focus:ring-0 outline-none placeholder:text-slate-600"
                                         placeholder="pocholos"
                                     />
                                 </div>
-                                <p className="text-xs text-slate-400 mt-2 flex items-center gap-1">
-                                    <AlertCircle size={12} />
+                                <p className="text-[10px] text-slate-500 mt-3 flex items-center gap-1.5 font-medium italic">
+                                    <AlertCircle size={14} />
                                     El sistema usará este slug o el subdominio {formData.slug || 'xyz'}.localhost
                                 </p>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-1.5">URL del Logo</label>
+                                <label className="block text-sm font-black text-slate-300 mb-2 uppercase tracking-widest text-[10px]">URL del Logo</label>
                                 <input
                                     type="text"
                                     value={formData.logo_url}
                                     onChange={e => setFormData({...formData, logo_url: e.target.value})}
-                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-all placeholder:font-normal"
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-slate-600 shadow-inner"
                                     placeholder="https://..."
                                 />
                             </div>
                             
-                            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                            <div className="grid grid-cols-2 gap-6 pt-4 border-t border-white/5">
                                 <div>
-                                    <label className="block text-sm font-bold text-slate-700 mb-2">Color Primario</label>
-                                    <div className="flex items-center gap-3">
+                                    <label className="block text-sm font-black text-slate-400 mb-3 uppercase tracking-widest text-[9px]">Color Primario</label>
+                                    <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/5">
                                         <input
                                             type="color"
                                             value={formData.color_primario}
                                             onChange={e => setFormData({...formData, color_primario: e.target.value})}
-                                            className="w-12 h-12 rounded-xl cursor-pointer border-0 bg-transparent p-0"
+                                            className="w-10 h-10 rounded-xl cursor-pointer border-0 bg-transparent p-0 overflow-hidden"
                                         />
-                                        <span className="text-slate-600 font-mono text-sm uppercase">{formData.color_primario}</span>
+                                        <span className="text-indigo-300 font-mono text-xs uppercase font-bold tracking-wider">{formData.color_primario}</span>
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-slate-700 mb-2">Color Secundario</label>
-                                    <div className="flex items-center gap-3">
+                                    <label className="block text-sm font-black text-slate-400 mb-3 uppercase tracking-widest text-[9px]">Color Secundario</label>
+                                    <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/5">
                                         <input
                                             type="color"
                                             value={formData.color_secundario}
                                             onChange={e => setFormData({...formData, color_secundario: e.target.value})}
-                                            className="w-12 h-12 rounded-xl cursor-pointer border-0 bg-transparent p-0"
+                                            className="w-10 h-10 rounded-xl cursor-pointer border-0 bg-transparent p-0 overflow-hidden"
                                         />
-                                        <span className="text-slate-600 font-mono text-sm uppercase">{formData.color_secundario}</span>
+                                        <span className="text-indigo-300 font-mono text-xs uppercase font-bold tracking-wider">{formData.color_secundario}</span>
                                     </div>
                                 </div>
                             </div>
@@ -212,18 +212,18 @@ export default function AdminBusinessModal({ isOpen, onClose, negocio, onSave }:
                     </form>
 
                     {/* Acciones */}
-                    <div className="px-6 py-5 border-t border-slate-100 bg-slate-50/50 flex gap-3 justify-end items-center">
+                    <div className="px-8 py-6 border-t border-white/5 bg-white/5 flex gap-4 justify-end items-center">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-6 py-3 font-bold text-slate-500 hover:text-slate-700 bg-white border border-slate-200 shadow-sm rounded-xl hover:bg-slate-50 transition-colors"
+                            className="px-8 py-4 font-bold text-slate-400 hover:text-white bg-transparent rounded-2xl hover:bg-white/5 transition-all text-sm"
                         >
                             Cancelar
                         </button>
                         <button
                             onClick={handleSubmit}
                             disabled={loading}
-                            className="px-6 py-3 bg-slate-900 text-white font-black rounded-xl hover:bg-rodrigo-terracotta active:scale-95 transition-all flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-8 py-4 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-500 active:scale-95 transition-all flex items-center gap-3 shadow-[0_0_30px_rgba(99,102,241,0.3)] disabled:opacity-50 disabled:cursor-not-allowed text-sm uppercase tracking-widest"
                         >
                             {loading ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -107,13 +107,17 @@ export default function Navbar() {
                                     const Icon = item.icon;
                                     const isActive = pathname === item.href;
                                     return (
-                                        <Link key={item.href} href={item.href}>
-                                            <div className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-[13px] transition-all duration-200 group ${isActive
-                                                ? (isSuperAdminMode ? 'bg-indigo-600 text-white shadow-lg' : 'bg-rodrigo-terracotta text-white shadow-lg')
+                                        <Link 
+                                            key={item.href} 
+                                            href={item.href}
+                                            className="block no-underline"
+                                        >
+                                            <div className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-[13px] transition-all duration-300 group cursor-pointer ${isActive
+                                                ? (isSuperAdminMode ? 'bg-indigo-600/90 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] ring-1 ring-white/20' : 'bg-rodrigo-terracotta text-white font-bold shadow-md shadow-rodrigo-terracotta/20')
                                                 : (isSuperAdminMode ? 'text-slate-400 hover:text-indigo-400 hover:bg-white/5' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-semibold')
                                                 }`}>
-                                                <Icon size={18} className={isActive ? 'text-white' : (isSuperAdminMode ? 'text-slate-500 group-hover:text-indigo-400' : 'text-slate-400 group-hover:text-rodrigo-terracotta')} />
-                                                <span>{item.label}</span>
+                                                <Icon size={18} className={isActive ? 'text-white' : (isSuperAdminMode ? 'text-slate-500 group-hover:text-indigo-400 transition-colors' : 'text-slate-400 group-hover:text-rodrigo-terracotta transition-colors')} />
+                                                <span className={isActive ? 'font-bold' : ''}>{item.label}</span>
                                             </div>
                                         </Link>
                                     );

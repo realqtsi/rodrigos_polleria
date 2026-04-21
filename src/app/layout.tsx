@@ -31,7 +31,7 @@ export default function RootLayout({
         <meta name="description" content="La plataforma inteligente de gestión para tu negocio - KODIFY tech" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </head>
-      <body className={`${inter.variable} font-sans antialiased bg-[#f8fafc] text-slate-900`}>
+      <body className={`${inter.variable} font-sans antialiased text-slate-900 ${pathname?.startsWith('/superadmin') ? 'saas-dark-mode' : 'bg-[#f8fafc]'}`}>
         <BusinessProvider>
           <AuthProvider>
             <Toaster
@@ -60,7 +60,7 @@ export default function RootLayout({
           {isLoginPage ? (
             <main className="min-h-screen w-full overflow-x-hidden">{children}</main>
           ) : (
-            <div id="app-root" className="flex min-h-screen w-full overflow-x-hidden bg-[#f8fafc]">
+            <div id="app-root" className={`flex min-h-screen w-full overflow-x-hidden ${pathname?.startsWith('/superadmin') ? 'bg-[#050508]' : 'bg-[#f8fafc]'}`}>
               <div className="print:hidden">
                 <Navbar />
               </div>

@@ -29,6 +29,15 @@
   --radius-xl: 2.5rem;
 
   --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* KODIFY SaaS Master Dark Palette */
+  --kodify-black: #050508;
+  --kodify-deep-black: #0a0a0f;
+  --kodify-indigo: #6366f1;
+  --kodify-indigo-light: #818cf8;
+  --kodify-glass-white: rgba(255, 255, 255, 0.03);
+  --kodify-glass-border: rgba(255, 255, 255, 0.08);
+  --kodify-text-dim: #94a3b8;
 }
 
 @theme inline {
@@ -85,6 +94,34 @@ input, select, textarea {
   transform: translateY(-2px);
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
   border-color: var(--rodrigo-terracotta);
+}
+
+/* SaaS Premium Glass (Dark) */
+.kodify-glass {
+  background: rgba(10, 10, 15, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.kodify-card-border {
+  background: linear-gradient(to right, rgba(99, 102, 241, 0.1), transparent);
+}
+
+.saas-dark-mode {
+  background-color: var(--kodify-black);
+  color: #ffffff;
+}
+
+.saas-dark-mode h1,
+.saas-dark-mode h2,
+.saas-dark-mode h3 {
+  color: #f8fafc;
+}
+
+.saas-dark-mode p {
+  color: var(--kodify-text-dim);
 }
 
 /* ─── BUTTONS ─── */
