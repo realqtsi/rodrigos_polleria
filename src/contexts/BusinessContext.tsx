@@ -80,8 +80,8 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
             root.style.setProperty('--rodrigo-mustard', n.color_secundario);
         }
 
-        // Título de la pestaña
-        if (n.nombre) {
+        // Título de la pestaña - Solo si no estamos en login
+        if (n.nombre && window.location.pathname !== '/login') {
             document.title = `${n.nombre} - Sistema POS`;
         }
     };
@@ -92,7 +92,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
             {loading ? (
                 <div className="min-h-screen flex items-center justify-center bg-[#f8fafc]">
                     <div className="animate-pulse space-y-4 flex flex-col items-center">
-                        <div className="w-16 h-16 border-4 border-slate-200 border-t-[#9a3412] rounded-full animate-spin"></div>
+                        <div className="w-16 h-16 border-4 border-slate-200 border-t-[#6366f1] rounded-full animate-spin"></div>
                         <p className="text-slate-500 font-medium tracking-wide">Cargando Plataforma...</p>
                     </div>
                 </div>

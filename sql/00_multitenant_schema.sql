@@ -126,7 +126,7 @@ END $$;
 CREATE OR REPLACE FUNCTION public.user_negocio_id()
 RETURNS UUID AS $$
     SELECT negocio_id FROM public.user_profiles WHERE id = auth.uid() LIMIT 1;
-$$ LANGUAGE sql STABLE;
+$$ LANGUAGE sql STABLE SECURITY DEFINER;
 
 -- Activar RLS en todas las tablas a las que se les alteró la estructura
 ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;

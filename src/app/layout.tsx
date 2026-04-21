@@ -27,8 +27,8 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-        <title>Rodrigo&apos;s - Brasas &amp; Broasters Chicken - Sistema POS</title>
-        <meta name="description" content="Sistema de Punto de Venta para Rodrigo's" />
+        <title>KODIFY tech - Plataforma SaaS POS</title>
+        <meta name="description" content="La plataforma inteligente de gestión para tu negocio - KODIFY tech" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </head>
       <body className={`${inter.variable} font-sans antialiased bg-[#f8fafc] text-slate-900`}>
