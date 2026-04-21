@@ -6,6 +6,7 @@ import { Home, ShoppingCart, BarChart, Lock, ClipboardList, ChefHat, Package, Us
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBusiness } from '@/contexts/BusinessContext';
 import { hasPermission } from '@/lib/roles';
 
 interface MenuItem {
@@ -54,6 +55,11 @@ const menuSections: MenuSection[] = [
             { icon: BarChart, label: 'Reportes', href: '/reportes', permission: 'reportes' },
             { icon: RotateCcw, label: 'Restablecer Sistema', href: '/mantenimiento', permission: 'configuracion' },
             { icon: Settings, label: 'Configuración', href: '/configuracion', permission: 'configuracion' },
+    },
+    {
+        title: 'SaaS Platform',
+        items: [
+            { icon: Boxes, label: 'Negocios (SaaS)', href: '/superadmin', permission: 'superadmin_panel' },
         ]
     }
 ];
@@ -61,6 +67,7 @@ const menuSections: MenuSection[] = [
 export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
     const pathname = usePathname();
     const { user, loading } = useAuth();
+    const { negocio } = useBusiness();
 
     // Esperar a que termine de cargar el usuario 
     if (loading) {
@@ -158,7 +165,7 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                             <div className="relative w-28 h-28 lg:w-36 lg:h-36">
                                 <Image
                                     src="/images/logo-rodrigos.jpeg"
-                                    alt="Rodrigo's - Brasas & Broasters Chicken"
+                                    alt={negocio?.nombre || "Rodrigo's - Brasas & Broasters Chicken"}
                                     fill
                                     className="object-contain drop-shadow-[0_0_15px_rgba(242,201,76,0.5)]"
                                     priority
@@ -168,7 +175,7 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                         <motion.p
                             className="text-rodrigo-mustard text-md text-center font-bold -mt-2 drop-shadow-md"
                         >
-                            Rodrigo's - Brasas & Broasters Chicken
+                            {negocio?.nombre || "Rodrigo's - Brasas & Broasters Chicken"}
                         </motion.p>
                     </div>
                 </div>

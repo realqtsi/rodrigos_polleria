@@ -98,7 +98,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     email: email,
                     nombre: esAdmin ? 'Administrador' : (email ? email.split('@')[0] : 'Usuario Generado'),
                     rol: esAdmin ? 'admin' : 'mozo',
-                    activo: true
+                    activo: true,
+                    // negocio_id debe definirse después o heredar del entorno, temporalmente lo dejamos null
                 };
 
                 const { error: insertError } = await supabase.from('user_profiles').insert(nuevoPerfil);
@@ -122,7 +123,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     email: profile.email,
                     rol: profile.rol,
                     activo: true,
-                    created_at: profile.created_at
+                    created_at: profile.created_at,
+                    negocio_id: profile.negocio_id
                 });
             }
         } catch (error) {
@@ -185,7 +187,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         email: profile.email,
                         rol: profile.rol,
                         activo: true,
-                        created_at: profile.created_at
+                        created_at: profile.created_at,
+                        negocio_id: profile.negocio_id
                     });
                     console.log('[AuthContext] User set after login:', profile.nombre);
                     toast.success(`¡Bienvenido, ${profile.nombre}!`);

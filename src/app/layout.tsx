@@ -6,6 +6,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { BusinessProvider } from "@/contexts/BusinessContext";
 import { usePathname } from "next/navigation";
 import OfflineIndicator from '@/components/OfflineIndicator';
 
@@ -31,8 +32,9 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </head>
       <body className={`${inter.variable} font-sans antialiased bg-[#f8fafc] text-slate-900`}>
-        <AuthProvider>
-          <Toaster
+        <BusinessProvider>
+          <AuthProvider>
+            <Toaster
             position="top-right"
             toastOptions={{
               duration: 3000,
@@ -69,7 +71,8 @@ export default function RootLayout({
               </div>
             </div>
           )}
-        </AuthProvider>
+          </AuthProvider>
+        </BusinessProvider>
       </body>
     </html>
   );

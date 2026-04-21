@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'cajero' | 'mozo' | 'cocinero' | 'repartidor';
+export type UserRole = 'superadmin' | 'admin' | 'cajero' | 'mozo' | 'cocinero' | 'repartidor';
 
 export interface Usuario {
     id: string;
@@ -7,6 +7,7 @@ export interface Usuario {
     rol: UserRole;
     activo: boolean;
     created_at: string;
+    negocio_id?: string;
 }
 
 export interface AuthUser {
@@ -16,6 +17,7 @@ export interface AuthUser {
 
 // Configuración de permisos por rol
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
+    superadmin: ['dashboard', 'apertura', 'pos', 'mesas', 'cocina', 'ventas', 'inventario', 'reportes', 'cierre', 'gastos', 'configuracion', 'delivery', 'superadmin_panel'],
     admin: ['dashboard', 'apertura', 'pos', 'mesas', 'cocina', 'ventas', 'inventario', 'reportes', 'cierre', 'gastos', 'configuracion', 'delivery'],
     cajero: ['dashboard', 'apertura', 'pos', 'mesas', 'cocina', 'ventas', 'inventario', 'reportes', 'cierre', 'gastos', 'configuracion'],
     mozo: ['dashboard', 'pos', 'mesas', 'cocina', 'ventas', 'delivery'],
@@ -25,6 +27,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
 
 // Nombres amigables de roles
 export const ROLE_NAMES: Record<UserRole, string> = {
+    superadmin: 'Super Admin',
     admin: 'Administrador',
     cajero: 'Cajero',
     mozo: 'Mozo',

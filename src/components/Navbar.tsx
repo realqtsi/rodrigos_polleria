@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Home, ShoppingCart, BarChart, Lock, ClipboardList, ChefHat, Package, Menu, X, Settings, RotateCcw, Navigation, LogOut } from 'lucide-react';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBusiness } from '@/contexts/BusinessContext';
 import { hasPermission } from '@/lib/roles';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -44,13 +45,14 @@ const menuSections = [
 
 export default function Navbar() {
     const pathname = usePathname();
-    const { user, loading, logout } = useAuth();
+    const { user, loading: authLoading, logout } = useAuth();
+    const { negocio } = useBusiness();
     const [isMounted, setIsMounted] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => { setIsMounted(true); }, []);
 
-    if (loading || !user || !isMounted) return null;
+    if (authLoading || !user || !isMounted) return null;
 
     const filteredSections = menuSections.map(section => ({
         ...section,
@@ -63,11 +65,11 @@ export default function Navbar() {
             <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-60 flex-col z-50 bg-white border-r border-slate-100 shadow-[2px_0_10px_rgba(0,0,0,0.02)]">
                 <div className="flex items-center gap-3 px-5 py-6 border-b border-slate-50">
                     <div className="relative w-10 h-10 shrink-0 rounded-xl overflow-hidden shadow-sm border border-slate-100">
-                        <Image src="/images/logo-rodrigos.jpeg" alt="Rodrigo's" fill className="object-cover" />
+                        <Image src={negocio?.logo_url || "/images/logo-rodrigos.jpeg"} alt={negocio?.nombre || "Rodrigo's"} fill className="object-cover" />
                     </div>
                     <div>
-                        <h1 className="text-sm font-black text-slate-900 leading-none tracking-tight">Rodrigo&apos;s</h1>
-                        <p className="text-[10px] text-rodrigo-terracotta font-bold uppercase tracking-wider mt-1">Brasas & Broasters</p>
+                        <h1 className="text-sm font-black text-slate-900 leading-none tracking-tight">{negocio?.nombre || "Rodrigo's"}</h1>
+                        <p className="text-[10px] text-rodrigo-terracotta font-bold uppercase tracking-wider mt-1">{negocio?.config_json?.tagline?.substring(0,20) || "Brasas & Broasters"}</p>
                     </div>
                 </div>
 
@@ -130,11 +132,11 @@ export default function Navbar() {
                     </button>
                     <div className="flex items-center gap-2.5">
                         <div className="relative w-9 h-9 rounded-xl overflow-hidden shadow-sm border border-slate-100">
-                            <Image src="/images/logo-rodrigos.jpeg" alt="Logo" fill className="object-cover" />
+                            <Image src={negocio?.logo_url || "/images/logo-rodrigos.jpeg"} alt="Logo" fill className="object-cover" />
                         </div>
                         <div className="leading-none">
-                            <span className="font-black text-slate-900 text-sm block tracking-tight">Rodrigo&apos;s</span>
-                            <span className="text-[9px] text-rodrigo-terracotta font-extrabold uppercase tracking-widest">POS System</span>
+                            <span className="font-black text-slate-900 text-sm block tracking-tight">{negocio?.nombre || "Rodrigo's"}</span>
+                            <span className="text-[9px] text-rodrigo-terracotta font-extrabold uppercase tracking-widest">{negocio?.config_json?.tagline?.substring(0,10) || "POS System"}</span>
                         </div>
                     </div>
                 </div>
@@ -197,11 +199,11 @@ export default function Navbar() {
                             <div className="flex items-center justify-between px-4 py-4 border-b border-slate-100">
                                 <div className="flex items-center gap-3">
                                     <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-slate-100">
-                                        <Image src="/images/logo-rodrigos.jpeg" alt="Rodrigo's" fill className="object-cover" />
+                                        <Image src={negocio?.logo_url || "/images/logo-rodrigos.jpeg"} alt={negocio?.nombre || "Rodrigo's"} fill className="object-cover" />
                                     </div>
                                     <div>
-                                        <h1 className="text-sm font-black text-slate-900">Rodrigo&apos;s</h1>
-                                        <p className="text-[10px] text-rodrigo-terracotta font-bold">Brasas & Broasters</p>
+                                        <h1 className="text-sm font-black text-slate-900">{negocio?.nombre || "Rodrigo's"}</h1>
+                                        <p className="text-[10px] text-rodrigo-terracotta font-bold">{negocio?.config_json?.tagline?.substring(0,20) || "Brasas & Broasters"}</p>
                                     </div>
                                 </div>
                                 <button
