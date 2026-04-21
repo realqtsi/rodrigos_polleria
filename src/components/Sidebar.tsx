@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ShoppingCart, BarChart, Lock, ClipboardList, ChefHat, Package, Users, Boxes, LucideIcon, X, Wine, Settings, RotateCcw, Navigation } from 'lucide-react';
+import { Home, ShoppingCart, BarChart3, Lock, ClipboardList, ChefHat, Package, Users, Boxes, LucideIcon, X, Wine, Settings, RotateCcw, Navigation } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
@@ -47,7 +47,7 @@ const menuSections: MenuSection[] = [
     {
         title: 'Administración',
         items: [
-            { icon: BarChart, label: 'Reportes', href: '/reportes', permission: 'reportes' },
+            { icon: BarChart3, label: 'Reportes', href: '/reportes', permission: 'reportes' },
             { icon: Settings, label: 'Configuración', href: '/configuracion', permission: 'configuracion' },
         ]
     }
@@ -243,7 +243,7 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                                                 }
                                             `}
                                         >
-                                            <item.icon size={18} className={isActive ? 'text-rodrigo-brown' : ''} />
+                                            <Icon size={18} className={isActive ? 'text-rodrigo-brown' : ''} />
                                             <span className="font-medium text-sm">
                                                 {item.label}
                                             </span>
