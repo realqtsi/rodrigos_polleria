@@ -30,7 +30,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
                 // 1. Detectar slug por subdominio (ej: rodrigos.miapp.com)
                 const hostname = window.location.hostname;
                 const parts = hostname.split('.');
-                let currentSlug = 'rodrigos'; // Default fallback para desarrollo local
+                let currentSlug = null; // No forzar negocio por defecto en la URL base
 
                 // Si tiene más de dos partes y no es www (ej: subdominio.midominio.com)
                 if (parts.length > 2 && parts[0] !== 'www') {
@@ -51,7 +51,10 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
                     .eq('slug', currentSlug)
                     .single();
 
-                if (error) throw error;
+                if (error) {
+                    if (currentSlug) throw error;
+                    return; // Si no hay slug, no es un error
+                }
                 
                 if (data) {
                     setNegocio(data as Negocio);
@@ -70,6 +73,12 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
 
     const aplicarEstilos = (n: Negocio) => {
         if (!n) return;
+        
+        // No aplicar estilos de negocio si estamos en el panel de superadmin
+        if (window.location.pathname.startsWith('/superadmin')) {
+            return;
+        }
+
         const root = document.documentElement;
 
         // Si tenemos colores en la DB, sobrescribimos las variables definidas en globals.css

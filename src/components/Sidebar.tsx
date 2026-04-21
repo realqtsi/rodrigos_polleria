@@ -123,7 +123,7 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
     }
 
     // Decidir qué secciones mostrar
-    const isSuperAdminMode = user.rol === 'superadmin' && !negocio;
+    const isSuperAdminMode = (user.rol === 'superadmin' && !negocio) || (user.rol === 'superadmin' && pathname.startsWith('/superadmin'));
     const baseSections = isSuperAdminMode ? superadminSections : menuSections;
 
     // Filtrar secciones según el rol del usuario
@@ -173,7 +173,7 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                             transition={{ duration: 0.3 }}
                             className="flex items-center justify-center p-2"
                         >
-                            {negocio ? (
+                            {negocio && !isSuperAdminMode ? (
                                 <div className="relative w-28 h-28 lg:w-36 lg:h-36">
                                     <Image
                                         src={negocio.logo_url || "/images/logo-rodrigos.jpeg"}
@@ -187,7 +187,7 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                                 <KodifyLogo size={64} showText light />
                             )}
                         </motion.div>
-                        {negocio && (
+                        {negocio && !isSuperAdminMode && (
                             <motion.p
                                 className="text-rodrigo-mustard text-md text-center font-bold -mt-2 drop-shadow-md"
                             >
