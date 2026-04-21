@@ -55,6 +55,7 @@ const menuSections: MenuSection[] = [
             { icon: BarChart, label: 'Reportes', href: '/reportes', permission: 'reportes' },
             { icon: RotateCcw, label: 'Restablecer Sistema', href: '/mantenimiento', permission: 'configuracion' },
             { icon: Settings, label: 'Configuración', href: '/configuracion', permission: 'configuracion' },
+        ]
     },
     {
         title: 'SaaS Platform',
