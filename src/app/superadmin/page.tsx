@@ -108,10 +108,20 @@ export default function SuperadminPage() {
                                     </div>
                                     
                                     <h3 className="text-2xl font-black text-white leading-tight mb-2 tracking-tight">{n.nombre}</h3>
-                                    <p className="text-indigo-400/80 text-sm font-bold mb-4 flex items-center gap-2 bg-indigo-500/5 py-1.5 px-3 rounded-full w-fit border border-indigo-500/10">
+                                    <p className="text-indigo-400/80 text-sm font-bold mb-6 flex items-center gap-2 bg-indigo-500/5 py-1.5 px-3 rounded-full w-fit border border-indigo-500/10">
                                         <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: n.color_secundario || '#eab308' }} />
                                         /{n.slug}
                                     </p>
+
+                                    <button
+                                        onClick={() => {
+                                            window.location.href = `/n/${n.slug}/pos`;
+                                        }}
+                                        className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-4 rounded-2xl font-black hover:bg-indigo-500 transition-all active:scale-95 shadow-xl shadow-indigo-600/30 group/btn"
+                                    >
+                                        <Target size={20} className="group-hover/btn:scale-125 transition-transform" />
+                                        GESTIONAR NEGOCIO
+                                    </button>
                                 </div>
                                 
                                 <div className="mt-8 pt-8 border-t border-white/5 flex items-center justify-between relative z-10">

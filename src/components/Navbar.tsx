@@ -76,8 +76,8 @@ export default function Navbar() {
     return (
         <>
             {/* SIDEBAR (Desktop) - siempre visible */}
-            <aside className={`hidden lg:flex fixed left-0 top-0 bottom-0 w-60 flex-col z-50 border-r border-slate-100 shadow-[2px_0_10px_rgba(0,0,0,0.02)] ${isSuperAdminMode ? 'bg-[#0a0a0f] border-white/5' : 'bg-white'}`}>
-                <div className={`flex items-center gap-3 px-5 py-6 border-b ${isSuperAdminMode ? 'border-white/5' : 'border-slate-50'}`}>
+            <aside className={`hidden lg:flex fixed left-0 top-0 bottom-0 w-64 flex-col z-50 border-r ${isSuperAdminMode ? 'bg-[#050508] border-white/5 shadow-[20px_0_40px_rgba(0,0,0,0.4)]' : 'bg-white border-slate-100 shadow-[2px_0_10px_rgba(0,0,0,0.02)]'}`}>
+                <div className={`flex items-center gap-3 px-6 py-8 border-b ${isSuperAdminMode ? 'border-white/5' : 'border-slate-50'}`}>
                     {negocio && !isSuperAdminMode ? (
                         <>
                             <div className="relative w-10 h-10 shrink-0 rounded-xl overflow-hidden shadow-sm border border-slate-100">
@@ -97,9 +97,9 @@ export default function Navbar() {
                     {filteredSections.map((section, sectionIndex) => (
                         <div key={section.title} className="mb-4">
                             {sectionIndex > 0 && (
-                                <div className="mx-2 mb-4 h-px bg-slate-100" />
+                                <div className="mx-4 my-6 h-px bg-white/5" />
                             )}
-                            <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-[0.15em] px-4 mb-2">
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.25em] px-5 mb-4">
                                 {section.title}
                             </p>
                             <div className="space-y-0.5">
@@ -112,12 +112,15 @@ export default function Navbar() {
                                             href={item.href}
                                             className="block no-underline"
                                         >
-                                            <div className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-[13px] transition-all duration-300 group cursor-pointer ${isActive
-                                                ? (isSuperAdminMode ? 'bg-indigo-600/90 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] ring-1 ring-white/20' : 'bg-rodrigo-terracotta text-white font-bold shadow-md shadow-rodrigo-terracotta/20')
-                                                : (isSuperAdminMode ? 'text-slate-400 hover:text-indigo-400 hover:bg-white/5' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-semibold')
+                                            <div className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-[13px] transition-all duration-500 group cursor-pointer relative ${isActive
+                                                ? (isSuperAdminMode ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.1)]' : 'bg-rodrigo-terracotta text-white font-bold shadow-md shadow-rodrigo-terracotta/20')
+                                                : (isSuperAdminMode ? 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.03]' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-semibold')
                                                 }`}>
-                                                <Icon size={18} className={isActive ? 'text-white' : (isSuperAdminMode ? 'text-slate-500 group-hover:text-indigo-400 transition-colors' : 'text-slate-400 group-hover:text-rodrigo-terracotta transition-colors')} />
-                                                <span className={isActive ? 'font-bold' : ''}>{item.label}</span>
+                                                {isActive && isSuperAdminMode && (
+                                                    <motion.div layoutId="active-bar" className="absolute left-0 w-1 h-2/3 bg-indigo-500 rounded-r-full" />
+                                                )}
+                                                <Icon size={18} className={isActive ? (isSuperAdminMode ? 'text-indigo-400' : 'text-white') : (isSuperAdminMode ? 'text-slate-600 group-hover:text-indigo-400 transition-colors' : 'text-slate-400 group-hover:text-rodrigo-terracotta transition-colors')} />
+                                                <span className={isActive ? 'font-bold tracking-wide' : 'font-medium transition-all group-hover:translate-x-1'}>{item.label}</span>
                                             </div>
                                         </Link>
                                     );
@@ -127,18 +130,18 @@ export default function Navbar() {
                     ))}
                 </nav>
 
-                <div className="border-t border-slate-50 p-4 bg-slate-50/30">
-                    <div className="flex items-center gap-3 mb-3 p-2">
-                        <div className="w-9 h-9 rounded-full bg-rodrigo-mustard/10 flex items-center justify-center text-rodrigo-mustard text-sm font-black border border-rodrigo-mustard/20">
+                <div className={`border-t p-6 ${isSuperAdminMode ? 'border-white/5 bg-[#08080c]/50' : 'border-slate-50 bg-slate-50/30'}`}>
+                    <div className="flex items-center gap-3 mb-6 p-2 rounded-2xl bg-white/[0.02] border border-white/[0.03]">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-black border ${isSuperAdminMode ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-rodrigo-mustard/10 text-rodrigo-mustard border-rodrigo-mustard/20'}`}>
                             {user.nombre.charAt(0)}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-xs font-black text-slate-900 truncate tracking-tight">{user.nombre}</p>
-                            <p className="text-[10px] text-slate-400 capitalize font-bold">{user.rol}</p>
+                            <p className={`text-xs font-bold truncate tracking-tight ${isSuperAdminMode ? 'text-white' : 'text-slate-900'}`}>{user.nombre}</p>
+                            <p className="text-[10px] text-slate-500 capitalize font-medium tracking-widest">{user.rol}</p>
                         </div>
                     </div>
                     <button onClick={logout}
-                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all">
+                        className={`w-full flex items-center justify-center gap-2 px-3 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all ${isSuperAdminMode ? 'text-slate-500 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10' : 'text-slate-400 hover:text-red-500 hover:bg-red-50'}`}>
                         <LogOut size={14} />
                         <span>Cerrar Sesión</span>
                     </button>
