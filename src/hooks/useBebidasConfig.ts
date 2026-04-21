@@ -77,17 +77,23 @@ export interface NuevaBebida {
  * Hook centralizado que combina marcas base (hardcoded) con marcas extras del catálogo.
  * Se usa en Apertura, Cierre y Configuración para garantizar consistencia.
  */
-export function useBebidasConfig() {
+export function useBebidasConfig(negocioId?: string) {
     const [customBrands, setCustomBrands] = useState<BrandConfig[]>([]);
     const [loading, setLoading] = useState(true);
 
     const fetchCustomBrands = async () => {
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from('catalogo_bebidas')
                 .select('*')
                 .eq('activo', true)
                 .order('nombre', { ascending: true });
+
+            if (negocioId) {
+                query = query.eq('negocio_id', negocioId);
+            }
+
+            const { data, error } = await query;
 
             if (error) {
                 console.warn('[useBebidasConfig] Error fetching catalog:', error.message);
@@ -118,8 +124,10 @@ export function useBebidasConfig() {
     };
 
     useEffect(() => {
-        fetchCustomBrands();
-    }, []);
+        if (negocioId || typeof window !== 'undefined') {
+            fetchCustomBrands();
+        }
+    }, [negocioId]);
 
     // Merged list: core brands + custom brands
     const allBrands: BrandConfig[] = [...CORE_BRANDS, ...customBrands];
@@ -171,6 +179,7 @@ export function useBebidasConfig() {
                     slug,
                     dot_color: nueva.dot_color,
                     formatos: nueva.formatos,
+                    negocio_id: negocioId || null
                 })
                 .select()
                 .single();
@@ -183,7 +192,19 @@ export function useBebidasConfig() {
             }
 
             // Also create productos entries for each formato so they're sellable in POS
-            const CATEGORIA_BEBIDAS_ID = 'fe4fd5ae-c14e-4ef4-95c1-73cb72ac80bf';
+            // 1. Dinamicamente buscar la categoria "Bebidas" de este negocio
+            let categoriaBebidasId = 'fe4fd5ae-c14e-4ef4-95c1-73cb72ac80bf'; // Fallback
+            
+            if (negocioId) {
+                const { data: catData } = await supabase
+                    .from('categorias')
+                    .select('id')
+                    .eq('negocio_id', negocioId)
+                    .ilike('nombre', 'Bebidas')
+                    .single();
+                if (catData) categoriaBebidasId = catData.id;
+            }
+
             for (const formato of nueva.formatos) {
                 const nombreProducto = `${nueva.nombre} ${formato.label}`;
                 await supabase.from('productos').insert({
@@ -194,7 +215,8 @@ export function useBebidasConfig() {
                     activo: true,
                     marca_gaseosa: slug,
                     tipo_gaseosa: formato.key,
-                    categoria_id: CATEGORIA_BEBIDAS_ID
+                    categoria_id: categoriaBebidasId,
+                    negocio_id: negocioId || null
                 });
             }
 

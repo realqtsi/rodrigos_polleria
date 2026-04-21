@@ -9,6 +9,7 @@ import { ChefHat, Loader2, RefreshCw, X, Save, Trash2, Plus, Minus, AlertTriangl
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { useBusiness } from '@/contexts/BusinessContext';
 
 export default function CocinaPage() {
     return (
@@ -19,6 +20,7 @@ export default function CocinaPage() {
 }
 
 function CocinaContent() {
+    const { negocio } = useBusiness();
     const [pedidos, setPedidos] = useState<Venta[]>([]);
     const [loading, setLoading] = useState(true);
     const [showTicketModal, setShowTicketModal] = useState(false);
@@ -42,7 +44,7 @@ function CocinaContent() {
         try {
             const hoy = obtenerFechaHoy();
 
-            const { data, error } = await supabase
+            let query = supabase
                 .from('ventas')
                 .select(`
                     *,
@@ -53,6 +55,12 @@ function CocinaContent() {
                 .eq('estado_pedido', 'pendiente')
                 .eq('fecha', hoy)
                 .order('created_at', { ascending: true });
+
+            if (negocio?.id) {
+                query = query.eq('negocio_id', negocio.id);
+            }
+
+            const { data, error } = await query;
 
             if (error) throw error;
             setPedidos(data || []);
@@ -66,11 +74,17 @@ function CocinaContent() {
 
     const cargarProductos = async () => {
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from('productos')
                 .select('*')
                 .eq('activo', true)
                 .order('nombre');
+
+            if (negocio?.id) {
+                query = query.eq('negocio_id', negocio.id);
+            }
+
+            const { data, error } = await query;
 
             if (error) throw error;
             setProductos(data || []);
@@ -80,11 +94,13 @@ function CocinaContent() {
     };
 
     useEffect(() => {
-        cargarPedidos();
-        cargarProductos();
+        if (negocio?.id || typeof window !== 'undefined') {
+            cargarPedidos();
+            cargarProductos();
+        }
         const interval = setInterval(cargarPedidos, 15000);
         return () => clearInterval(interval);
-    }, []);
+    }, [negocio?.id]);
 
     const handleComplete = async (id: string) => {
         try {
@@ -118,11 +134,16 @@ function CocinaContent() {
     const confirmCancel = async () => {
         if (!cancellingId) return;
         try {
-            const { data: pedido } = await supabase
+            let pedidoQuery = supabase
                 .from('ventas')
                 .select('estado_pago, mesa_id')
-                .eq('id', cancellingId)
-                .single();
+                .eq('id', cancellingId);
+            
+            if (negocio?.id) {
+                pedidoQuery = pedidoQuery.eq('negocio_id', negocio.id);
+            }
+
+            const { data: pedido } = await pedidoQuery.single();
 
             if (pedido?.estado_pago === 'pagado') {
                 toast.error('No se puede eliminar un pedido ya pagado');

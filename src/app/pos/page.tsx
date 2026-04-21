@@ -39,6 +39,7 @@ import { useEstadisticasProductos } from '@/hooks/useEstadisticasProductos';
 import { registrarVenta, actualizarVenta } from '@/lib/ventas';
 import ReceiptModal from '@/components/ReceiptModal';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBusiness } from '@/contexts/BusinessContext';
 import dynamic from 'next/dynamic';
 const DeliverySelector = dynamic(() => import('@/components/DeliverySelector'), {
     ssr: false,
@@ -56,6 +57,7 @@ type Categoria = 'todos' | 'populares' | 'pollos' | 'combos' | 'promociones' | '
 
 function POSContent() {
     const { user } = useAuth();
+    const { negocio } = useBusiness();
     const [view, setView] = useState<'start' | 'mesas' | 'pedido'>('start');
     const [productos, setProductos] = useState<Producto[]>([]);
     const [carrito, setCarrito] = useState<ItemCarrito[]>([]);
@@ -63,10 +65,10 @@ function POSContent() {
     const [procesando, setProcesando] = useState(false);
     const [categoriaActiva, setCategoriaActiva] = useState<Categoria>('todos');
     const [searchTerm, setSearchTerm] = useState('');
-    const { stock, refetch } = useInventario();
+    const { stock, refetch } = useInventario(negocio?.id);
 
     // Hook para estadísticas de productos más vendidos
-    const { topProductos } = useEstadisticasProductos();
+    const { topProductos } = useEstadisticasProductos(negocio?.id);
 
     const [selectedProduct, setSelectedProduct] = useState<Producto | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -88,7 +90,7 @@ function POSContent() {
     const [showDeliveryRadar, setShowDeliveryRadar] = useState(false);
     const [metodoPago, setMetodoPago] = useState<'efectivo' | 'tarjeta' | 'yape' | 'plin'>('efectivo');
 
-    const { mesas, loading: loadingMesas, ocuparMesa, cambiarMesa, refetch: refetchMesas } = useMesas();
+    const { mesas, loading: loadingMesas, ocuparMesa, cambiarMesa, refetch: refetchMesas } = useMesas(negocio?.id);
     const [currentVentaId, setCurrentVentaId] = useState<string | null>(null);
     const [showCambiarMesaModal, setShowCambiarMesaModal] = useState(false);
 
@@ -102,11 +104,17 @@ function POSContent() {
 
     const cargarProductos = async () => {
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from('productos')
                 .select('*')
                 .eq('activo', true)
                 .order('nombre', { ascending: true });
+
+            if (negocio?.id) {
+                query = query.eq('negocio_id', negocio.id);
+            }
+
+            const { data, error } = await query;
 
             if (error) throw error;
             setProductos(data || []);
@@ -132,7 +140,7 @@ function POSContent() {
             .subscribe();
 
         return () => { supabase.removeChannel(channel); };
-    }, []);
+    }, [negocio?.id]);
 
     // Suscripción a cambios en la venta actual (Prevención de conflictos)
     useEffect(() => {
@@ -188,15 +196,20 @@ function POSContent() {
         if (mesa.estado === 'ocupada') {
             setLoading(true);
             try {
-                const { data, error } = await supabase
+                let query = supabase
                     .from('ventas')
                     .select('*')
                     .eq('mesa_id', mesa.id)
                     .eq('estado_pago', 'pendiente')
                     .eq('fecha', obtenerFechaHoy())
                     .order('created_at', { ascending: false })
-                    .limit(1)
-                    .single();
+                    .limit(1);
+
+                if (negocio?.id) {
+                    query = query.eq('negocio_id', negocio.id);
+                }
+
+                const { data, error } = await query.single();
 
                 if (data && !error) {
                     setCurrentVentaId(data.id);
@@ -316,7 +329,7 @@ function POSContent() {
             if (currentVentaId) {
                 resultado = await actualizarVenta(currentVentaId, carrito, user?.nombre || undefined);
             } else {
-                resultado = await registrarVenta(carrito, selectedTable?.id, orderNotes, deliveryData, user?.nombre || undefined);
+                resultado = await registrarVenta(carrito, selectedTable?.id, orderNotes, deliveryData, user?.nombre || undefined, negocio?.id);
                 if (resultado.success && selectedTable) {
                     await ocuparMesa(selectedTable.id);
                 }
@@ -326,7 +339,17 @@ function POSContent() {
                 const itemsParaCocina = carrito.filter(item => !item.printed);
                 if (itemsParaCocina.length > 0) {
                     try {
-                        const { data: config } = await supabase.from('configuracion_negocio').select('ip_impresora_cocina, ip_impresora_caja, modo_impresion, nombre_negocio, telefono').eq('id', 1).single();
+                        let configQuery = supabase
+                            .from('configuracion_negocio')
+                            .select('ip_impresora_cocina, ip_impresora_caja, modo_impresion, nombre_negocio, telefono');
+                        
+                        if (negocio?.id) {
+                            configQuery = configQuery.eq('negocio_id', negocio.id);
+                        } else {
+                            configQuery = configQuery.eq('id', 1);
+                        }
+
+                        const { data: config } = await configQuery.single();
 
                         if (config?.modo_impresion === 'bridge') {
                             console.log('Modo Bridge detectado: El servidor local imprimirá automáticamente.');

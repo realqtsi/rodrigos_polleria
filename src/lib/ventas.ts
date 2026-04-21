@@ -57,18 +57,24 @@ export const calcularStockRestado = (items: ItemCarrito[]) => {
  * Valida que haya stock suficiente para realizar la venta
  */
 export const validarStockDisponible = async (
-    items: ItemCarrito[]
+    items: ItemCarrito[],
+    negocioId?: string
 ): Promise<{ valido: boolean; mensaje: string; advertenciaGaseosas?: string; gaseosasDisponibles?: number }> => {
     const { pollosRestados, gaseosasRestadas, bebidasDetalle } = calcularStockRestado(items);
 
     const fechaHoy = obtenerFechaHoy();
 
     // 1. Obtener inventario del día directamente
-    const { data: inventario, error: invError } = await supabase
+    let invQuery = supabase
         .from('inventario_diario')
         .select('*')
-        .eq('fecha', fechaHoy)
-        .single();
+        .eq('fecha', fechaHoy);
+    
+    if (negocioId) {
+        invQuery = invQuery.eq('negocio_id', negocioId);
+    }
+
+    const { data: inventario, error: invError } = await invQuery.single();
 
     if (invError || !inventario) {
         return {
@@ -85,10 +91,16 @@ export const validarStockDisponible = async (
     }
 
     // 2. Obtener TODAS las ventas del día para calcular el stock ya consumido
-    const { data: ventasDelDia, error: ventasError } = await supabase
+    let ventasQuery = supabase
         .from('ventas')
         .select('pollos_restados, gaseosas_restadas, bebidas_detalle')
         .eq('fecha', fechaHoy);
+
+    if (negocioId) {
+        ventasQuery = ventasQuery.eq('negocio_id', negocioId);
+    }
+
+    const { data: ventasDelDia, error: ventasError } = await ventasQuery;
 
     if (ventasError) {
         console.error('Error obteniendo ventas para validación:', ventasError);
@@ -192,11 +204,12 @@ export const registrarVenta = async (
         distancia_km?: number;
         metodo_pago?: 'efectivo' | 'tarjeta' | 'yape' | 'plin' | 'mixto';
     },
-    usuarioNombre?: string
+    usuarioNombre?: string,
+    negocioId?: string
 ): Promise<VentaResponse> => {
     try {
         // Validar stock disponible
-        const validacion = await validarStockDisponible(items);
+        const validacion = await validarStockDisponible(items, negocioId);
         if (!validacion.valido) {
             return {
                 success: false,
@@ -233,7 +246,8 @@ export const registrarVenta = async (
                 distancia_km: deliveryData?.distancia_km || 0,
                 estado_delivery: deliveryData?.tipo_pedido === 'delivery' ? 'buscando_repartidor' : null,
                 metodo_pago: deliveryData?.metodo_pago || 'efectivo',
-                usuario_nombre: usuarioNombre || null
+                usuario_nombre: usuarioNombre || null,
+                negocio_id: negocioId || null
             })
             .select()
             .single();

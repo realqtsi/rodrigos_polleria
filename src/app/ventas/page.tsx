@@ -11,6 +11,7 @@ import ReceiptModal from '@/components/ReceiptModal';
 import SplitPaymentModal from '@/components/SplitPaymentModal';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBusiness } from '@/contexts/BusinessContext';
 
 interface MesaConVenta extends Mesa {
     venta?: Venta;
@@ -26,6 +27,7 @@ export default function MesasActivasPage() {
 
 function MesasActivasContent() {
     const { user } = useAuth();
+    const { negocio } = useBusiness();
     const [mesasActivas, setMesasActivas] = useState<MesaConVenta[]>([]);
     const [ventasParaLlevar, setVentasParaLlevar] = useState<Venta[]>([]);
     const [ventasDelivery, setVentasDelivery] = useState<Venta[]>([]);
@@ -60,14 +62,26 @@ function MesasActivasContent() {
     };
 
     useEffect(() => {
-        cargarPedidosPendientes();
+        if (negocio?.id || typeof window !== 'undefined') {
+            cargarPedidosPendientes();
+        }
 
         const channel = supabase
-            .channel('mesas-ventas-changes')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'mesas' }, () => {
+            .channel(`mesas-ventas-changes-${negocio?.id || 'global'}`)
+            .on('postgres_changes', { 
+                event: '*', 
+                schema: 'public', 
+                table: 'mesas',
+                filter: negocio?.id ? `negocio_id=eq.${negocio.id}` : undefined 
+            }, () => {
                 cargarPedidosPendientes();
             })
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'ventas' }, () => {
+            .on('postgres_changes', { 
+                event: '*', 
+                schema: 'public', 
+                table: 'ventas',
+                filter: negocio?.id ? `negocio_id=eq.${negocio.id}` : undefined 
+            }, () => {
                 cargarPedidosPendientes();
             })
             .subscribe();
@@ -75,14 +89,14 @@ function MesasActivasContent() {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, []);
+    }, [negocio?.id]);
 
     const cargarPedidosPendientes = async () => {
         try {
             setLoading(true);
             const hoy = obtenerFechaHoy();
 
-            const { data: ventasPendientes, error: ventasError } = await supabase
+            let query = supabase
                 .from('ventas')
                 .select(`
                     *,
@@ -94,6 +108,12 @@ function MesasActivasContent() {
                 .eq('estado_pago', 'pendiente')
                 .eq('fecha', hoy)
                 .order('created_at', { ascending: false });
+
+            if (negocio?.id) {
+                query = query.eq('negocio_id', negocio.id);
+            }
+
+            const { data: ventasPendientes, error: ventasError } = await query;
 
             if (ventasError) throw ventasError;
 
@@ -158,10 +178,16 @@ function MesasActivasContent() {
                 updateData.pago_dividido = pagoDividido;
             }
 
-            const { error } = await supabase
+            let query = supabase
                 .from('ventas')
                 .update(updateData)
                 .eq('id', ventaId);
+            
+            if (negocio?.id) {
+                query = query.eq('negocio_id', negocio.id);
+            }
+
+            const { error } = await query;
 
             if (error) throw error;
 

@@ -13,17 +13,23 @@ export interface EstadisticaProducto {
     ultima_venta: string;
 }
 
-export function useEstadisticasProductos() {
+export function useEstadisticasProductos(negocioId?: string) {
     const [topProductos, setTopProductos] = useState<EstadisticaProducto[]>([]);
     const [loading, setLoading] = useState(true);
 
     const cargarEstadisticas = async () => {
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from('estadisticas_productos')
                 .select('*')
                 .order('veces_vendido', { ascending: false })
                 .limit(8);
+
+            if (negocioId) {
+                query = query.eq('negocio_id', negocioId);
+            }
+
+            const { data, error } = await query;
 
             if (error) {
                 console.log('Tabla estadisticas_productos no existe o está vacía');

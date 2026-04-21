@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Check, X, Package, Pencil, Users, Settings, Trash2, Plus, RefreshCw, Loader2, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBusiness } from '@/contexts/BusinessContext';
 import { useBebidasConfig } from '@/hooks/useBebidasConfig';
 
 type TipoProducto = 'pollo' | 'bebida' | 'complemento';
@@ -29,8 +30,9 @@ function ConfiguracionContent() {
     const [filtroTipo, setFiltroTipo] = useState<TipoProducto | 'todos'>('todos');
 
     const { user } = useAuth();
+    const { negocio } = useBusiness();
     const [activeTab, setActiveTab] = useState<'precios' | 'usuarios' | 'impresoras' | 'bebidas' | 'stock'>('precios');
-    const { allBrands, customBrands, deleteBeverage, loading: loadingBebidas } = useBebidasConfig();
+    const { allBrands, customBrands, deleteBeverage, loading: loadingBebidas } = useBebidasConfig(negocio?.id);
     const [config, setConfig] = useState<any>(null);
     const [editConfig, setEditConfig] = useState({
         ip_impresora_cocina: '',
@@ -58,11 +60,17 @@ function ConfiguracionContent() {
 
     const cargarProductos = async () => {
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from('productos')
                 .select('*')
                 .order('tipo', { ascending: true })
                 .order('nombre', { ascending: true });
+
+            if (negocio?.id) {
+                query = query.eq('negocio_id', negocio.id);
+            }
+
+            const { data, error } = await query;
 
             if (error) throw error;
             setProductos(data || []);
@@ -75,20 +83,31 @@ function ConfiguracionContent() {
     };
 
     useEffect(() => {
-        cargarProductos();
-        if (user && user.rol === 'admin') {
-            cargarEmpleados();
-            cargarConfiguracion();
+        if (negocio?.id) {
+            cargarProductos();
+            if (user && (user.rol === 'admin' || user.rol === 'superadmin')) {
+                cargarEmpleados();
+                cargarConfiguracion();
+            }
+        } else if (typeof window !== 'undefined' && !negocio?.id) {
+             // Fallback minimal cargando productos si no hay contexto (ej: admin panel raíz)
+             cargarProductos();
         }
-    }, [user]);
+    }, [user, negocio?.id]);
 
     const cargarConfiguracion = async () => {
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from('configuracion_negocio')
-                .select('*')
-                .eq('id', 1)
-                .single();
+                .select('*');
+            
+            if (negocio?.id) {
+                query = query.eq('negocio_id', negocio.id);
+            } else {
+                query = query.eq('id', 1);
+            }
+
+            const { data, error } = await query.single();
 
             if (data && !error) {
                 setConfig(data);
@@ -110,10 +129,17 @@ function ConfiguracionContent() {
     const guardarConfig = async () => {
         setSaving(true);
         try {
-            const { error } = await supabase
+            let query = supabase
                 .from('configuracion_negocio')
-                .update(editConfig)
-                .eq('id', 1);
+                .update(editConfig);
+            
+            if (negocio?.id) {
+                query = query.eq('negocio_id', negocio.id);
+            } else {
+                query = query.eq('id', 1);
+            }
+
+            const { error } = await query;
 
             if (error) throw error;
             setConfig(editConfig);
@@ -128,11 +154,17 @@ function ConfiguracionContent() {
 
     const cargarEmpleados = async () => {
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from('user_profiles')
                 .select('*')
                 .order('rol', { ascending: true })
                 .order('nombre', { ascending: true });
+
+            if (negocio?.id) {
+                query = query.eq('negocio_id', negocio.id);
+            }
+
+            const { data, error } = await query;
 
             if (error) throw error;
             setEmpleados(data || []);
@@ -268,7 +300,8 @@ function ConfiguracionContent() {
                     nombre: newUserName.trim(),
                     email: newUserEmail.trim(),
                     password: newUserPassword,
-                    rol: newUserRole
+                    rol: newUserRole,
+                    negocio_id: negocio?.id // Asignar al negocio actual
                 })
             });
 

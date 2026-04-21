@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { Mesa } from '@/lib/database.types';
 
-export function useMesas() {
+export function useMesas(negocioId?: string) {
     const [mesas, setMesas] = useState<Mesa[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -11,10 +11,17 @@ export function useMesas() {
     const fetchMesas = async () => {
         try {
             setLoading(true);
-            const { data, error: fetchError } = await supabase
+            
+            let query = supabase
                 .from('mesas')
                 .select('*')
                 .order('numero', { ascending: true });
+
+            if (negocioId) {
+                query = query.eq('negocio_id', negocioId);
+            }
+
+            const { data, error: fetchError } = await query;
 
             if (fetchError) throw fetchError;
             setMesas(data || []);
@@ -115,17 +122,22 @@ export function useMesas() {
 
     // Suscripción en tiempo real a cambios en mesas
     useEffect(() => {
-        fetchMesas();
+        if (negocioId) {
+            fetchMesas();
+        } else if (!negocioId && typeof window !== 'undefined') {
+             fetchMesas();
+        }
 
         // Suscribirse a cambios en tiempo real
         const channel = supabase
-            .channel('mesas-changes')
+            .channel(`mesas-changes-${negocioId || 'global'}`)
             .on(
                 'postgres_changes',
                 {
                     event: '*',
                     schema: 'public',
-                    table: 'mesas'
+                    table: 'mesas',
+                    filter: negocioId ? `negocio_id=eq.${negocioId}` : undefined
                 },
                 (payload) => {
                     console.log('Mesa actualizada:', payload);
@@ -137,7 +149,7 @@ export function useMesas() {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, []);
+    }, [negocioId]);
 
     return {
         mesas,

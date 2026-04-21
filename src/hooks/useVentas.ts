@@ -15,7 +15,7 @@ interface UseVentasResult {
 /**
  * Hook para obtener las ventas del día en tiempo real
  */
-export const useVentas = (): UseVentasResult => {
+export const useVentas = (negocioId?: string): UseVentasResult => {
     const [ventas, setVentas] = useState<Venta[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -24,7 +24,7 @@ export const useVentas = (): UseVentasResult => {
         try {
             setLoading(true);
             setError(null);
-            const data = await obtenerVentasDelDia();
+            const data = await obtenerVentasDelDia(negocioId);
             setVentas(data);
         } catch (err) {
             console.error('Error al obtener ventas:', err);
@@ -35,17 +35,22 @@ export const useVentas = (): UseVentasResult => {
     };
 
     useEffect(() => {
-        fetchVentas();
+        if (negocioId) {
+            fetchVentas();
+        } else if (!negocioId && typeof window !== 'undefined') {
+            fetchVentas();
+        }
 
         // Suscribirse a cambios en tiempo real
         const channel = supabase
-            .channel('ventas-changes')
+            .channel(`ventas-changes-${negocioId || 'global'}`)
             .on(
                 'postgres_changes',
                 {
                     event: '*',
                     schema: 'public',
                     table: 'ventas',
+                    filter: negocioId ? `negocio_id=eq.${negocioId}` : undefined
                 },
                 () => {
                     fetchVentas();
@@ -60,7 +65,7 @@ export const useVentas = (): UseVentasResult => {
             supabase.removeChannel(channel);
             clearInterval(interval);
         };
-    }, []);
+    }, [negocioId]);
 
     return {
         ventas,
