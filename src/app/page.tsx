@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { ShoppingCart, AlertCircle, Package, BarChart3, Clock, Wallet, ArrowRight, Zap, Receipt, ChefHat, ClipboardList, Loader2, Navigation, Users, Flame, TrendingUp } from 'lucide-react';
 import { useInventario } from '@/hooks/useInventario';
 import { useVentas } from '@/hooks/useVentas';
@@ -15,6 +16,7 @@ import { supabase, obtenerFechaHoy } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 import AdminAjusteModal from '@/components/AdminAjusteModal';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBusiness } from '@/contexts/BusinessContext';
 import { useBebidasConfig } from '@/hooks/useBebidasConfig';
 
 function DashboardContent() {
@@ -391,6 +393,24 @@ function DashboardContent() {
 }
 
 export default function Home() {
+  const { user, loading: authLoading } = useAuth();
+  const { negocio, loading: bizLoading } = useBusiness();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !bizLoading && user?.rol === 'superadmin' && !negocio) {
+      router.push('/superadmin');
+    }
+  }, [user, negocio, authLoading, bizLoading, router]);
+
+  if (authLoading || bizLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-slate-400" />
+      </div>
+    );
+  }
+
   return (
     <ProtectedRoute requiredPermission="dashboard">
       <DashboardContent />
