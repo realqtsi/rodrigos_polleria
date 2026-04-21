@@ -5,32 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, Loader2, ArrowRight, Zap, Shield, BarChart3, Globe } from 'lucide-react';
+import KodifyLogo from '@/components/KodifyLogo';
 
-// Logo SVG de KODIFY tech inline
-function KodifyLogo({ size = 48 }: { size?: number }) {
-    return (
-        <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="kodifyGrad" x1="0" y1="0" x2="64" y2="64">
-                    <stop offset="0%" stopColor="#6366f1" />
-                    <stop offset="50%" stopColor="#8b5cf6" />
-                    <stop offset="100%" stopColor="#a78bfa" />
-                </linearGradient>
-                <linearGradient id="kodifyGrad2" x1="0" y1="0" x2="64" y2="64">
-                    <stop offset="0%" stopColor="#818cf8" />
-                    <stop offset="100%" stopColor="#c4b5fd" />
-                </linearGradient>
-            </defs>
-            <rect width="64" height="64" rx="16" fill="url(#kodifyGrad)" />
-            {/* K shape */}
-            <path d="M20 16L20 48" stroke="white" strokeWidth="5" strokeLinecap="round" />
-            <path d="M20 32L38 16" stroke="white" strokeWidth="5" strokeLinecap="round" />
-            <path d="M20 32L38 48" stroke="url(#kodifyGrad2)" strokeWidth="5" strokeLinecap="round" />
-            {/* Code brackets */}
-            <path d="M42 20L48 32L42 44" stroke="rgba(255,255,255,0.4)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-    );
-}
+// LoginPage component start
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -117,11 +94,8 @@ export default function LoginPage() {
                         transition={{ delay: 0.3, duration: 0.6 }}
                         style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '48px' }}
                     >
-                        <KodifyLogo size={56} />
-                        <div>
-                            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: 'white', letterSpacing: '-1px', lineHeight: 1 }}>KODIFY</h2>
-                            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#818cf8', letterSpacing: '0.2em', textTransform: 'uppercase' }}>tech</span>
-                        </div>
+                        < KodifyLogo size={56} showText light />
+
                     </motion.div>
 
                     <motion.h1
@@ -200,13 +174,8 @@ export default function LoginPage() {
                             {/* Línea superior decorativa */}
                             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(to right, transparent, #6366f1, #a78bfa, transparent)' }} />
 
-                            {/* Logo mobile */}
                             <div className="lg:hidden" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', marginBottom: '36px' }}>
-                                <KodifyLogo size={44} />
-                                <div>
-                                    <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'white', letterSpacing: '-0.5px', lineHeight: 1 }}>KODIFY</h2>
-                                    <span style={{ fontSize: '0.65rem', fontWeight: 600, color: '#818cf8', letterSpacing: '0.2em', textTransform: 'uppercase' }}>tech</span>
-                                </div>
+                                <KodifyLogo size={44} showText light />
                             </div>
 
                             <div style={{ textAlign: 'center', marginBottom: '36px' }}>

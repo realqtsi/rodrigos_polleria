@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBusiness } from '@/contexts/BusinessContext';
 import { hasPermission } from '@/lib/roles';
+import KodifyLogo from './KodifyLogo';
 
 interface MenuItem {
     icon: LucideIcon;
@@ -161,23 +162,29 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                         <motion.div
                             whileHover={{ scale: 1.05 }}
                             transition={{ duration: 0.3 }}
-                            className="flex items-center justify-center"
+                            className="flex items-center justify-center p-2"
                         >
-                            <div className="relative w-28 h-28 lg:w-36 lg:h-36">
-                                <Image
-                                    src="/images/logo-rodrigos.jpeg"
-                                    alt={negocio?.nombre || "Rodrigo's - Brasas & Broasters Chicken"}
-                                    fill
-                                    className="object-contain drop-shadow-[0_0_15px_rgba(242,201,76,0.5)]"
-                                    priority
-                                />
-                            </div>
+                            {negocio ? (
+                                <div className="relative w-28 h-28 lg:w-36 lg:h-36">
+                                    <Image
+                                        src={negocio.logo_url || "/images/logo-rodrigos.jpeg"}
+                                        alt={negocio.nombre}
+                                        fill
+                                        className="object-contain drop-shadow-[0_0_15px_rgba(242,201,76,0.5)]"
+                                        priority
+                                    />
+                                </div>
+                            ) : (
+                                <KodifyLogo size={64} showText light />
+                            )}
                         </motion.div>
-                        <motion.p
-                            className="text-rodrigo-mustard text-md text-center font-bold -mt-2 drop-shadow-md"
-                        >
-                            {negocio?.nombre || "Rodrigo's - Brasas & Broasters Chicken"}
-                        </motion.p>
+                        {negocio && (
+                            <motion.p
+                                className="text-rodrigo-mustard text-md text-center font-bold -mt-2 drop-shadow-md"
+                            >
+                                {negocio.nombre}
+                            </motion.p>
+                        )}
                     </div>
                 </div>
             </motion.div>
