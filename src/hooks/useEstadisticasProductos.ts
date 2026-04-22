@@ -48,15 +48,20 @@ export function useEstadisticasProductos(negocioId?: string) {
     const registrarVentaProducto = async (productoId: string, nombreProducto: string, cantidad: number, precio: number) => {
         try {
             // Verificar si ya existe
-            const { data: existente } = await supabase
+            let query = supabase
                 .from('estadisticas_productos')
                 .select('*')
-                .eq('producto_id', productoId)
-                .single();
+                .eq('producto_id', productoId);
+
+            if (negocioId) {
+                query = query.eq('negocio_id', negocioId);
+            }
+
+            const { data: existente } = await query.single();
 
             if (existente) {
                 // Actualizar existente
-                await supabase
+                let updateQuery = supabase
                     .from('estadisticas_productos')
                     .update({
                         cantidad_total: existente.cantidad_total + cantidad,
@@ -65,6 +70,12 @@ export function useEstadisticasProductos(negocioId?: string) {
                         ultima_venta: new Date().toISOString()
                     })
                     .eq('producto_id', productoId);
+                
+                if (negocioId) {
+                    updateQuery = updateQuery.eq('negocio_id', negocioId);
+                }
+                
+                await updateQuery;
             } else {
                 // Crear nuevo
                 await supabase
@@ -75,7 +86,8 @@ export function useEstadisticasProductos(negocioId?: string) {
                         cantidad_total: cantidad,
                         veces_vendido: 1,
                         ingresos_total: cantidad * precio,
-                        ultima_venta: new Date().toISOString()
+                        ultima_venta: new Date().toISOString(),
+                        negocio_id: negocioId || null
                     });
             }
 
@@ -88,7 +100,7 @@ export function useEstadisticasProductos(negocioId?: string) {
 
     useEffect(() => {
         cargarEstadisticas();
-    }, []);
+    }, [negocioId]);
 
     return {
         topProductos,

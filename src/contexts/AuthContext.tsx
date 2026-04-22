@@ -92,14 +92,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const { data: { session } } = await supabase.auth.getSession();
                 const email = session?.user?.email || '';
                 const esAdmin = email.toLowerCase().includes('admin');
+                const esRodrigos = email.toLowerCase().endsWith('@rodrigos.com');
+
+                // Si es @rodrigos.com, buscamos el negocio 'rodrigos'
+                let defaultNegocioId = null;
+                if (esRodrigos) {
+                    const { data: bData } = await supabase.from('negocios').select('id').eq('slug', 'rodrigos').single();
+                    defaultNegocioId = bData?.id || null;
+                }
 
                 const nuevoPerfil = {
                     id: userId,
                     email: email,
                     nombre: esAdmin ? 'Administrador' : (email ? email.split('@')[0] : 'Usuario Generado'),
-                    rol: esAdmin ? 'admin' : 'mozo',
+                    rol: esAdmin ? 'admin' : (esRodrigos ? 'admin' : 'mozo'),
                     activo: true,
-                    // negocio_id debe definirse después o heredar del entorno, temporalmente lo dejamos null
+                    negocio_id: defaultNegocioId
                 };
 
                 const { error: insertError } = await supabase.from('user_profiles').insert(nuevoPerfil);
@@ -155,13 +163,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     console.log('[AuthContext] Perfil faltante, auto-generando...');
 
                     const esAdmin = email.toLowerCase().includes('admin');
+                    const esRodrigos = email.toLowerCase().endsWith('@rodrigos.com');
+
+                    // Si es @rodrigos.com, buscamos el negocio 'rodrigos'
+                    let defaultNegocioId = null;
+                    if (esRodrigos) {
+                        const { data: bData } = await supabase.from('negocios').select('id').eq('slug', 'rodrigos').single();
+                        defaultNegocioId = bData?.id || null;
+                    }
 
                     const nuevoPerfil = {
                         id: data.user.id,
                         email: email,
                         nombre: esAdmin ? 'Administrador' : email.split('@')[0],
-                        rol: esAdmin ? 'admin' : 'mozo',
-                        activo: true
+                        rol: esAdmin ? 'admin' : (esRodrigos ? 'admin' : 'mozo'),
+                        activo: true,
+                        negocio_id: defaultNegocioId
                     };
 
                     const { error: insertError } = await supabase.from('user_profiles').insert(nuevoPerfil);
